@@ -10,12 +10,12 @@
 
     <div class="login-container">
         <h2>SISTEMA DE AUDITORIOS</h2>
-        <p>Inicia sesión para gestionar tu reservación</p>
+        <p>Inicia sesión con tu matrícula</p>
 
-        <form action="modules/login_proceso.php" method="POST">
+        <form action="modules/autenticacion.php" method="POST">
             
-            <label for="correo">Usuario / Correo</label>
-            <input type="email" name="correo" id="correo" placeholder="ejemplo@utm.mx" required>
+            <label for="matricula">Matrícula</label>
+            <input type="text" name="matricula" id="matricula" placeholder="Ingresa tu matrícula" required>
 
             <label for="password">Contraseña</label>
             <input type="password" name="password" id="password" placeholder="********" required>

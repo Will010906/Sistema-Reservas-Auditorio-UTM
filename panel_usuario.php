@@ -1,0 +1,1 @@
+<?php session_start(); echo "<h1>Bienvenido Usuario: " . $_SESSION['nombre'] . "</h1>"; ?>
