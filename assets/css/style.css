@@ -1,0 +1,86 @@
+/* assets/css/style.css */
+
+:root {
+    --primary-color: #007bff; /* Azul institucional */
+    --secondary-color: #6c757d;
+    --success-color: #28a745; /* Verde para el semáforo/aceptadas */
+    --warning-color: #ffc107; /* Amarillo para pendientes */
+    --danger-color: #dc3545;  /* Rojo para urgentes/rechazadas */
+    --bg-color: #f4f7f6;
+    --text-color: #333;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo para el Login (Módulo 1) */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 100px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* Estilos de Formulario (Módulo 5) */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input, select, textarea {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Semáforo de Prioridad (Módulo 2 y 4) */
+.status-urgent { color: white; background-color: var(--danger-color); padding: 5px; border-radius: 4px; }
+.status-process { color: white; background-color: var(--warning-color); padding: 5px; border-radius: 4px; }
+.status-ok { color: white; background-color: var(--success-color); padding: 5px; border-radius: 4px; }
+
+/* Menú de Navegación (Header) */
+nav {
+    background: #222;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+}
+
+nav ul li { margin-left: 20px; }
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
