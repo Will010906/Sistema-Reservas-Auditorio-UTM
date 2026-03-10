@@ -1,4 +1,4 @@
-<?php session_start(); echo "<h1>Bienvenido Administrador: " . $_SESSION['nombre'] . "</h1>"; ?>
+<?php session_start(); echo "<h1>Bienvenido Usuario: " . $_SESSION['nombre'] . "</h1>"; ?>
 
 <!DOCTYPE html>
 <html lang="es">
