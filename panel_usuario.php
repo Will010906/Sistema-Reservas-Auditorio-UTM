@@ -38,17 +38,16 @@ $resultado = mysqli_query($conexion,$sql);
 
 <tr>
 
-<td><?php echo $fila['folio']; ?></td>
-<td><?php echo $fila['evento']; ?></td>
-<td><?php echo $fila['auditorio']; ?></td>
-<td><?php echo $fila['fecha']; ?></td>
+<td><?php echo $fila['titulo_event']; ?></td>
+<td><?php echo $fila['id_auditorio']; ?></td>
+<td><?php echo $fila['fecha_evento']; ?></td>
 
 <td class="<?php
 
-if($fila['estatus']=="Rechazada"){
+if($fila['estado']=="Rechazada"){
 echo "status-urgent";
 }
-elseif($fila['estatus']=="Pendiente"){
+elseif($fila['estado']=="Pendiente"){
 echo "status-process";
 }
 else{
@@ -57,7 +56,7 @@ echo "status-ok";
 
 ?>">
 
-<?php echo $fila['estatus']; ?>
+<?php echo $fila['estado']; ?>
 
 </td>
 

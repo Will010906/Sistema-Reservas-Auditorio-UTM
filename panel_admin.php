@@ -1,3 +1,5 @@
+<?php session_start(); echo "<h1>Bienvenido Administrador: " . $_SESSION['nombre'] . "</h1>"; ?>
+
 <?php 
 session_start(); 
 require_once("conexion.php");
