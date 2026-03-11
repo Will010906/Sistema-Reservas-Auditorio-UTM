@@ -19,10 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Redirección según el perfil (Admin o Alumno/Docente)
         if ($usuario['perfil'] == 'Administrador') {
-            header("Location: ../panel_admin.php");
-        } else {
-            header("Location: ../panel_usuario.php");
-        }
+    header("Location: ../panel_admin.php");
+    exit(); // Esto obliga al navegador a saltar de página
+} else {
+    header("Location: ../panel_usuario.php");
+    exit();
+}
     } else {
         echo "<script>alert('Matrícula o contraseña incorrecta'); window.location='../index.php';</script>";
     }
