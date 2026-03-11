@@ -5,7 +5,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Panel Administrador</title>
-<link rel="stylesheet" href="assets/css/estilo.css">
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
