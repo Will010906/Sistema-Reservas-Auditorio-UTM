@@ -1,0 +1,104 @@
+/* TARJETAS */
+.cards {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 35px;
+    gap: 20px;
+}
+
+.card {
+    width: 30%;
+    padding: 25px;
+    color: white;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.card:hover { transform: translateY(-5px); }
+
+.red { background: linear-gradient(135deg, #e53935, #b40000); }
+.yellow { background: linear-gradient(135deg, #ffca28, #f2a900); color: #2c2c2c; }
+.green { background: linear-gradient(135deg, #66bb6a, #2e7d32); }
+
+.number {
+    font-size: 48px;
+    font-weight: 800;
+    margin-top: 10px;
+}
+
+/* FILTROS Y TABLA */
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* admin.php.css */
+
+/* Etiquetas de Estatus */
+.status {
+    padding: 6px 14px;
+    border-radius: 50px; /* Forma de píldora */
+    font-size: 11px;
+    font-weight: bold;
+    color: white !important;
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+/* Colores según el estado */
+.urgent { background-color: #b01c1c; } /* Rojo */
+.delay { background-color: #f2a900; color: #222 !important; } /* Naranja */
+.ontime { background-color: #2d6b41; } /* Verde */
+
+/* Botón Gestionar */
+.btn-gestionar {
+    background-color: #2d6cdf;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.3s;
+}
+
+.btn-gestionar:hover {
+    background-color: #1a56c5;
+}
+
+/* assets/css/admin.php.css */
+
+.btn {
+    background-color: #2d6cdf !important; /* Azul UTM */
+    color: white !important;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #1a56c5 !important;
+    transform: scale(1.05);
+}
