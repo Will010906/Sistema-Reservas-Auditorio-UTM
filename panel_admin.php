@@ -81,22 +81,33 @@ $con_tiempo = mysqli_fetch_assoc($res_tiempo)['total'];
             $resultado = mysqli_query($conexion, $query);
 
             while ($row = mysqli_fetch_assoc($resultado)) {
-                // Determinamos la clase CSS según el estatus para el semáforo
-                $clase_estatus = ($row['estatus'] == 'Urgente') ? 'urgent' : (($row['estatus'] == 'Pendiente') ? 'delay' : 'ontime');
-                
-                echo "<tr>
-                        <td>{$row['folio']}</td>
-                        <td>{$row['nombre_solicitante']}</td>
-                        <td>{$row['auditorio']}</td>
-                        <td>{$row['autorizante']}</td>
-                        <td>{$row['fecha_evento']}</td>
-                        <td><span class='status {$clase_estatus}'>{$row['estatus']}</span></td>
-                        <td><button class='btn' onclick='gestionar({$row['id']})'>Gestionar</button></td>
-                      </tr>";
-            }
+    // 1. Usamos 'estado' en lugar de 'estatus'
+    $clase_estatus = ($row['estado'] == 'Urgente') ? 'urgent' : (($row['estado'] == 'Pendiente') ? 'delay' : 'ontime');
+    
+    echo "<tr>
+            <td>{$row['folio']}</td>
+            <td>{$row['titulo_event']}</td> <td>ID Auditorio: {$row['id_auditorio']}</td> <td>Pendiente</td> <td>{$row['fecha_evento']}</td>
+            <td><span class='status {$clase_estatus}'>{$row['estado']}</span></td>
+            <td>
+                <button class='btn' onclick='gestionar({$row['id_solicitud']})'>Gestionar</button>
+            </td>
+          </tr>";
+}
             ?>
         </tbody>
     </table>
+</div>
+<div id="modalGestion" class="modal" style="display:none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 8px;">
+        <span onclick="cerrarModal()" style="float: right; cursor: pointer; font-size: 28px;">&times;</span>
+        <h2 id="modalFolio">Detalle de la Solicitud</h2>
+        <hr>
+        <p><strong>Solicitante:</strong> <span id="modalNombre"></span></p>
+        <p><strong>Auditorio:</strong> <span id="modalAuditorio"></span></p>
+        <p><strong>Fecha:</strong> <span id="modalFecha"></span></p>
+        <div style="margin-top: 20px;">
+            <button class="btn ontime" onclick="actualizarEstado('Aceptada')">Aprobar</button> <button class="btn urgent" onclick="actualizarEstado('Rechazada')">Rechazar</button> </div>
+    </div>
 </div>
 
 <script src="assets/js/admin_interactivo.js"></script>
