@@ -8,7 +8,6 @@ let bsModal = null;
 function gestionar(id) {
     idSeleccionado = id;
     
-    // Inicializamos el objeto Modal de Bootstrap solo una vez
     if (!bsModal) {
         const modalElement = document.getElementById('bsModalDetalle');
         if (modalElement) {
@@ -19,26 +18,27 @@ function gestionar(id) {
         }
     }
 
-    // Traemos los datos del servidor (PHP)
-   fetch(`modules/get_detalle.php?id=${id}`)
-    .then(res => res.json())
-    .then(data => {
-        // Usamos una función auxiliar para llenar datos de forma segura
-        const llenar = (id, texto) => {
-            const el = document.getElementById(id);
-            if (el) el.innerText = texto;
-        };
+    fetch(`modules/get_detalle.php?id=${id}`)
+        .then(res => res.json())
+        .then(data => {
+            const llenar = (id, texto) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = texto;
+            };
 
-        llenar('detFolio', "Folio: " + (data.folio || ''));
-        llenar('detFechaSol', data.fecha_registro || '');
-        llenar('detEstado', data.estado || '');
-        llenar('detUsuarioNombre', data.nombre || '');
-        llenar('detTituloEv', data.titulo_event || '');
-        llenar('detDescripcion', data.descripcion || '');
-        
-        bsModal.show();
-    });
-       
+            llenar('detFolio', "Folio: " + (data.folio || ''));
+            llenar('detFechaSol', data.fecha_registro || '');
+            
+            // --- DATO NUEVO: FECHA DEL EVENTO ---
+            llenar('detFechaEvento', data.fecha_evento || ''); 
+            
+            llenar('detEstado', data.estado || '');
+            llenar('detUsuarioNombre', data.nombre || '');
+            llenar('detTituloEv', data.titulo_event || '');
+            llenar('detDescripcion', data.descripcion || '');
+            
+            bsModal.show();
+        });
 }
 
 /**
@@ -56,24 +56,27 @@ function cerrarModal() {
 function actualizarEstado(nuevoEstado) {
     if (!idSeleccionado) return;
 
+    // Obtenemos el texto del motivo de rechazo/comentario
+    const motivo = document.getElementById('motivoRechazo').value;
+
     fetch('modules/actualizar_estado.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             id: idSeleccionado, 
-            estado: nuevoEstado 
+            estado: nuevoEstado,
+            comentario: motivo // Enviamos el comentario a la DB
         })
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
             alert("¡Solicitud " + nuevoEstado + " con éxito!");
-            location.reload(); // Recargamos para ver los cambios en la tabla y tarjetas
+            location.reload(); 
         } else {
-            alert("Error al actualizar la base de datos.");
+            alert("Error al actualizar.");
         }
-    })
-    .catch(error => console.error('Error:', error));
+    });
 }
 
 /**
@@ -115,3 +118,4 @@ document.getElementById('btnFiltrar')?.addEventListener('click', () => {
             });
         });
 });
+
