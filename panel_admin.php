@@ -25,7 +25,9 @@ $con_tiempo = mysqli_fetch_assoc($res_tiempo)['total'];
 <head>
     <meta charset="UTF-8">
     <title>Panel Administrador - UTM</title>
-    <link rel="stylesheet" href="assets/css/estilo.css"> 
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/componentes.css">
+    <link rel="stylesheet" href="assets/css/admin.php.css">
 </head>
 <body>
 
@@ -97,16 +99,36 @@ $con_tiempo = mysqli_fetch_assoc($res_tiempo)['total'];
         </tbody>
     </table>
 </div>
-<div id="modalGestion" class="modal" style="display:none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-    <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 8px;">
-        <span onclick="cerrarModal()" style="float: right; cursor: pointer; font-size: 28px;">&times;</span>
-        <h2 id="modalFolio">Detalle de la Solicitud</h2>
-        <hr>
-        <p><strong>Solicitante:</strong> <span id="modalNombre"></span></p>
-        <p><strong>Auditorio:</strong> <span id="modalAuditorio"></span></p>
-        <p><strong>Fecha:</strong> <span id="modalFecha"></span></p>
-        <div style="margin-top: 20px;">
-            <button class="btn ontime" onclick="actualizarEstado('Aceptada')">Aprobar</button> <button class="btn urgent" onclick="actualizarEstado('Rechazada')">Rechazar</button> </div>
+<div id="modalDetalle" class="modal-container" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Revisión de Solicitud</h3>
+            <span class="close-btn" onclick="cerrarModal()">&times;</span>
+        </div>
+        
+        <div class="modal-body">
+            <div class="detalle-izq">
+                <h2 id="detFolio">Folio: </h2>
+                <p><strong>Fecha de Registro:</strong> <span id="detFechaSol"></span></p>
+                <p><strong>Estado Actual:</strong> <span id="detEstado"></span></p>
+                <p><strong>Fecha del Evento:</strong> <span id="detFechaEv"></span></p>
+                
+                <div class="acciones-btn">
+                    <button class="btn red" onclick="actualizarEstado('Rechazada')">Rechazar</button>
+                    <button class="btn green" onclick="actualizarEstado('Aceptada')">Aprobar</button>
+                </div>
+                <textarea id="motivoRechazo" placeholder="Por favor indicar el motivo de rechazo..."></textarea>
+            </div>
+
+            <div class="detalle-der">
+                <h3>Usuario Solicitante:</h3>
+                <p id="detUsuarioNombre" style="font-size: 1.2rem; font-weight: bold;"></p>
+                <p><strong>Evento:</strong> <span id="detTituloEv"></span></p>
+                <p><strong>Descripción:</strong></p>
+                <p class="motivo-texto" id="detDescripcion"></p>
+                <button class="btn blue" onclick="cerrarModal()">Confirmar / Cerrar</button>
+            </div>
+        </div>
     </div>
 </div>
 

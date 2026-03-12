@@ -43,3 +43,21 @@ document.querySelector('.filters button').addEventListener('click', () => {
             });
         });
 });
+
+function gestionar(id) {
+    const modal = document.getElementById('modalDetalle');
+    
+    fetch(`modules/get_detalle.php?id=${id}`) // Ahora sí encontrará el archivo
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('detFolio').innerText = "Folio: " + data.folio;
+            document.getElementById('detFechaSol').innerText = data.fecha_registro;
+            document.getElementById('detFechaEv').innerText = data.fecha_evento;
+            document.getElementById('detUsuarioNombre').innerText = data.nombre; // Viene del JOIN
+            document.getElementById('detTituloEv').innerText = data.titulo_event;
+            document.getElementById('detDescripcion').innerText = data.descripcion;
+            
+            modal.style.display = "flex";
+        })
+        .catch(err => console.error("Error al cargar detalles:", err));
+}
