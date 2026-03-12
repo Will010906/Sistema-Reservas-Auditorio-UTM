@@ -1,125 +1,172 @@
-body{
-font-family: Arial, Helvetica, sans-serif;
-background:#dcdcdc;
+:root {
+    --primary: #2d6cdf;
+    --bg-main: #f0f2f5;
+    --glass: rgba(255, 255, 255, 0.95);
+    --shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
-.container{
-width:90%;
-margin:auto;
-border:2px solid #444;
-background:#cfcfcf;
-padding:20px;
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg-main);
+    color: #333;
+    margin: 0;
+    padding: 20px;
 }
 
-h2{
-text-align:center;
-margin-bottom:30px;
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    border: none; /* Quitamos el borde oscuro */
+    background: var(--glass);
+    padding: 30px;
+    border-radius: 15px; /* Bordes más modernos */
+    box-shadow: var(--shadow);
 }
 
-/* TARJETAS */
-
-.cards{
-display:flex;
-justify-content:space-between;
-margin-bottom:25px;
+h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #1a1a1a;
+    font-weight: 700;
 }
 
-.card{
-width:28%;
-padding:20px;
-color:white;
-border-radius:3px;
+/* TARJETAS CON DEGRADADOS */
+.cards {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 35px;
+    gap: 20px;
 }
 
-.red{
-background:#b40000;
+.card {
+    width: 30%;
+    padding: 25px;
+    color: white;
+    border-radius: 12px; /* Más redondeado */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
 }
 
-.yellow{
-background:#f2a900;
-color:black;
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-.green{
-background:#2e7d32;
+.red {
+    background: linear-gradient(135deg, #e53935, #b40000);
 }
 
-.card h3{
-margin:0;
-font-size:18px;
+.yellow {
+    background: linear-gradient(135deg, #ffca28, #f2a900);
+    color: #2c2c2c;
 }
 
-.number{
-font-size:40px;
-font-weight:bold;
+.green {
+    background: linear-gradient(135deg, #66bb6a, #2e7d32);
 }
 
-/* FILTROS */
-
-.filters{
-display:flex;
-gap:15px;
-margin-bottom:20px;
+.card h3 {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.filters input{
-padding:8px;
-width:200px;
+.number {
+    font-size: 48px;
+    font-weight: 800;
+    margin-top: 10px;
 }
 
-.filters button{
-padding:8px 20px;
-background:#2d6cdf;
-color:white;
-border:none;
-cursor:pointer;
+/* FILTROS ESTILIZADOS */
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
 }
 
-/* TABLA */
-
-table{
-width:100%;
-border-collapse:collapse;
-background:white;
+.filters input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    transition: border 0.3s;
 }
 
-th, td{
-border:1px solid #777;
-padding:10px;
-text-align:center;
+.filters input:focus {
+    border-color: var(--primary);
 }
 
-th{
-background:#e0e0e0;
+.filters button {
+    padding: 10px 25px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-/* ESTATUS */
-
-.status{
-color:white;
-padding:5px 10px;
-border-radius:3px;
+.filters button:hover {
+    background: #1a56c5;
 }
 
-.urgent{
-background:#b40000;
+/* TABLA MODERNA */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden; /* Para que los bordes redondeados se vean */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
-.delay{
-background:#f2a900;
-color:black;
+th, td {
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 15px;
+    text-align: center;
 }
 
-.ontime{
-background:#2e7d32;
+th {
+    background: #f8f9fa;
+    color: #666;
+    font-weight: 600;
+    font-size: 14px;
 }
 
-/* BOTON */
+tr:hover {
+    background-color: #f9fbff;
+}
 
-.btn{
-background:#2d6cdf;
-color:white;
-border:none;
-padding:6px 12px;
-cursor:pointer;
+/* ESTATUS TIPO BADGE */
+.status {
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 20px; /* Estilo píldora */
+}
+
+/* BOTON ACCIONES */
+.btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background: #1a56c5;
+    transform: scale(1.05);
 }
