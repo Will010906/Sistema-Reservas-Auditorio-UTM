@@ -1,7 +1,7 @@
 <?php session_start(); echo "<h1>Bienvenido Usuario: " . $_SESSION['nombre'] . "</h1>"; ?>
 
 <?php
-include("db.php");
+include("config/db_local.php");
 
 /* CONSULTA PARA LA TABLA */
 $sql = "SELECT * FROM solicitudes";

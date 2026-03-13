@@ -1,14 +1,14 @@
 <?php
-$host = "192.168.99.3";               // IP de la dirección de conexión BD
-$port = 9091;                       // Puerto específico de la base de datos
-$user = "user_equipo11";              // Usuario de la BD
-$password = "user_secret_password11"; // Contraseña de la BD
-$database = "proyecto_equipo11_db";   // Nombre de la base de datos
+$servername = "192.168.99.3";
+$username = "user_equipo11";
+$password = "user_secret_password11";
+$dbname = "proyecto_equipo11_db";
+$port = 3311;
 
 // Conexión incluyendo el puerto
-$conexion = mysqli_connect($host, $user, $password, $database, $port);
+$conexion = mysqli_connect( $servername, $username, $password, $dbname, $port );
 
 if (!$conexion) {
     die("Error de conexión al servidor remoto: " . mysqli_connect_error());
 }
-?>
+

@@ -1,5 +1,5 @@
 <?php
-include '../config/db_local.php';
+include '../config/db.php';
 
 $inicio = $_GET['inicio'];
 $fin = $_GET['fin'];
