@@ -1,9 +1,13 @@
-// Variables globales
+/**
+ * LÓGICA INTERACTIVA DEL PANEL ADMINISTRADOR
+ * Maneja la gestión de solicitudes, filtrado combinado y reportes.
+ */
+
 let idSeleccionado = null;
 let bsModal = null; 
 
 /**
- * 1. FUNCIÓN PARA ABRIR EL MODAL Y CARGAR DATOS
+ * Carga el detalle de una solicitud mediante AJAX y abre el modal de gestión
  */
 function gestionar(id) {
     idSeleccionado = id;
@@ -26,12 +30,10 @@ function gestionar(id) {
                 if (el) el.innerText = texto;
             };
 
+            // Inyección de datos en la interfaz del modal
             llenar('detFolio', "Folio: " + (data.folio || ''));
             llenar('detFechaSol', data.fecha_registro || '');
-            
-            // --- DATO NUEVO: FECHA DEL EVENTO ---
             llenar('detFechaEvento', data.fecha_evento || ''); 
-            
             llenar('detEstado', data.estado || '');
             llenar('detUsuarioNombre', data.nombre || '');
             llenar('detTituloEv', data.titulo_event || '');
@@ -41,22 +43,16 @@ function gestionar(id) {
         });
 }
 
-/**
- * 2. FUNCIÓN PARA CERRAR EL MODAL
- */
 function cerrarModal() {
-    if (bsModal) {
-        bsModal.hide();
-    }
+    if (bsModal) bsModal.hide();
 }
 
 /**
- * 3. FUNCIÓN PARA ACTUALIZAR EL ESTADO (APROBAR/RECHAZAR)
+ * Envía la decisión del administrador (Aprobar/Rechazar) al servidor
  */
 function actualizarEstado(nuevoEstado) {
     if (!idSeleccionado) return;
 
-    // Obtenemos el texto del motivo de rechazo/comentario
     const motivo = document.getElementById('motivoRechazo').value;
 
     fetch('modules/actualizar_estado.php', {
@@ -65,7 +61,7 @@ function actualizarEstado(nuevoEstado) {
         body: JSON.stringify({ 
             id: idSeleccionado, 
             estado: nuevoEstado,
-            comentario: motivo // Enviamos el comentario a la DB
+            comentario: motivo 
         })
     })
     .then(res => res.json())
@@ -80,42 +76,61 @@ function actualizarEstado(nuevoEstado) {
 }
 
 /**
- * 4. LÓGICA DE FILTRADO POR FECHAS
+ * SISTEMA DE FILTRADO COMBINADO (Estatus + Fechas)
  */
-document.getElementById('btnFiltrar')?.addEventListener('click', () => {
-    const inicio = document.getElementById('fecha_inicio').value;
-    const fin = document.getElementById('fecha_fin').value;
+document.addEventListener("change", function(e) {
+    if (e.target.classList.contains("filter-check") || e.target.type === "date") {
+        aplicarFiltros();
+    }
+});
+
+function aplicarFiltros() {
+    const seleccionados = Array.from(document.querySelectorAll(".filter-check:checked"))
+                               .map(cb => cb.value);
+
+    const inicio = document.getElementById("fecha_inicio").value;
+    const fin = document.getElementById("fecha_fin").value;
+    const filas = document.querySelectorAll("#tablaSolicitudes tbody tr");
+
+    filas.forEach(fila => {
+        const badge = fila.querySelector(".badge-status");
+        const fechaFila = fila.querySelector("td:nth-child(4)").innerText; 
+        
+        if (!badge) return;
+        const textoEstado = badge.innerText.trim().toUpperCase();
+
+        const cumpleEstatus = seleccionados.includes(textoEstado);
+        let cumpleFecha = true;
+        if (inicio && fin) {
+            cumpleFecha = (fechaFila >= inicio && fechaFila <= fin);
+        }
+
+        fila.style.display = (cumpleEstatus && cumpleFecha) ? "" : "none";
+    });
+}
+
+function resetFiltros() {
+    document.querySelectorAll(".filter-check").forEach(cb => cb.checked = true);
+    document.getElementById("fecha_inicio").value = "";
+    document.getElementById("fecha_fin").value = "";
+    aplicarFiltros();
+}
+
+/**
+ * Redirección al generador de PDF con los parámetros de filtro actuales
+ */
+function descargarReporte() {
+    const inicio = document.getElementById("fecha_inicio").value;
+    const fin = document.getElementById("fecha_fin").value;
+    const seleccionados = Array.from(document.querySelectorAll(".filter-check:checked"))
+                               .map(cb => cb.value)
+                               .join(',');
 
     if (!inicio || !fin) {
-        alert("Selecciona ambas fechas para filtrar.");
+        alert("Por favor selecciona un rango de fechas para el reporte.");
         return;
     }
 
-    fetch(`modules/filtrar_solicitudes.php?inicio=${inicio}&fin=${fin}`)
-        .then(res => res.json())
-        .then(data => {
-            const tbody = document.querySelector('#tablaSolicitudes tbody');
-            tbody.innerHTML = ""; // Limpiamos la tabla
-            
-            data.forEach(sol => {
-                // Determinamos la clase del badge según el estado
-                const badgeClass = (sol.estado === 'Urgente') ? 'bg-danger' : 
-                                   (sol.estado === 'Pendiente' ? 'bg-warning text-dark' : 'bg-success');
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="fw-bold">${sol.folio}</td>
-                        <td>${sol.titulo_event}</td>
-                        <td>ID Auditorio: ${sol.id_auditorio}</td>
-                        <td>${sol.fecha_evento}</td>
-                        <td><span class="badge-status ${badgeClass}">${sol.estado}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="gestionar(${sol.id_solicitud})">
-                                Gestionar
-                            </button>
-                        </td>
-                    </tr>`;
-            });
-        });
-});
-
+    const url = `modules/generar_reporte.php?inicio=${inicio}&fin=${fin}&estatus=${seleccionados}`;
+    window.open(url, '_blank');
+}
