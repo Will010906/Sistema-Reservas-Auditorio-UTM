@@ -3,36 +3,31 @@ session_start();
 include '../config/db_local.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. Limpiamos solo la matrícula (el password no se limpia igual para no alterar caracteres especiales)
-    $matricula = mysqli_real_escape_string($conexion, $_POST['matricula']);
-    $password_ingresado = $_POST['password'];
+    // trim() elimina espacios accidentales al inicio o final
+    $matricula = trim(mysqli_real_escape_string($conexion, $_POST['matricula']));
+    $password_ingresado = trim($_POST['password']);
 
-    // 2. Buscamos al usuario solo por su matrícula
     $query = "SELECT id_usuario, nombre, perfil, password FROM usuarios WHERE matricula='$matricula'";
     $resultado = mysqli_query($conexion, $query);
 
     if ($usuario = mysqli_fetch_assoc($resultado)) {
-        
-        // 3. Verificamos la contraseña usando la función segura de PHP
+        // password_verify compara el texto plano con el hash de la BD
         if (password_verify($password_ingresado, $usuario['password'])) {
-            
+
             $_SESSION['id_usuario'] = $usuario['id_usuario'];
             $_SESSION['nombre'] = $usuario['nombre'];
             $_SESSION['perfil'] = $usuario['perfil'];
 
-            if ($usuario['perfil'] == 'Administrador') {
+            if ($usuario['perfil'] == 'administrador' || $usuario['perfil'] == 'subdirector') {
                 header("Location: ../panel_admin.php");
-                exit();
             } else {
                 header("Location: ../panel_usuario.php");
-                exit();
             }
+            exit();
         } else {
-            // Contraseña incorrecta
-            echo "<script>alert('Matrícula o contraseña incorrecta'); window.location='../index.php';</script>";
+            echo "<script>alert('La contraseña no coincide con el registro.'); window.location='../index.php';</script>";
         }
     } else {
-        // Usuario no encontrado
-        echo "<script>alert('Matrícula o contraseña incorrecta'); window.location='../index.php';</script>";
+        echo "<script>alert('La matrícula $matricula no existe.'); window.location='../index.php';</script>";
     }
 }
