@@ -1,0 +1,95 @@
+/* Importar fuente moderna (Inter) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Estilos generales del fondo y la letra */
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+/* El cuadro principal del Login (La Tarjeta) */
+.login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+/* Título principal */
+.login-container h2 {
+    text-align: center;
+    color: #1a202c;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+}
+
+/* Estilos para las etiquetas (Matrícula, Contraseña) */
+.login-container label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Cajas de texto (Inputs) */
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Efecto cuando haces clic en la caja de texto */
+.login-container input[type="text"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #008a45; /* Verde UTM */
+    background-color: #ffffff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 138, 69, 0.1);
+}
+
+/* Botón de Entrar */
+.login-container button {
+    width: 100%;
+    background-color: #008a45; /* Verde UTM */
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+/* Efecto al pasar el mouse por el botón */
+.login-container button:hover {
+    background-color: #006b35;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 107, 53, 0.3);
+}
+
+/* Efecto al dar clic en el botón */
+.login-container button:active {
+    transform: translateY(0);
+}
