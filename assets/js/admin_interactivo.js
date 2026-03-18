@@ -1,25 +1,19 @@
 /**
- * LÓGICA INTERACTIVA DEL PANEL ADMINISTRADOR
- * Maneja la gestión de solicitudes, filtrado combinado y reportes.
+ * LÓGICA INTERACTIVA DEL PANEL ADMINISTRADOR - SIRA UTM
+ * Corregido: Filtrado por estatus y rango de fechas sincronizado.
  */
 
 let idSeleccionado = null;
 let bsModal = null; 
 
 /**
- * Carga el detalle de una solicitud mediante AJAX y abre el modal de gestión
+ * Carga el detalle y abre el modal
  */
 function gestionar(id) {
     idSeleccionado = id;
-    
     if (!bsModal) {
         const modalElement = document.getElementById('bsModalDetalle');
-        if (modalElement) {
-            bsModal = new bootstrap.Modal(modalElement);
-        } else {
-            console.error("No se encontró el modal con ID: bsModalDetalle");
-            return;
-        }
+        if (modalElement) bsModal = new bootstrap.Modal(modalElement);
     }
 
     fetch(`modules/get_detalle.php?id=${id}`)
@@ -27,42 +21,120 @@ function gestionar(id) {
         .then(data => {
             const llenar = (id, texto) => {
                 const el = document.getElementById(id);
-                if (el) el.innerText = texto;
+                if (el) el.innerText = texto || '';
             };
 
-            // Inyección de datos en la interfaz del modal
-            llenar('detFolio', "Folio: " + (data.folio || ''));
-            llenar('detFechaEvento', data.fecha_evento || ''); 
-            
-            // --- NUEVOS DATOS TÉCNICOS ---
+            llenar('detFolio', "Folio: " + data.folio);
+            llenar('detFechaEvento', data.fecha_evento); 
             llenar('detHorario', (data.hora_inicio || '') + ' a ' + (data.hora_fin || ''));
-            llenar('detAuditorio', data.nombre_espacio || '');
+            llenar('detAuditorio', data.nombre_espacio);
+            llenar('detEstado', data.estado);
+            llenar('detUsuarioNombre', data.nombre);
+            llenar('detTituloEv', data.titulo_event);
+            llenar('detDescription', data.descripcion);
             
-            llenar('detEstado', data.estado || '');
-            llenar('detUsuarioNombre', data.nombre || '');
-            llenar('detTituloEv', data.titulo_event || '');
-            llenar('detDescripcion', data.descripcion || '');
-            
-            // Asignación dinámica del ID al botón de eliminar dentro del modal
             const btnBorrar = document.getElementById('btnBorrarModal');
-            if(btnBorrar) {
-                btnBorrar.setAttribute('onclick', `eliminarSolicitud(${id})`);
-            }
+            if(btnBorrar) btnBorrar.setAttribute('onclick', `eliminarSolicitud(${id})`);
             
             bsModal.show();
         });
 }
 
-function cerrarModal() {
-    if (bsModal) bsModal.hide();
+/**
+ * SISTEMA DE FILTRADO (Estatus + Fechas)
+ */
+
+// Escuchar cambios en checkboxes y fechas
+document.addEventListener("change", function(e) {
+    if (e.target.classList.contains("filter-check") || e.target.type === "date") {
+        aplicarFiltros();
+    }
+});
+
+function aplicarFiltros() {
+    // 1. Obtener valores seleccionados de los checkboxes
+    const seleccionados = Array.from(document.querySelectorAll(".filter-check:checked"))
+                               .map(cb => cb.value.toUpperCase());
+
+    // 2. Obtener valores de fecha
+    const inicio = document.getElementById("fecha_inicio").value; // Formato YYYY-MM-DD
+    const fin = document.getElementById("fecha_fin").value;       // Formato YYYY-MM-DD
+    
+    const filas = document.querySelectorAll("#tablaSolicitudes tbody tr");
+
+    filas.forEach(fila => {
+        // Obtenemos el texto del estatus del badge
+        const badge = fila.querySelector(".badge-status, .badge-status-pro");
+        // Obtenemos la fecha de la celda (asumiendo que es la 4ta columna)
+        const fechaCeldaRaw = fila.querySelector("td:nth-child(4)").innerText.trim();
+        
+        // Convertir dd/mm/aaaa a aaaa-mm-dd para poder comparar fechas correctamente
+        const partes = fechaCeldaRaw.split('/');
+        const fechaFila = `${partes[2]}-${partes[1]}-${partes[0]}`;
+
+        if (!badge) return;
+        const textoEstado = badge.innerText.trim().toUpperCase();
+
+        // Lógica de validación
+        const cumpleEstatus = seleccionados.includes(textoEstado);
+        
+        let cumpleFecha = true;
+        if (inicio && fin) {
+            cumpleFecha = (fechaFila >= inicio && fechaFila <= fin);
+        } else if (inicio) {
+            cumpleFecha = (fechaFila >= inicio);
+        } else if (fin) {
+            cumpleFecha = (fechaFila <= fin);
+        }
+
+        // Aplicar visibilidad
+        fila.style.display = (cumpleEstatus && cumpleFecha) ? "" : "none";
+    });
 }
 
 /**
- * Envía la decisión del administrador (Aprobar/Rechazar) al servidor
+ * Función Limpiar (RESTAURADA)
+ */
+function resetFiltros() {
+    // Marcar los 3 principales por defecto, desmarcar los otros
+    document.getElementById("chkUrg").checked = true;
+    document.getElementById("chkPen").checked = true;
+    document.getElementById("chkTie").checked = true;
+    document.getElementById("chkAce").checked = false;
+    document.getElementById("chkRec").checked = false;
+
+    // Limpiar fechas
+    document.getElementById("fecha_inicio").value = "";
+    document.getElementById("fecha_fin").value = "";
+
+    // Refrescar tabla
+    aplicarFiltros();
+}
+
+/**
+ * Reporte PDF
+ */
+function descargarReporte() {
+    const inicio = document.getElementById("fecha_inicio").value;
+    const fin = document.getElementById("fecha_fin").value;
+    const seleccionados = Array.from(document.querySelectorAll(".filter-check:checked"))
+                               .map(cb => cb.value)
+                               .join(',');
+
+    if (!inicio || !fin) {
+        alert("Por favor selecciona un rango de fechas para generar el PDF.");
+        return;
+    }
+
+    const url = `modules/generar_reporte.php?inicio=${inicio}&fin=${fin}&estatus=${seleccionados}`;
+    window.open(url, '_blank');
+}
+
+/**
+ * Actualizar Estado (Aprobar/Rechazar)
  */
 function actualizarEstado(nuevoEstado) {
     if (!idSeleccionado) return;
-
     const motivo = document.getElementById('motivoRechazo').value;
 
     fetch('modules/actualizar_estado.php', {
@@ -77,103 +149,20 @@ function actualizarEstado(nuevoEstado) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert("¡Solicitud " + nuevoEstado + " con éxito!");
             location.reload(); 
         } else {
-            alert("Error al actualizar.");
+            alert("Error al actualizar: " + data.error);
         }
     });
 }
 
-/**
- * SISTEMA DE FILTRADO COMBINADO (Estatus + Fechas)
- */
-document.addEventListener("change", function(e) {
-    if (e.target.classList.contains("filter-check") || e.target.type === "date") {
-        aplicarFiltros();
-    }
-});
-
-function aplicarFiltros() {
-    const seleccionados = Array.from(document.querySelectorAll(".filter-check:checked"))
-                               .map(cb => cb.value);
-
-    const inicio = document.getElementById("fecha_inicio").value;
-    const fin = document.getElementById("fecha_fin").value;
-    const filas = document.querySelectorAll("#tablaSolicitudes tbody tr");
-
-    filas.forEach(fila => {
-        const badge = fila.querySelector(".badge-status");
-        const fechaFila = fila.querySelector("td:nth-child(4)").innerText; 
-        
-        if (!badge) return;
-        const textoEstado = badge.innerText.trim().toUpperCase();
-
-        const cumpleEstatus = seleccionados.includes(textoEstado);
-        let cumpleFecha = true;
-        if (inicio && fin) {
-            cumpleFecha = (fechaFila >= inicio && fechaFila <= fin);
-        }
-
-        fila.style.display = (cumpleEstatus && cumpleFecha) ? "" : "none";
-    });
-}
-
-function resetFiltros() {
-    document.querySelectorAll(".filter-check").forEach(cb => cb.checked = true);
-    document.getElementById("fecha_inicio").value = "";
-    document.getElementById("fecha_fin").value = "";
-    aplicarFiltros();
-}
-
-/**
- * Redirección al generador de PDF con los parámetros de filtro actuales
- */
-function descargarReporte() {
-    const inicio = document.getElementById("fecha_inicio").value;
-    const fin = document.getElementById("fecha_fin").value;
-    const seleccionados = Array.from(document.querySelectorAll(".filter-check:checked"))
-                               .map(cb => cb.value)
-                               .join(',');
-
-    if (!inicio || !fin) {
-        alert("Por favor selecciona un rango de fechas para el reporte.");
-        return;
-    }
-
-    const url = `modules/generar_reporte.php?inicio=${inicio}&fin=${fin}&estatus=${seleccionados}`;
-    window.open(url, '_blank');
-}
-
-/**
- * Elimina permanentemente una solicitud de reservación
- * @param {number} id - ID de la solicitud a eliminar de la base de datos
- */
 function eliminarSolicitud(id) {
-    if (confirm("¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.")) {
-        
-        // Ponemos un alert para saber que sí entró a la función y qué ID está mandando
-        alert("Intentando borrar el ID: " + id);
-
+    if (confirm("¿Eliminar permanentemente este registro?")) {
         fetch(`modules/eliminar_solicitud.php?id=${id}`)
-            .then(res => res.text()) // Lo pedimos como texto para leer los errores ocultos de PHP
-            .then(texto => {
-                console.log("Respuesta cruda del servidor:", texto); // Se guarda en la consola (F12)
-                
-                try {
-                    const data = JSON.parse(texto);
-                    if (data.success) {
-                        alert("¡Borrado exitoso!");
-                        location.reload(); 
-                    } else {
-                        // Si la base de datos falla (ej. llaves foráneas), nos dirá el porqué
-                        alert("Error en la Base de Datos: " + data.error); 
-                    }
-                } catch(e) {
-                    // Si el archivo PHP no existe o tiene un error de sintaxis, nos avisará aquí
-                    alert("Error crítico del servidor. La respuesta fue: " + texto);
-                }
-            })
-            .catch(err => alert("Error de red o ruta: " + err));
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert("Error: " + data.error);
+            });
     }
 }

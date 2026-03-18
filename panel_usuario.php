@@ -1,125 +1,268 @@
 <?php
 /**
- * PANEL DE USUARIO - UTM
- * Descripción: Interfaz para que alumnos/docentes gestionen sus propias solicitudes.
- * Funcionalidades: 
- * - Mis estadísticas personales (Aceptadas, Pendientes, Rechazadas).
- * - Historial de reservaciones personales.
- * - Flujo guiado (Catalogo -> Calendario -> Formulario) para nuevas solicitudes.
+ * PANEL DE USUARIO - SIRA UTM
+ * Versión Sinergia Final: Contadores dinámicos y Filtros optimizados.
  */
 session_start();
 include("config/db_local.php");
 
-// Validación de sesión
 if (!isset($_SESSION['id_usuario'])) {
     header("Location: index.php");
     exit();
 }
 $id_user = $_SESSION['id_usuario'];
 
-// --- CONSULTAS DE CONTADORES PERSONALES ---
-$res_acep = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'Aceptada'");
+// --- CONSULTAS DE CONTADORES DINÁMICOS ---
+$res_acep = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'ACEPTADA'");
 $aceptadas = mysqli_fetch_assoc($res_acep)['t'];
 
-$res_pend = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'Pendiente'");
+$res_pend = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'PENDIENTE'");
 $pendientes = mysqli_fetch_assoc($res_pend)['t'];
 
-$res_rech = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'Rechazada'");
+$res_rech = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'RECHAZADA'");
 $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
-
-// --- CONSULTA DEL HISTORIAL PERSONAL ---
-$sql = "SELECT s.*, a.nombre_espacio FROM solicitudes s 
-        JOIN auditorio a ON s.id_auditorio = a.id_auditorio 
-        WHERE s.id_usuario = '$id_user' ORDER BY s.id_solicitud DESC";
-$resultado = mysqli_query($conexion, $sql);
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Panel Usuario - UTM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRA - Mis Reservaciones</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .card-stats { border: none; border-radius: 25px; transition: transform 0.3s; }
-        .card-stats:hover { transform: translateY(-7px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important; }
-        .bg-pendientes { background-color: #ffc107 !important; color: #444 !important; }
-        .bg-aceptadas { background-color: #198754 !important; color: white !important; }
-        .bg-rechazadas { background-color: #dc3545 !important; color: white !important; }
-        .table-container { background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03); }
-        .badge-status { padding: 10px 18px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; }
+        :root {
+            --sira-purple-dark: #2D1B33;
+            --sira-purple-primary: #5B3D66;
+            --sira-bg: #EBEFF2;
+            --grad-pending: linear-gradient(135deg, #FFD93D 0%, #F9A825 100%);
+            --grad-accepted: linear-gradient(135deg, #42A5F5 0%, #1E88E5 100%);
+            --grad-rejected: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--sira-bg);
+            margin: 0;
+            color: #2D2D2D;
+        }
+
+        .main-content {
+            margin-left: 310px;
+            padding: 30px 40px;
+            width: calc(100% - 310px);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        }
+
+        .btn-nueva-solicitud {
+            background-color: var(--sira-purple-primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 12px 28px;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(91, 61, 102, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-nueva-solicitud:hover {
+            background-color: var(--sira-purple-dark);
+            transform: translateY(-4px);
+            color: white;
+            box-shadow: 0 15px 30px rgba(91, 61, 102, 0.3);
+        }
+
+        .card-user {
+            border: none;
+            border-radius: 20px;
+            padding: 15px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04);
+            height: 105px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-user .count {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+            z-index: 2;
+            color: white;
+        }
+
+        .card-user h6 {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            z-index: 2;
+            color: white;
+        }
+
+        .bg-pend { background: var(--grad-pending); }
+        .bg-pend h6, .bg-pend .count { color: #2D1B33; }
+        .bg-acep { background: var(--grad-accepted); }
+        .bg-rech { background: var(--grad-rejected); }
+
+        .watermark {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            font-size: 3.2rem;
+            opacity: 0.12;
+            transform: rotate(-10deg);
+            color: white;
+        }
+
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            min-width: 105px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .st-pendiente { background: var(--grad-pending); color: #2D1B33 !important; }
+        .st-aceptada { background: var(--grad-accepted); color: white !important; }
+        .st-rechazada { background: var(--grad-rejected); color: white !important; }
+
+        .dataTables_filter { display: none; }
+        
+        /* Forzar la primera letra del mes a Mayúscula y mejorar el estilo */
+.fc .fc-toolbar-title {
+    text-transform: capitalize !important;
+    font-weight: 800 !important;
+    color: var(--sira-purple-dark);
+    font-size: 1.5rem !important;
+}
+
+/* También para los días de la semana (opcional) */
+.fc-col-header-cell-cushion {
+    text-transform: capitalize !important;
+    text-decoration: none !important;
+    font-weight: 700;
+    color: var(--sira-purple-primary);
+}
+
+/* Mejorar el aspecto de los botones del calendario */
+.fc .fc-button-primary {
+    background-color: var(--sira-purple-primary) !important;
+    border-color: var(--sira-purple-primary) !important;
+    border-radius: 10px !important;
+    text-transform: capitalize;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: var(--sira-purple-dark) !important;
+}
+
     </style>
 </head>
 
 <body>
-    <div class="container py-5">
+    <?php include 'includes/sidebar.php'; ?>
+
+    <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <h1 class="h3 fw-bold text-dark mb-0">Panel Usuario</h1>
-                <p class="text-muted">Bienvenido, <?php echo $_SESSION['nombre']; ?></p>
+                <h1 class="h2 mb-1" style="font-weight: 800; color: var(--sira-purple-dark);">Mis Reservaciones</h1>
+                <p class="text-muted small">Hola, <strong><?php echo explode(' ', $_SESSION['nombre'])[0]; ?></strong> • Gestiona tus solicitudes.</p>
             </div>
-            <button class="btn btn-primary px-4 py-2 fw-bold shadow-sm" style="border-radius: 12px;" data-bs-toggle="modal" data-bs-target="#modalNuevaSolicitud">
-                + Nueva Solicitud
+            <button class="btn btn-nueva-solicitud shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaSolicitud">
+                <i class="bi bi-plus-lg me-2"></i> Nueva Solicitud
             </button>
         </div>
 
-        <div class="row g-4 mb-5 text-white">
+        <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <div class="card card-stats bg-pendientes shadow h-100">
-                    <div class="card-body text-center py-4">
-                        <h6 class="text-uppercase small opacity-75 fw-bold">Mis Pendientes</h6>
-                        <div class="display-5 fw-bold"><?php echo $pendientes; ?></div>
-                    </div>
+                <div class="card-user bg-pend">
+                    <h6>En Revisión</h6>
+                    <div class="count"><?php echo $pendientes; ?></div><i class="bi bi-clock-history watermark"></i>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card card-stats bg-aceptadas shadow h-100">
-                    <div class="card-body text-center py-4">
-                        <h6 class="text-uppercase small opacity-75 fw-bold">Aceptadas</h6>
-                        <div class="display-5 fw-bold"><?php echo $aceptadas; ?></div>
-                    </div>
+                <div class="card-user bg-acep">
+                    <h6>Aprobadas</h6>
+                    <div class="count"><?php echo $aceptadas; ?></div><i class="bi bi-check-circle-fill watermark"></i>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card card-stats bg-rechazadas shadow h-100">
-                    <div class="card-body text-center py-4">
-                        <h6 class="text-uppercase small opacity-75 fw-bold">Rechazadas</h6>
-                        <div class="display-5 fw-bold"><?php echo $rechazadas; ?></div>
-                    </div>
+                <div class="card-user bg-rech">
+                    <h6>Rechazadas</h6>
+                    <div class="count"><?php echo $rechazadas; ?></div><i class="bi bi-x-circle-fill watermark"></i>
                 </div>
             </div>
         </div>
 
-        <div class="table-container shadow-sm border-0">
-            <h5 class="fw-bold mb-4">Mis Reservaciones</h5>
+        <div class="bg-white p-4 mb-4 rounded-4 shadow-sm border-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="filtros_estatus">
+                    <span class="small fw-bold text-muted me-3 text-uppercase">Filtrar Estatus:</span>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input check-filtro" type="checkbox" value="PENDIENTE" id="f_pen">
+                        <label class="form-check-label text-warning fw-bold small" for="f_pen">Pendientes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input check-filtro" type="checkbox" value="ACEPTADA" id="f_apr">
+                        <label class="form-check-label text-info fw-bold small" for="f_apr">Aprobadas</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input check-filtro" type="checkbox" value="RECHAZADA" id="f_rec">
+                        <label class="form-check-label text-danger fw-bold small" for="f_rec">Rechazadas</label>
+                    </div>
+                </div>
+                <button class="btn btn-dark btn-sm rounded-pill px-4 fw-bold" onclick="limpiarFiltros()">Limpiar Filtros</button>
+            </div>
+        </div>
+
+        <div class="table-container">
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr class="text-muted small">
-                            <th>FOLIO</th>
-                            <th>EVENTO</th>
-                            <th>AUDITORIO</th>
-                            <th>FECHA</th>
-                            <th>ESTATUS</th>
+                <table class="table table-hover align-middle mb-0" id="tablaMisReservas" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr class="text-muted x-small fw-bold text-uppercase border-bottom">
+                            <th class="ps-4">Folio</th>
+                            <th>Título del Evento</th>
+                            <th>Auditorio</th>
+                            <th>Fecha</th>
+                            <th class="text-center">Estatus</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($fila = mysqli_fetch_assoc($resultado)): ?>
+                        <?php
+                        $sql = "SELECT s.*, a.nombre_espacio FROM solicitudes s 
+                                JOIN auditorio a ON s.id_auditorio = a.id_auditorio 
+                                WHERE s.id_usuario = '$id_user' ORDER BY s.id_solicitud DESC";
+                        $resultado = mysqli_query($conexion, $sql);
+                        while ($fila = mysqli_fetch_assoc($resultado)):
+                            $status_val = strtoupper($fila['estado']);
+                            $st_class = ($status_val == 'ACEPTADA') ? 'st-aceptada' : (($status_val == 'RECHAZADA') ? 'st-rechazada' : 'st-pendiente');
+                        ?>
                             <tr>
-                                <td class="fw-bold text-primary"><?php echo $fila['folio']; ?></td>
-                                <td><span class="fw-semibold"><?php echo $fila['titulo_event']; ?></span></td>
-                                <td><span class="badge bg-light text-dark border px-3 py-2 rounded-pill"><?php echo $fila['nombre_espacio']; ?></span></td>
-                                <td class="text-muted small"><?php echo $fila['fecha_evento']; ?></td>
-                                <td>
-                                    <?php
-                                    $status_class = ($fila['estado'] == 'Aceptada') ? 'bg-aceptadas' : (($fila['estado'] == 'Rechazada') ? 'bg-rechazadas' : 'bg-pendientes');
-                                    ?>
-                                    <span class="badge badge-status <?php echo $status_class; ?> text-white">
-                                        <?php echo strtoupper($fila['estado']); ?>
-                                    </span>
-                                </td>
+                                <td class="ps-4 fw-bold" style="color: var(--sira-purple-primary);">#<?php echo $fila['folio']; ?></td>
+                                <td class="fw-600"><?php echo $fila['titulo_event']; ?></td>
+                                <td><span class="badge rounded-pill bg-light text-dark border px-3 py-2"><?php echo $fila['nombre_espacio']; ?></span></td>
+                                <td class="text-muted fw-bold"><?php echo date('d/m/Y', strtotime($fila['fecha_evento'])); ?></td>
+                                <td class="text-center"><span class="badge-status <?php echo $st_class; ?> shadow-sm"><?php echo $status_val; ?></span></td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -128,85 +271,25 @@ $resultado = mysqli_query($conexion, $sql);
         </div>
     </div>
 
-    <div class="modal fade" id="modalNuevaSolicitud" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content shadow-lg" style="border-radius: 25px; border: none;">
-                
-                <div id="paso_catalogo" class="p-4">
-                    <h4 class="fw-bold mb-4 text-center">Selecciona un Auditorio</h4>
-                    <div class="row g-4">
-                        <?php 
-                        $res = mysqli_query($conexion, "SELECT * FROM auditorio");
-                        while($aud = mysqli_fetch_assoc($res)): 
-                        ?>
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                                <img src="assets/img/auditorios/<?php echo $aud['id_auditorio']; ?>.jpg" class="card-img-top" style="height: 160px; object-fit: cover;" onerror="this.src='assets/img/placeholder_auditorio.jpg'">
-                                <div class="card-body text-center">
-                                    <h6 class="fw-bold mb-1"><?php echo $aud['nombre_espacio']; ?></h6>
-                                    <p class="small text-muted mb-3">Capacidad: <?php echo $aud['capacidad_maxima']; ?> personas</p>
-                                    <button class="btn btn-success w-100 rounded-pill fw-bold" onclick="irAlCalendario(<?php echo $aud['id_auditorio']; ?>, '<?php echo $aud['nombre_espacio']; ?>')">Seleccionar</button>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endwhile; ?>
-                    </div>
-                </div>
+    <?php include 'includes/modal_reservacion.php'; ?>
 
-                <div id="paso_calendario" class="p-4" style="display: none;">
-                    <button class="btn btn-sm btn-outline-secondary mb-3 rounded-pill" onclick="regresarAlCatalogo()">← Volver al catálogo</button>
-                    <h4 class="fw-bold text-center mb-4">Selección de Horario y Día</h4>
-                    <div class="row g-4">
-                        <div class="col-md-5 border-end">
-                            <label class="form-label fw-bold">1. Elige la fecha:</label>
-                            <input type="date" id="fecha_seleccionada" class="form-control rounded-3" min="<?php echo date('Y-m-d'); ?>" onchange="actualizarDisponibilidad()">
-                        </div>
-                        <div class="col-md-7 text-center">
-                            <label class="form-label fw-bold d-block">2. Horarios disponibles:</label>
-                            <div id="contenedor_horarios" class="d-flex flex-wrap justify-content-center gap-2 bg-light p-3 rounded-4 border">
-                                <p class="text-muted small">Por favor, selecciona una fecha primero.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-5">
-                        <button class="btn btn-primary px-5 py-2 fw-bold shadow rounded-pill" id="btnIrAPasoFinal" disabled onclick="irAlFormularioFinal()">Confirmar Horario y Continuar</button>
-                    </div>
-                </div>
-
-                <div id="paso_formulario" class="p-4" style="display: none;">
-                    <button class="btn btn-sm btn-outline-secondary mb-3 rounded-pill" onclick="regresarAlCalendario()">← Ajustar horario</button>
-                    <form action="modules/guardar_solicitud.php" method="POST">
-                        <input type="hidden" name="id_auditorio" id="input_id_auditorio">
-                        <input type="hidden" name="fecha_evento" id="input_fecha_evento">
-                        <input type="hidden" name="hora_inicio" id="input_hora_inicio">
-                        <input type="hidden" name="hora_fin" id="input_hora_fin">
-
-                        <div class="bg-primary bg-opacity-10 p-3 mb-4 rounded-4 border border-primary border-opacity-25">
-                            <h6 class="mb-0 fw-bold">Resumen de selección:</h6>
-                            <span id="display_nombre_auditorio" class="badge bg-primary mt-2"></span>
-                            <span id="display_resumen_fecha" class="badge bg-dark mt-2"></span>
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Nombre del Evento</label>
-                                <input type="text" name="titulo_event" class="form-control rounded-3" placeholder="Ej. Taller de Redes" required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Razón de la Solicitud</label>
-                                <textarea name="descripcion" class="form-control rounded-3" rows="4" placeholder="Describe brevemente el objetivo del evento..."></textarea>
-                            </div>
-                            <div class="col-md-12 text-end mt-4">
-                                <button type="submit" class="btn btn-success btn-lg px-5 fw-bold rounded-pill shadow">Enviar Solicitud</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="assets/js/gestion_reservas.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        <?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>
+            Swal.fire({
+                title: '¡Reservación Solicitada!',
+                text: 'Tu folio es <?php echo $_GET['folio']; ?>. Revisa el estado en tu tabla de mis reservaciones.',
+                icon: 'success',
+                confirmButtonColor: '#008f39'
+            });
+        <?php endif; ?>
+    </script>
 </body>
 </html>

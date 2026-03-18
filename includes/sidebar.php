@@ -1,115 +1,76 @@
 <?php
 /**
- * COMPONENTE DE NAVEGACIÓN LATERAL (SIDEBAR) - SIRA
- * Adaptado a la paleta de colores Púrpura/Lila
+ * SIDEBAR SIRA - CORRECCIÓN SEGÚN BASE DE DATOS
+ * Usando columna 'perfil' y valor 'administrador'
  */
 $pagina_actual = basename($_SERVER['PHP_SELF']);
+
+// 1. Usamos 'perfil' que es como aparece en tu captura de phpMyAdmin
+// Forzamos a minúsculas para que coincida con 'administrador'
+$perfil_usuario = isset($_SESSION['perfil']) ? strtolower($_SESSION['perfil']) : 'alumno'; 
 ?>
 
 <style>
     :root {
-        --sira-purple-dark: #714B75;
-        --sira-purple-light: #F4EFFF;
-        --sira-text-muted: #8E7A91;
+        --sira-purple-dark: #2D1B33;
+        --sira-purple-primary: #5B3D66;
+        --sira-purple-active: #F4EFFF;
     }
-
-    /* Barra de iconos delgada */
-    .activity-bar {
-        background-color: var(--sira-purple-dark);
-        width: 70px;
-        min-height: 100vh;
-        z-index: 1001;
-    }
-
-    /* Barra de navegación con texto */
-    .side-bar {
-        background-color: white;
-        width: 200px;
-        min-height: 100vh;
-        border-right: 1px solid rgba(113, 75, 117, 0.1);
-    }
-
-    .nav-link-custom {
-        display: flex;
-        align-items: center;
-        padding: 12px 15px;
-        border-radius: 12px;
-        color: var(--sira-text-muted);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.9rem;
-        margin-bottom: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .nav-link-custom:hover {
-        background-color: var(--sira-purple-light);
-        color: var(--sira-purple-dark);
-    }
-
-    .nav-link-custom.active {
-        background-color: var(--sira-purple-light);
-        color: var(--sira-purple-dark);
-        box-shadow: inset 4px 0 0 var(--sira-purple-dark);
-    }
-
-    .activity-bar a i {
-        transition: transform 0.2s;
-    }
-
-    .activity-bar a:hover i {
-        transform: scale(1.2);
-    }
+    .activity-bar { background-color: var(--sira-purple-dark); width: 80px; min-height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; padding-top: 25px; z-index: 1001; }
+    .side-bar { background-color: #FDFBFF; width: 230px; min-height: 100vh; position: fixed; left: 80px; top: 0; border-right: 1px solid rgba(0,0,0,0.05); padding: 30px 15px; z-index: 1000; }
+    .nav-section-title { font-size: 0.65rem; font-weight: 800; color: #adb5bd; text-transform: uppercase; letter-spacing: 1.2px; margin: 20px 0 10px 10px; }
+    .nav-link-custom { display: flex; align-items: center; padding: 12px 15px; border-radius: 14px; color: #6c757d; text-decoration: none; font-weight: 600; margin-bottom: 5px; transition: 0.3s; }
+    .nav-link-custom i { font-size: 1.1rem; margin-right: 12px; }
+    .nav-link-custom.active { background-color: var(--sira-purple-active); color: var(--sira-purple-primary); }
+    .nav-link-custom:hover:not(.active) { background-color: #f8f9fa; transform: translateX(5px); }
 </style>
 
-<div class="activity-bar d-flex flex-column align-items-center py-4">
-    <div class="mb-5 text-white">
-        <i class="bi bi-shield-check fs-2"></i>
-    </div>
-
-    <a href="panel_admin.php"
-        class="text-white mb-4 <?php echo $pagina_actual == 'panel_admin.php' ? 'opacity-100' : 'opacity-50'; ?>"
-        title="Dashboard">
-        <i class="bi bi-grid-fill fs-4"></i>
-    </a>
-
-    <a href="admin_auditorios.php"
-        class="text-white mb-4 <?php echo $pagina_actual == 'admin_auditorios.php' ? 'opacity-100' : 'opacity-50'; ?>"
-        title="Auditorios">
-        <i class="bi bi-building fs-4"></i>
-    </a>
-
-    <a href="admin_usuarios.php"
-        class="text-white mb-4 <?php echo $pagina_actual == 'admin_usuarios.php' ? 'opacity-100' : 'opacity-50'; ?>"
-        title="Usuarios">
-        <i class="bi bi-people fs-4"></i>
-    </a>
-
-    <div class="mt-auto pb-4">
-        <a href="modules/logout.php" class="text-white opacity-75 hover-opacity-100" title="Cerrar Sesión">
-            <i class="bi bi-box-arrow-left fs-4"></i>
+<div class="activity-bar">
+    <img src="assets/img/logo_app_web_RA.png" style="max-width: 45px;" class="mb-5">
+    <div class="d-flex flex-column gap-4">
+        <?php $url_home = ($perfil_usuario == 'administrador') ? 'panel_admin.php' : 'panel_usuario.php'; ?>
+        <a href="<?php echo $url_home; ?>" class="text-white">
+            <i class="bi bi-grid-fill fs-4"></i>
         </a>
+        <?php if ($perfil_usuario == 'administrador'): ?>
+            <a href="admin_auditorios.php" class="text-white opacity-25"><i class="bi bi-building fs-4"></i></a>
+            <a href="admin_usuarios.php" class="text-white opacity-25"><i class="bi bi-people fs-4"></i></a>
+        <?php endif; ?>
+    </div>
+    <div style="margin-top: auto; padding-bottom: 30px;">
+        <a href="modules/logout.php" class="text-white opacity-50"><i class="bi bi-box-arrow-left fs-4"></i></a>
     </div>
 </div>
 
-<div class="side-bar p-3">
-    <h6 class="text-uppercase fw-bold mb-4 px-2" style="font-size: 0.65rem; color: var(--sira-purple-dark); letter-spacing: 1px;">Gestión Sistema</h6>
-    <nav class="d-flex flex-column">
-
-        <a href="panel_admin.php"
-            class="nav-link-custom <?php echo $pagina_actual == 'panel_admin.php' ? 'active' : ''; ?>">
-            <i class="bi bi-grid-fill me-2"></i> Dashboard
+<div class="side-bar">
+    <div class="nav-section-title">Principal</div>
+    <nav>
+        <a href="<?php echo $url_home; ?>" class="nav-link-custom <?php echo ($pagina_actual == 'panel_admin.php' || $pagina_actual == 'panel_usuario.php') ? 'active' : ''; ?>">
+            <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-
-        <a href="admin_auditorios.php"
-            class="nav-link-custom <?php echo $pagina_actual == 'admin_auditorios.php' ? 'active' : ''; ?>">
-            <i class="bi bi-building-gear me-2"></i> Auditorios
-        </a>
-
-        <a href="admin_usuarios.php"
-            class="nav-link-custom <?php echo $pagina_actual == 'admin_usuarios.php' ? 'active' : ''; ?>">
-            <i class="bi bi-people-fill me-2"></i> Usuarios
-        </a>
-
     </nav>
+
+    <?php if ($perfil_usuario == 'administrador'): ?>
+        <div class="nav-section-title">Gestión Sistema</div>
+        <nav>
+            <a href="admin_auditorios.php" class="nav-link-custom <?php echo ($pagina_actual == 'admin_auditorios.php') ? 'active' : ''; ?>"><i class="bi bi-building"></i> Auditorios</a>
+            <a href="admin_usuarios.php" class="nav-link-custom <?php echo ($pagina_actual == 'admin_usuarios.php') ? 'active' : ''; ?>"><i class="bi bi-people"></i> Usuarios</a>
+            <a href="#" class="nav-link-custom"><i class="bi bi-calendar3"></i> Calendario</a>
+        </nav>
+        <div class="nav-section-title">Reportes y Ayuda</div>
+        <nav>
+            <a href="#" class="nav-link-custom"><i class="bi bi-file-earmark-pdf"></i> Reportes PDF</a>
+            <a href="#" class="nav-link-custom"><i class="bi bi-question-circle"></i> Soporte</a>
+        </nav>
+    <?php else: ?>
+        <div class="nav-section-title">Mi Cuenta</div>
+        <nav>
+            <a href="panel_usuario.php" class="nav-link-custom <?php echo ($pagina_actual == 'panel_usuario.php') ? 'active' : ''; ?>"><i class="bi bi-journal-text"></i> Mis Reservas</a>
+        </nav>
+        <div class="nav-section-title">Reportes y Ayuda</div>
+        <nav>
+            <a href="#" class="nav-link-custom"><i class="bi bi-journal-text"></i> Manual Usuario</a>
+            <a href="#" class="nav-link-custom"><i class="bi bi-question-circle"></i> Soporte</a>
+        </nav>
+    <?php endif; ?>
 </div>

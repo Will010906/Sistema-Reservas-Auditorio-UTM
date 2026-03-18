@@ -1,32 +1,29 @@
 <?php
 
 /**
- * PANEL DE ADMINISTRACIÓN - SIRA UTM
- * Versión Final: Recuperando estructura original con diseño SIRA.
+ * PANEL DE ADMINISTRACIÓN - SIRA UTM 
+ * VERSIÓN FINAL INTEGRADA: Sidebar Completo, Cards Compactas y Modal funcional.
  */
 session_start();
-
 if (!isset($_SESSION['nombre'])) {
     header("Location: index.php");
     exit();
 }
 include 'config/db_local.php';
 
-// --- SECCIÓN: ESTADÍSTICAS ---
+// Consultas estadísticas
 $res_urg = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE prioridad = 'Urgente' AND estado = 'Pendiente'");
 $urgentes = mysqli_fetch_assoc($res_urg)['t'];
-
 $res_dem = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE prioridad = 'Pendiente' AND estado = 'Pendiente'");
 $demorados = mysqli_fetch_assoc($res_dem)['t'];
-
 $res_tiem = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE prioridad = 'Con tiempo' AND estado = 'Pendiente'");
 $a_tiempo = mysqli_fetch_assoc($res_tiem)['t'];
-
 $res_acep = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE estado = 'Aceptada'");
 $total_aceptadas = mysqli_fetch_assoc($res_acep)['t'];
-
 $res_rech = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE estado = 'Rechazada'");
 $total_rechazadas = mysqli_fetch_assoc($res_rech)['t'];
+
+$rol_usuario = $_SESSION['rol'] ?? 'Admin';
 ?>
 
 <!DOCTYPE html>
@@ -35,234 +32,374 @@ $total_rechazadas = mysqli_fetch_assoc($res_rech)['t'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrador - SIRA UTM</title>
+    <title>SIRA - Dashboard Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
         :root {
-            --sira-purple-dark: #714B75;
-            --sira-purple-bg: #F4EFFF;
-            --status-urgent: #FF8A80;
-            --status-pending: #FFD180;
-            --status-on-time: #B9F6CA;
-            --status-accepted: #80D8FF;
-            --status-rejected: #CFD8DC;
+            --sira-purple-dark: #2D1B33;
+            --sira-purple-primary: #5B3D66;
+            --sira-bg: #EBEFF2;
+            --grad-urgent: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%);
+            --grad-pending: linear-gradient(135deg, #FFD93D 0%, #F9A825 100%);
+            --grad-ontime: linear-gradient(135deg, #6BCB77 0%, #46A351 100%);
+            --grad-accepted: linear-gradient(135deg, #42A5F5 0%, #1E88E5 100%);
+            --grad-rejected: linear-gradient(135deg, #B0BEC5 0%, #78909C 100%);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--sira-purple-bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--sira-bg);
+            margin: 0;
+            color: #2D2D2D;
+        }
+
+        /* --- SIDEBAR CORREGIDO (3 SECCIONES) --- */
+        .activity-bar {
+            background-color: var(--sira-purple-dark);
+            width: 80px;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 25px;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .side-bar {
+            background-color: #FDFBFF;
+            width: 230px;
+            min-height: 100vh;
+            position: fixed;
+            left: 80px;
+            top: 0;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 30px 15px;
+            z-index: 1000;
         }
 
         .main-content {
-            padding: 40px;
+            margin-left: 310px;
+            padding: 30px 40px;
+            width: calc(100% - 310px);
         }
 
-        /* Estilos de Tarjetas Recuperados */
-        .card-custom {
+        .nav-section-title {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #adb5bd;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 20px 0 10px 10px;
+        }
+
+        .nav-link-custom {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 14px;
+            color: #6c757d;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 5px;
+            transition: 0.3s;
+        }
+
+        .nav-link-custom i {
+            font-size: 1.1rem;
+            margin-right: 12px;
+        }
+
+        .nav-link-custom.active {
+            background-color: #F4EFFF;
+            color: var(--sira-purple-primary);
+        }
+
+        .nav-link-custom:hover:not(.active) {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        /* --- CARDS COMPACTAS --- */
+        .card-sira {
             border: none;
-            border-radius: 15px;
-            transition: transform 0.2s;
-            color: #3D2C40;
+            border-radius: 20px;
+            padding: 15px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04);
+            height: 105px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .card-custom:hover {
-            transform: translateY(-5px);
+        .card-sira .count {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+            z-index: 2;
+            color: white;
         }
 
-        .card-urgent {
-            background-color: var(--status-urgent) !important;
+        .card-sira h6 {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            z-index: 2;
+            margin-bottom: 2px;
+            color: white;
         }
 
-        .card-pending {
-            background-color: var(--status-pending) !important;
+        .bg-pen h6,
+        .bg-pen .count {
+            color: #2D1B33;
         }
 
-        .card-on-time {
-            background-color: var(--status-on-time) !important;
+        /* Ajuste para amarillo */
+        .watermark {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            font-size: 3.2rem;
+            opacity: 0.15;
+            transform: rotate(-10deg);
+            color: white;
         }
 
-        .card-accepted {
-            background-color: var(--status-accepted) !important;
+        .bg-pen .watermark {
+            color: #2D1B33;
+            opacity: 0.1;
         }
 
-        .card-rejected {
-            background-color: var(--status-rejected) !important;
+        .bg-urg {
+            background: var(--grad-urgent);
+        }
+
+        .bg-pen {
+            background: var(--grad-pending);
+        }
+
+        .bg-ont {
+            background: var(--grad-ontime);
+        }
+
+        .bg-acc {
+            background: var(--grad-accepted);
+        }
+
+        .bg-rej {
+            background: var(--grad-rejected);
+        }
+
+        /* --- TABLA Y BOTONES --- */
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        }
+
+        .btn-stalked {
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: 0.3s;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-gestionar-sira {
+            background-color: var(--sira-purple-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 6px 18px;
+            transition: 0.3s;
         }
 
         .badge-status {
-            padding: 0.5em 1em;
-            border-radius: 50px;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-block;
-            min-width: 100px;
+            min-width: 105px;
             text-align: center;
         }
 
-        .x-small {
-            font-size: 0.7rem;
+        .st-urgente {
+            background: var(--grad-urgent);
+            color: white !important;
         }
 
-        /* Estilo de Tabla SIRA */
-        .table-container {
+        .st-aceptada {
+            background: var(--grad-accepted);
+            color: white !important;
+        }
+
+        .st-rechazada {
+            background: var(--grad-rejected);
+            color: white !important;
+        }
+
+        /* Colores para los estados que faltaban */
+        .st-pendiente {
+            background: var(--grad-pending) !important;
+            color: #2D1B33 !important;
+        }
+
+        .st-tiempo {
+            background: var(--grad-ontime) !important;
+            color: white !important;
+        }
+
+        .user-header-profile {
             background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-gestionar {
-            background-color: var(--sira-purple-dark);
-            color: white;
+            padding: 6px 16px;
             border-radius: 50px;
-            border: none;
-            padding: 5px 15px;
-            font-weight: 600;
-        }
-
-        .btn-gestionar:hover {
-            background-color: #5A3A5D;
-            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
 
 <body>
-    <div class="d-flex">
-        <?php include 'includes/sidebar.php'; ?>
 
-        <div class="main-content w-100">
-            <div class="d-flex justify-content-between align-items-center mb-5">
-                <div>
-                    <h1 class="h3 fw-bold text-dark mb-0">Panel Administrador</h1>
-                    <p class="text-muted small">Bienvenido, <?php echo $_SESSION['nombre']; ?> (SIRA UTM)</p>
+    <?php include 'includes/sidebar.php'; ?>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-800 h3 mb-0" style="color: var(--sira-purple-dark); font-weight: 800;">Panel Administrador</h1>
+                <p class="text-muted x-small mb-0">UTM • Sistema de Reservación de Auditorios</p>
+            </div>
+            <div class="user-header-profile">
+                <div class="text-end d-none d-md-block">
+                    <div class="fw-bold small" style="font-size: 0.75rem;"><?php echo $_SESSION['nombre']; ?></div>
+                    <small class="text-muted fw-bold" style="font-size: 0.55rem;">ADMINISTRADOR</small>
+                </div>
+                <div style="width: 32px; height: 32px; background: var(--sira-purple-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                    <?php echo strtoupper(substr($_SESSION['nombre'], 0, 1)); ?>
                 </div>
             </div>
+        </div>
 
-            <div class="row g-4 mb-5">
-                <div class="col-md-9">
-                    <div class="row g-3 h-100">
-                        <div class="col-md-4">
-                            <div class="card card-custom card-urgent shadow-sm h-100">
-                                <div class="card-body text-center py-4">
-                                    <h6 class="text-uppercase small opacity-75 fw-bold">Urgentes</h6>
-                                    <div class="display-5 fw-bold"><?php echo $urgentes; ?></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card card-custom card-pending shadow-sm h-100">
-                                <div class="card-body text-center py-4">
-                                    <h6 class="text-uppercase small opacity-75 fw-bold">Pendientes</h6>
-                                    <div class="display-5 fw-bold"><?php echo $demorados; ?></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card card-custom card-on-time shadow-sm h-100">
-                                <div class="card-body text-center py-4">
-                                    <h6 class="text-uppercase small opacity-75 fw-bold">A Tiempo</h6>
-                                    <div class="display-5 fw-bold"><?php echo $a_tiempo; ?></div>
-                                </div>
-                            </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-9">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card-sira bg-urg">
+                            <h6>Urgentes</h6>
+                            <div class="count"><?php echo $urgentes; ?></div><i class="bi bi-exclamation-octagon watermark"></i>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="d-flex flex-column gap-3 h-100">
-                        <div class="card card-custom card-accepted shadow-sm flex-fill d-flex align-items-center justify-content-center py-3">
-                            <div class="text-center">
-                                <h6 class="text-uppercase x-small mb-1 opacity-75 fw-bold">Aceptadas</h6>
-                                <div class="h3 fw-bold mb-0"><?php echo $total_aceptadas; ?></div>
-                            </div>
+                    <div class="col-md-4">
+                        <div class="card-sira bg-pen">
+                            <h6>Pendientes</h6>
+                            <div class="count"><?php echo $demorados; ?></div><i class="bi bi-clock-history watermark"></i>
                         </div>
-                        <div class="card card-custom card-rejected shadow-sm flex-fill d-flex align-items-center justify-content-center py-3">
-                            <div class="text-center">
-                                <h6 class="text-uppercase x-small mb-1 opacity-75 fw-bold">Rechazadas</h6>
-                                <div class="h3 fw-bold mb-0"><?php echo $total_rechazadas; ?></div>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-sira bg-ont">
+                            <h6>A Tiempo</h6>
+                            <div class="count"><?php echo $a_tiempo; ?></div><i class="bi bi-check2-circle watermark"></i>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="d-flex flex-column gap-2 h-100">
+                    <div class="card-sira bg-acc flex-fill">
+                        <h6>Aceptadas</h6>
+                        <div class="count" style="font-size: 1.6rem;"><?php echo $total_aceptadas; ?></div><i class="bi bi-hand-thumbs-up watermark" style="font-size: 2.2rem;"></i>
+                    </div>
+                    <div class="card-sira bg-rej flex-fill">
+                        <h6>Rechazadas</h6>
+                        <div class="count" style="font-size: 1.6rem;"><?php echo $total_rechazadas; ?></div><i class="bi bi-hand-thumbs-down watermark" style="font-size: 2.2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <div class="row g-3 mb-4 align-items-end bg-white p-3 rounded-4 shadow-sm border">
+        <div class="bg-white p-3 mb-4 rounded-4 shadow-sm border-0">
+            <div class="row g-3 align-items-end">
                 <div class="col-lg-6">
-                    <label class="form-label fw-bold small text-muted text-uppercase">Filtrar por Estatus</label>
+                    <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Filtrar por Estatus</label>
                     <div class="d-flex flex-wrap gap-3">
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="URGENTE" id="chkUrg" checked><label class="form-check-label small fw-bold" style="color: #d32f2f" for="chkUrg">Urgentes</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="PENDIENTE" id="chkPen" checked><label class="form-check-label small fw-bold text-warning" for="chkPen">Pendientes</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="CON TIEMPO" id="chkTie" checked><label class="form-check-label small fw-bold text-success" for="chkTie">A Tiempo</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="ACEPTADA" id="chkAce"><label class="form-check-label small fw-bold text-info" for="chkAce">Aceptadas</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="RECHAZADA" id="chkRechazada"><label class="form-check-label small fw-bold text-secondary" for="chkRechazada">Rechazadas</label>
-                        </div>
+                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="URGENTE" id="chkUrg" checked><label class="form-check-label x-small fw-bold text-danger">Urgentes</label></div>
+                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="PENDIENTE" id="chkPen" checked><label class="form-check-label x-small fw-bold text-warning">Pendientes</label></div>
+                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="CON TIEMPO" id="chkTie" checked><label class="form-check-label x-small fw-bold text-success">A Tiempo</label></div>
+                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="ACEPTADA" id="chkAce" checked><label class="form-check-label x-small fw-bold text-info">Aceptadas</label></div>
+                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="RECHAZADA" id="chkRec" checked><label class="form-check-label x-small fw-bold text-secondary">Rechazadas</label></div>
                     </div>
                 </div>
-
                 <div class="col-lg-4">
-                    <label class="form-label fw-bold small text-muted text-uppercase">Rango de Fechas</label>
+                    <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Rango de Fechas</label>
                     <div class="input-group input-group-sm">
-                        <input type="date" id="fecha_inicio" class="form-control">
-                        <span class="input-group-text bg-white"><i class="bi bi-arrow-right"></i></span>
-                        <input type="date" id="fecha_fin" class="form-control">
+                        <input type="date" id="fecha_inicio" class="form-control"><span class="input-group-text bg-white">→</span><input type="date" id="fecha_fin" class="form-control">
                     </div>
                 </div>
+                <div class="col-lg-2">
+                    <button class="btn btn-stalked btn-dark btn-sm w-100 mb-1" onclick="resetFiltros()">Limpiar</button>
+                    <button class="btn btn-stalked btn-danger btn-sm w-100">PDF</button>
+                </div>
+            </div>
+        </div>
 
-                <div class="col-lg-2 d-flex gap-2">
-    <button class="btn btn-dark btn-sm w-100 rounded-pill" onclick="resetFiltros()">
-        <i class="bi bi-trash-fill me-1"></i> Limpiar
-    </button>
-    
-    <button class="btn btn-danger btn-sm w-100 rounded-pill" onclick="descargarReporte()">
-        <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
-    </button>
-</div>
-
-            <div class="table-container shadow-sm border-0 overflow-hidden">
-                <table class="table table-hover align-middle mb-0" id="tablaSolicitudes">
-                    <thead class="table-light text-uppercase small">
-                        <tr>
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="tablaSolicitudes" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr class="text-muted x-small fw-bold text-uppercase">
                             <th class="ps-4">Folio</th>
-                            <th>Solicitante / Evento</th>
+                            <th>Evento / Solicitante</th>
                             <th>Auditorio</th>
                             <th>Fecha</th>
-                            <th>Estatus</th>
+                            <th class="text-center">Estatus</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        $query = "SELECT s.*, u.nombre as nombre_usuario, a.nombre_espacio 
-                                  FROM solicitudes s
-                                  JOIN usuarios u ON s.id_usuario = u.id_usuario
-                                  JOIN auditorio a ON s.id_auditorio = a.id_auditorio
-                                  ORDER BY s.id_solicitud DESC";
+                        $query = "SELECT s.*, u.nombre as nombre_usuario, a.nombre_espacio FROM solicitudes s JOIN usuarios u ON s.id_usuario = u.id_usuario JOIN auditorio a ON s.id_auditorio = a.id_auditorio ORDER BY s.id_solicitud DESC";
                         $resultado = mysqli_query($conexion, $query);
                         while ($row = mysqli_fetch_assoc($resultado)):
                             if ($row['estado'] == 'Pendiente') {
-                                $bg_status = ($row['prioridad'] == 'Urgente') ? 'card-urgent' : (($row['prioridad'] == 'Pendiente') ? 'card-pending' : 'card-on-time');
-                                $texto_mostrar = $row['prioridad'];
+                                if ($row['prioridad'] == 'Urgente') {
+                                    $st_class = 'st-urgente';
+                                    $txt = 'URGENTE';
+                                } elseif ($row['prioridad'] == 'Pendiente') {
+                                    $st_class = 'st-pendiente';
+                                    $txt = 'PENDIENTE';
+                                } else {
+                                    $st_class = 'st-tiempo';
+                                    $txt = 'A TIEMPO';
+                                }
                             } else {
-                                $bg_status = ($row['estado'] == 'Aceptada') ? 'card-accepted' : 'card-rejected';
-                                $texto_mostrar = $row['estado'];
+                                $st_class = ($row['estado'] == 'Aceptada') ? 'st-aceptada' : 'st-rechazada';
+                                $txt = strtoupper($row['estado']);
                             }
                         ?>
                             <tr>
-                                <td class="ps-4 fw-bold text-primary small"><?php echo $row['folio']; ?></td>
+                                <td class="ps-4 fw-bold" style="color: var(--sira-purple-primary);">#<?php echo $row['folio']; ?></td>
                                 <td>
-                                    <div class="fw-bold text-dark small"><?php echo $row['titulo_event']; ?></div>
-                                    <div class="text-muted x-small">Solicitó: <?php echo $row['nombre_usuario']; ?></div>
+                                    <div class="fw-bold"><?php echo $row['titulo_event']; ?></div>
+                                    <div class="text-muted x-small">Por: <?php echo $row['nombre_usuario']; ?></div>
                                 </td>
                                 <td><span class="badge rounded-pill bg-light text-dark border px-3"><?php echo $row['nombre_espacio']; ?></span></td>
-                                <td class="small text-muted"><?php echo $row['fecha_evento']; ?></td>
-                                <td><span class="badge-status <?php echo $bg_status; ?>"><?php echo strtoupper($texto_mostrar); ?></span></td>
-                                <td class="text-center">
-                                    <button class="btn btn-gestionar shadow-sm" onclick="gestionar(<?php echo $row['id_solicitud']; ?>)">Gestionar</button>
-                                </td>
+                                <td class="fw-bold text-muted"><?php echo $row['fecha_evento']; ?></td>
+                                <td class="text-center"><span class="badge-status <?php echo $st_class; ?> shadow-sm"><?php echo $txt; ?></span></td>
+                                <td class="text-center"><button class="btn btn-gestionar-sira btn-sm shadow-sm" onclick="gestionar(<?php echo $row['id_solicitud']; ?>)">Gestionar</button></td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -272,76 +409,49 @@ $total_rechazadas = mysqli_fetch_assoc($res_rech)['t'];
     </div>
 
     <div class="modal fade" id="bsModalDetalle" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
-            <div class="modal-header text-white p-4" style="background-color: var(--sira-purple-dark); border-radius: 25px 25px 0 0;">
-                <h5 class="modal-title fw-bold"><i class="bi bi- eye-fill me-2"></i> Revisión de Solicitud</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            
-            <div class="modal-body p-4">
-                <div class="row g-4">
-                    <div class="col-md-5 border-end">
-                        <h4 class="fw-bold mb-3" style="color: var(--sira-purple-dark);" id="detFolio"></h4>
-                        
-                        <div class="mb-3">
-                            <label class="text-muted x-small fw-bold text-uppercase d-block">Fecha del Evento</label>
-                            <span class="fw-bold fs-5 text-dark" id="detFechaEvento"></span>
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+                <div class="modal-header text-white" style="background-color: var(--sira-purple-dark); border-radius: 25px 25px 0 0;">
+                    <h5 class="modal-title fw-bold" id="detFolio">Detalle de Solicitud</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-md-6 border-end">
+                            <label class="text-muted small fw-bold text-uppercase">Evento</label>
+                            <p class="fw-bold fs-5" id="detTituloEv">---</p>
+                            <label class="text-muted small fw-bold text-uppercase">Solicitante</label>
+                            <p id="detUsuarioNombre">---</p>
+                            <label class="text-muted small fw-bold text-uppercase">Auditorio</label>
+                            <p class="fw-bold text-primary" id="detAuditorio">---</p>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label class="text-muted x-small fw-bold text-uppercase d-block">Horario</label>
-                            <span class="fw-bold text-dark" id="detHorario"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="text-muted x-small fw-bold text-uppercase d-block">Estado Actual</label>
-                            <span id="detEstado" class="badge-status card-pending"></span>
-                        </div>
-                        
-                        <hr class="my-4">
-                        
-                        <label class="form-label fw-bold small text-muted text-uppercase mb-2">Tomar Decisión</label>
-                        <div class="d-flex gap-2 mb-3">
-                            <button class="btn btn-success flex-fill fw-bold rounded-pill" onclick="actualizarEstado('Aceptada')">Aprobar</button>
-                            <button class="btn btn-danger flex-fill fw-bold rounded-pill" onclick="actualizarEstado('Rechazada')">Rechazar</button>
-                        </div>
-                        
-                        <textarea id="motivoRechazo" class="form-control mb-3 border-0 bg-light" rows="2" placeholder="Escribe un comentario o motivo..."></textarea>
-                        
-                        <button class="btn btn-outline-danger btn-sm w-100 fw-bold rounded-pill" id="btnBorrarModal">
-                            <i class="bi bi-trash3-fill me-1"></i> Eliminar Registro
-                        </button>
-                    </div>
-                    
-                    <div class="col-md-7">
-                        <div class="mb-4">
-                            <label class="text-primary x-small fw-bold text-uppercase d-block">Solicitante</label>
-                            <p class="h5 fw-bold text-dark" id="detUsuarioNombre"></p>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="text-muted x-small fw-bold text-uppercase d-block">Espacio / Auditorio</label>
-                            <p class="fw-bold text-dark" id="detAuditorio"></p>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="text-muted x-small fw-bold text-uppercase d-block">Título del Evento</label>
-                            <p class="fw-bold text-dark" id="detTituloEv"></p>
-                        </div>
-                        
-                        <div>
-                            <label class="text-muted x-small fw-bold text-uppercase d-block">Descripción detallada</label>
-                            <div class="p-3 rounded-4 mt-1 shadow-sm border" id="detDescription" style="background-color: #fafafa; min-height: 120px; font-size: 0.9rem; color: #555;">
-                                </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold text-uppercase">Fecha y Hora</label>
+                            <p id="detFechaEvento">--/--/----</p>
+                            <p class="small" id="detHorario">--:-- - --:--</p>
+                            <label class="text-muted small fw-bold text-uppercase">Descripción</label>
+                            <div class="p-2 bg-light rounded shadow-sm mb-3" id="detDescription" style="font-size: 0.9rem; min-height: 60px;">---</div>
                         </div>
                     </div>
+                    <hr class="my-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-7">
+                            <textarea id="motivoRechazo" class="form-control border-0 bg-light" rows="2" placeholder="Opcional: Motivo de rechazo..." style="border-radius: 12px;"></textarea>
+                        </div>
+                        <div class="col-md-5 d-flex gap-2">
+                            <button class="btn btn-success flex-fill fw-bold rounded-pill py-2 shadow-sm" onclick="actualizarEstado('Aceptada')">Aceptar</button>
+                            <button class="btn btn-danger flex-fill fw-bold rounded-pill py-2 shadow-sm" onclick="actualizarEstado('Rechazada')">Rechazar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4">
+                    <button class="btn btn-link text-danger text-decoration-none small" id="btnBorrarModal">Eliminar Solicitud</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/admin_interactivo.js"></script>
 </body>
