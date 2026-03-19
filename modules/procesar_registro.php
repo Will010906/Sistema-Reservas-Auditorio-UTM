@@ -8,10 +8,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $carrera = $_POST['carrera'];
     $pass_plana = $_POST['password'];
     
-    // NUEVA LÍNEA: Capturamos el teléfono del formulario
-    $telefono = mysqli_real_escape_string($conexion, $_POST['telefono']);
+    // LIMPIEZA: Quitamos los guiones del teléfono antes de guardar
+    $telefono = preg_replace('/\D/', '', $_POST['telefono']); 
+    $telefono = mysqli_real_escape_string($conexion, $telefono);
 
-    // 1. Verificar si la matrícula ya existe
+    // Verificar si la matrícula ya existe
     $checkQuery = "SELECT id_usuario FROM usuarios WHERE matricula = '$matricula'";
     $resCheck = mysqli_query($conexion, $checkQuery);
 
@@ -22,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $pass_hash = password_hash($pass_plana, PASSWORD_DEFAULT);
 
-    // 2. INSERT actualizado con la columna 'telefono'
+    // INSERT con el teléfono limpio y estatus activo
     $query = "INSERT INTO usuarios (matricula, nombre, correo_electronico, telefono, password, perfil, carrera_area, estatus) 
               VALUES ('$matricula', '$nombre', '$correo', '$telefono', '$pass_hash', 'alumno', '$carrera', 1)";
 

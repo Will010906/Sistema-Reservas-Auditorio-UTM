@@ -1,26 +1,39 @@
 <?php
 /**
- * MÓDULO DE ELIMINACIÓN DE SOLICITUDES
- * Proyecto: Sistema de Reservación de Auditorios - UTM
- * Descripción: Elimina un registro de reservación de la base de datos mediante su ID. [cite: 1]
- * Formato de respuesta: JSON para integración con Fetch API.
+ * MÓDULO DE ELIMINACIÓN DE SOLICITUDES (SEGURIDAD REFORZADA)
  */
+session_start();
 include '../config/db_local.php';
 
-// Validación de la existencia del parámetro ID enviado por método GET
-if (isset($_GET['id'])) {
-    // Saneamiento del ID para seguridad de la consulta [cite: 1]
-    $id = mysqli_real_escape_string($conexion, $_GET['id']);
+// Verificamos sesión iniciada y parámetro ID
+if (isset($_SESSION['id_usuario']) && isset($_GET['id'])) {
     
-    // Sentencia SQL de eliminación [cite: 2]
-    $sql = "DELETE FROM solicitudes WHERE id_solicitud = '$id'";
+    $id_solicitud = intval($_GET['id']);
+    $id_user_sesion = $_SESSION['id_usuario'];
+    $rol_user = $_SESSION['rol'] ?? 'Usuario';
+
+    // Si es Administrador, borra cualquier cosa.
+    // Si es Usuario, solo borra si le pertenece Y está PENDIENTE.
+    if ($rol_user === 'Admin') {
+        $sql = "DELETE FROM solicitudes WHERE id_solicitud = $id_solicitud";
+    } else {
+        $sql = "DELETE FROM solicitudes 
+                WHERE id_solicitud = $id_solicitud 
+                AND id_usuario = '$id_user_sesion' 
+                AND estado = 'PENDIENTE'";
+    }
 
     if (mysqli_query($conexion, $sql)) {
-        // Respuesta exitosa capturada por admin_interactivo.js
-        echo json_encode(['success' => true]);
+        // mysqli_affected_rows nos dice si realmente se borró algo
+        if (mysqli_affected_rows($conexion) > 0) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'No tienes permiso para eliminar esta solicitud o ya no está pendiente.']);
+        }
     } else {
-        // Error técnico en caso de fallo en la base de datos [cite: 3]
         echo json_encode(['success' => false, 'error' => mysqli_error($conexion)]);
     }
+} else {
+    echo json_encode(['success' => false, 'error' => 'Acceso no autorizado o ID faltante.']);
 }
 ?>

@@ -4,138 +4,226 @@
  */
 
 let idSeleccionado = null;
-let bsModal = null; 
+let bsModal = null;
 
 /**
  * Carga el detalle y abre el modal
  */
 function gestionar(id) {
-    idSeleccionado = id;
-    if (!bsModal) {
-        const modalElement = document.getElementById('bsModalDetalle');
-        if (modalElement) bsModal = new bootstrap.Modal(modalElement);
-    }
+  idSeleccionado = id;
+  if (!bsModal) {
+    const modalElement = document.getElementById("bsModalDetalle");
+    if (modalElement) bsModal = new bootstrap.Modal(modalElement);
+  }
 
-    fetch(`modules/get_detalle.php?id=${id}`)
-        .then(res => res.json())
-        .then(data => {
-            const llenar = (id, texto) => {
-                const el = document.getElementById(id);
-                if (el) el.innerText = texto || '';
-            };
+  fetch(`modules/get_detalle.php?id=${id}`)
+    .then((res) => res.json())
+    .then((data) => {
+      // Llenado básico
+      document.getElementById("detFolio").innerText = "Folio: " + data.folio;
+      document.getElementById("detTituloEv").innerText = data.titulo_event;
+      document.getElementById("detUsuarioNombre").innerText = data.nombre;
+      document.getElementById("detAuditorio").innerText = data.nombre_espacio;
+      document.getElementById("detFechaEvento").innerText = data.fecha_evento;
+      document.getElementById("detHorario").innerText =
+        `${data.hora_inicio} a ${data.hora_fin}`;
+      document.getElementById("detDescription").innerText = data.descripcion;
 
-            llenar('detFolio', "Folio: " + data.folio);
-            llenar('detFechaEvento', data.fecha_evento); 
-            llenar('detHorario', (data.hora_inicio || '') + ' a ' + (data.hora_fin || ''));
-            llenar('detAuditorio', data.nombre_espacio);
-            llenar('detEstado', data.estado);
-            llenar('detUsuarioNombre', data.nombre);
-            llenar('detTituloEv', data.titulo_event);
-            llenar('detDescription', data.descripcion);
-            
-            const btnBorrar = document.getElementById('btnBorrarModal');
-            if(btnBorrar) btnBorrar.setAttribute('onclick', `eliminarSolicitud(${id})`);
-            
-            bsModal.show();
+      // 1. Lógica de WhatsApp
+      const btnWA = document.getElementById("btnWhatsApp");
+      if (data.telefono) {
+        btnWA.href = `https://wa.me/52${data.telefono.replace(/\D/g, "")}`;
+        btnWA.style.display = "inline-block";
+      } else {
+        btnWA.style.display = "none";
+      }
+
+      // 2. Alerta de Capacidad
+      const asistentes = parseInt(data.num_asistentes || 0);
+      const capacidad = parseInt(data.capacidad_maxima || 0);
+      const alertaCap = document.getElementById("detAsistentes");
+      if (asistentes > capacidad) {
+        alertaCap.innerHTML = `<span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle"></i> Sobrecupo: ${asistentes}/${capacidad}</span>`;
+      } else {
+        alertaCap.innerHTML = `<span class="text-muted small">${asistentes} asistentes (Capacidad: ${capacidad})</span>`;
+      }
+
+      // 3. Renderizar Equipamiento
+      const contenedorEquip = document.getElementById("detEquipamiento");
+      contenedorEquip.innerHTML = "";
+      if (data.equipos_solicitados) {
+        data.equipos_solicitados.split(", ").forEach((item) => {
+          contenedorEquip.innerHTML += `<span class="badge bg-light text-dark border small">${item}</span>`;
         });
-}
+      } else {
+        contenedorEquip.innerHTML =
+          '<span class="text-muted small italic">Ninguno solicitado</span>';
+      }
 
+      bsModal.show();
+    });
+}
 /**
  * SISTEMA DE FILTRADO (Estatus + Fechas)
  */
 
 // Escuchar cambios en checkboxes y fechas
-document.addEventListener("change", function(e) {
-    if (e.target.classList.contains("filter-check") || e.target.type === "date") {
-        aplicarFiltros();
-    }
+// --- LÓGICA DE EXCLUSIÓN PARA "TODOS" ---
+
+// 1. Si marco "TODOS", desmarco los demás
+document.getElementById("chkTodos").addEventListener("change", function (e) {
+  if (this.checked) {
+    document
+      .querySelectorAll(".filter-check")
+      .forEach((cb) => (cb.checked = false));
+  }
+  aplicarFiltros();
 });
 
+// 2. Si marco cualquier otro, desmarco "TODOS"
+document.querySelectorAll(".filter-check").forEach((checkbox) => {
+  checkbox.addEventListener("change", function () {
+    if (this.checked) {
+      document.getElementById("chkTodos").checked = false;
+    }
+    aplicarFiltros();
+  });
+});
+
+/**
+ * SISTEMA DE FILTRADO (Estatus + Fechas)
+ */
 function aplicarFiltros() {
-    // 1. Obtener valores seleccionados de los checkboxes
-    const seleccionados = Array.from(document.querySelectorAll(".filter-check:checked"))
-                               .map(cb => cb.value.toUpperCase());
+  const todosActivo = document.getElementById("chkTodos").checked;
 
-    // 2. Obtener valores de fecha
-    const inicio = document.getElementById("fecha_inicio").value; // Formato YYYY-MM-DD
-    const fin = document.getElementById("fecha_fin").value;       // Formato YYYY-MM-DD
-    
-    const filas = document.querySelectorAll("#tablaSolicitudes tbody tr");
+  // Obtener valores solo si "TODOS" no está marcado
+  const seleccionados = todosActivo
+    ? []
+    : Array.from(document.querySelectorAll(".filter-check:checked")).map((cb) =>
+        cb.value.toUpperCase(),
+      );
 
-    filas.forEach(fila => {
-        // Obtenemos el texto del estatus del badge
-        const badge = fila.querySelector(".badge-status, .badge-status-pro");
-        // Obtenemos la fecha de la celda (asumiendo que es la 4ta columna)
-        const fechaCeldaRaw = fila.querySelector("td:nth-child(4)").innerText.trim();
-        
-        // Convertir dd/mm/aaaa a aaaa-mm-dd para poder comparar fechas correctamente
-        const partes = fechaCeldaRaw.split('/');
-        const fechaFila = `${partes[2]}-${partes[1]}-${partes[0]}`;
+  const inicio = document.getElementById("fecha_inicio").value;
+  const fin = document.getElementById("fecha_fin").value;
+  const filas = document.querySelectorAll("#tablaSolicitudes tbody tr");
 
-        if (!badge) return;
-        const textoEstado = badge.innerText.trim().toUpperCase();
+  filas.forEach((fila) => {
+    const badge = fila.querySelector(".badge-status");
+    if (!badge) return;
 
-        // Lógica de validación
-        const cumpleEstatus = seleccionados.includes(textoEstado);
-        
-        let cumpleFecha = true;
-        if (inicio && fin) {
-            cumpleFecha = (fechaFila >= inicio && fechaFila <= fin);
-        } else if (inicio) {
-            cumpleFecha = (fechaFila >= inicio);
-        } else if (fin) {
-            cumpleFecha = (fechaFila <= fin);
-        }
+    const textoEstado = badge.innerText.trim().toUpperCase();
+    const fechaCeldaRaw = fila
+      .querySelector("td:nth-child(4)")
+      .innerText.trim();
+    const partes = fechaCeldaRaw.split("/");
+    const fechaFila = `${partes[2]}-${partes[1]}-${partes[0]}`;
 
-        // Aplicar visibilidad
-        fila.style.display = (cumpleEstatus && cumpleFecha) ? "" : "none";
-    });
+    // Lógica de validación
+    // Si 'todosActivo' es true, cumpleEstatus siempre es true
+    const cumpleEstatus = todosActivo || seleccionados.includes(textoEstado);
+
+    let cumpleFecha = true;
+    if (inicio && fin) {
+      cumpleFecha = fechaFila >= inicio && fechaFila <= fin;
+    } else if (inicio) {
+      cumpleFecha = fechaFila >= inicio;
+    } else if (fin) {
+      cumpleFecha = fechaFila <= fin;
+    }
+
+    fila.style.display = cumpleEstatus && cumpleFecha ? "" : "none";
+  });
 }
 
 /**
  * Función Limpiar (RESTAURADA)
  */
-function resetFiltros() {
-    // Marcar los 3 principales por defecto, desmarcar los otros
-    document.getElementById("chkUrg").checked = true;
-    document.getElementById("chkPen").checked = true;
-    document.getElementById("chkTie").checked = true;
-    document.getElementById("chkAce").checked = false;
-    document.getElementById("chkRec").checked = false;
+/**
+ * Función Limpiar (RESTAURADA Y GLOBAL)
+ */
+// Lógica para el checkbox "TODOS"
+document.getElementById("chkTodos").addEventListener("change", function (e) {
+  const estaMarcado = e.target.checked;
+  const filtros = document.querySelectorAll(".filter-check");
 
-    // Limpiar fechas
-    document.getElementById("fecha_inicio").value = "";
-    document.getElementById("fecha_fin").value = "";
+  // Marcamos o desmarcamos todos los demás
+  filtros.forEach((cb) => (cb.checked = estaMarcado));
 
-    // Refrescar tabla
-    aplicarFiltros();
-}
+  // Aplicamos el filtro a la tabla inmediatamente
+  aplicarFiltros();
+});
+
+// Función Limpiar (Actualizada para incluir 'Todos')
+window.resetFiltros = function () {
+  console.log("Reiniciando panel SIRA...");
+
+  // Marcamos 'Todos' y activamos los filtros principales
+  document.getElementById("chkTodos").checked = true;
+  document
+    .querySelectorAll(".filter-check")
+    .forEach((cb) => (cb.checked = false));
+  document.getElementById("chkUrg").checked = false;
+  document.getElementById("chkPen").checked = false;
+  document.getElementById("chkTie").checked = false;
+
+  // Dejamos las terminadas desmarcadas por orden visual
+  document.getElementById("chkAce").checked = false;
+  document.getElementById("chkRec").checked = false;
+
+  // Limpiar fechas
+  document.getElementById("fecha_inicio").value = "";
+  document.getElementById("fecha_fin").value = "";
+
+  // Mostrar todas las filas antes de filtrar
+  document
+    .querySelectorAll("#tablaSolicitudes tbody tr")
+    .forEach((f) => (f.style.display = ""));
+
+  aplicarFiltros();
+};
 
 /**
  * Reporte PDF
  */
-function descargarReporte() {
-    const inicio = document.getElementById("fecha_inicio").value;
-    const fin = document.getElementById("fecha_fin").value;
-    const seleccionados = Array.from(document.querySelectorAll(".filter-check:checked"))
-                               .map(cb => cb.value)
-                               .join(',');
+window.descargarReporte = function () {
+  const inicio = document.getElementById("fecha_inicio").value;
+  const fin = document.getElementById("fecha_fin").value;
 
-    if (!inicio || !fin) {
-        alert("Por favor selecciona un rango de fechas para generar el PDF.");
-        return;
-    }
+  // Obtenemos los estatus marcados para el reporte
+  const seleccionados = Array.from(
+    document.querySelectorAll(".filter-check:checked"),
+  )
+    .map((cb) => cb.value)
+    .join(",");
 
-    const url = `modules/generar_reporte.php?inicio=${inicio}&fin=${fin}&estatus=${seleccionados}`;
-    window.open(url, '_blank');
-}
+  if (!inicio || !fin) {
+    Swal.fire({
+      icon: "info",
+      title: "Rango incompleto",
+      text: "Selecciona una fecha de inicio y fin para el PDF.",
+      confirmButtonColor: "#5B3D66",
+    });
+    return;
+  }
+
+  const url = `modules/generar_reporte.php?inicio=${inicio}&fin=${fin}&estatus=${seleccionados}`;
+  window.open(url, "_blank");
+};
 
 /**
  * Actualizar Estado (Aprobar/Rechazar)
  */
-function actualizarEstado(nuevoEstado) {
+window.actualizarEstado = function(nuevoEstado) {
     if (!idSeleccionado) return;
-    const motivo = document.getElementById('motivoRechazo').value;
+    
+    // 1. CAPTURAMOS EL TEXTO (Asegúrate de que este nombre sea el que usas abajo)
+    const motivoTexto = document.getElementById('motivoRechazo').value;
+
+    Swal.fire({
+        title: 'Procesando...',
+        didOpen: () => { Swal.showLoading() },
+        allowOutsideClick: false
+    });
 
     fetch('modules/actualizar_estado.php', {
         method: 'POST',
@@ -143,26 +231,27 @@ function actualizarEstado(nuevoEstado) {
         body: JSON.stringify({ 
             id: idSeleccionado, 
             estado: nuevoEstado,
-            comentario: motivo 
+            comentario: motivoTexto // <-- AQUÍ: Debe decir 'motivoTexto', no 'motivo'
         })
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            location.reload(); 
-        } else {
-            alert("Error al actualizar: " + data.error);
-        }
-    });
-}
+            // Construir mensaje para WhatsApp usando la misma variable 'motivoTexto'
+            const msg = nuevoEstado === 'Aceptada' 
+                ? `¡Hola ${data.usuario}! Tu solicitud para "${data.evento}" fue ACEPTADA. \nInstrucciones: ${motivoTexto}`
+                : `Hola ${data.usuario}, tu solicitud para "${data.evento}" fue RECHAZADA. \nMotivo: ${motivoTexto}`;
 
-function eliminarSolicitud(id) {
-    if (confirm("¿Eliminar permanentemente este registro?")) {
-        fetch(`modules/eliminar_solicitud.php?id=${id}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) location.reload();
-                else alert("Error: " + data.error);
+            const urlWA = `https://wa.me/52${data.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`;
+            
+            Swal.fire('¡Éxito!', 'Estado actualizado correctamente.', 'success').then(() => {
+                window.open(urlWA, '_blank');
+                location.reload(); 
             });
-    }
-}
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+    });
+};

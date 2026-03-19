@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PANEL DE USUARIO - SIRA UTM
  * Versión Sinergia Final: Contadores dinámicos y Filtros optimizados.
@@ -116,10 +117,22 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
             color: white;
         }
 
-        .bg-pend { background: var(--grad-pending); }
-        .bg-pend h6, .bg-pend .count { color: #2D1B33; }
-        .bg-acep { background: var(--grad-accepted); }
-        .bg-rech { background: var(--grad-rejected); }
+        .bg-pend {
+            background: var(--grad-pending);
+        }
+
+        .bg-pend h6,
+        .bg-pend .count {
+            color: #2D1B33;
+        }
+
+        .bg-acep {
+            background: var(--grad-accepted);
+        }
+
+        .bg-rech {
+            background: var(--grad-rejected);
+        }
 
         .watermark {
             position: absolute;
@@ -142,40 +155,52 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
             display: inline-block;
         }
 
-        .st-pendiente { background: var(--grad-pending); color: #2D1B33 !important; }
-        .st-aceptada { background: var(--grad-accepted); color: white !important; }
-        .st-rechazada { background: var(--grad-rejected); color: white !important; }
+        .st-pendiente {
+            background: var(--grad-pending);
+            color: #2D1B33 !important;
+        }
 
-        .dataTables_filter { display: none; }
-        
+        .st-aceptada {
+            background: var(--grad-accepted);
+            color: white !important;
+        }
+
+        .st-rechazada {
+            background: var(--grad-rejected);
+            color: white !important;
+        }
+
+        .dataTables_filter {
+            display: none;
+        }
+
         /* Forzar la primera letra del mes a Mayúscula y mejorar el estilo */
-.fc .fc-toolbar-title {
-    text-transform: capitalize !important;
-    font-weight: 800 !important;
-    color: var(--sira-purple-dark);
-    font-size: 1.5rem !important;
-}
+        .fc .fc-toolbar-title {
+            text-transform: capitalize !important;
+            font-weight: 800 !important;
+            color: var(--sira-purple-dark);
+            font-size: 1.5rem !important;
+        }
 
-/* También para los días de la semana (opcional) */
-.fc-col-header-cell-cushion {
-    text-transform: capitalize !important;
-    text-decoration: none !important;
-    font-weight: 700;
-    color: var(--sira-purple-primary);
-}
+        /* También para los días de la semana (opcional) */
+        .fc-col-header-cell-cushion {
+            text-transform: capitalize !important;
+            text-decoration: none !important;
+            font-weight: 700;
+            color: var(--sira-purple-primary);
+        }
 
-/* Mejorar el aspecto de los botones del calendario */
-.fc .fc-button-primary {
-    background-color: var(--sira-purple-primary) !important;
-    border-color: var(--sira-purple-primary) !important;
-    border-radius: 10px !important;
-    text-transform: capitalize;
-}
+        /* Mejorar el aspecto de los botones del calendario */
+        .fc .fc-button-primary {
+            background-color: var(--sira-purple-primary) !important;
+            border-color: var(--sira-purple-primary) !important;
+            border-radius: 10px !important;
+            text-transform: capitalize;
+        }
 
-.fc .fc-button-primary:hover {
-    background-color: var(--sira-purple-dark) !important;
-}
-
+        .fc .fc-button-primary:hover {
+            background-color: var(--sira-purple-dark) !important;
+        }
     </style>
 </head>
 
@@ -245,16 +270,18 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
                             <th>Auditorio</th>
                             <th>Fecha</th>
                             <th class="text-center">Estatus</th>
+                            <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
                         $sql = "SELECT s.*, a.nombre_espacio FROM solicitudes s 
-                                JOIN auditorio a ON s.id_auditorio = a.id_auditorio 
-                                WHERE s.id_usuario = '$id_user' ORDER BY s.id_solicitud DESC";
+            JOIN auditorio a ON s.id_auditorio = a.id_auditorio 
+            WHERE s.id_usuario = '$id_user' ORDER BY s.id_solicitud DESC";
                         $resultado = mysqli_query($conexion, $sql);
                         while ($fila = mysqli_fetch_assoc($resultado)):
                             $status_val = strtoupper($fila['estado']);
+                            $id_sol = $fila['id_solicitud'];
                             $st_class = ($status_val == 'ACEPTADA') ? 'st-aceptada' : (($status_val == 'RECHAZADA') ? 'st-rechazada' : 'st-pendiente');
                         ?>
                             <tr>
@@ -262,7 +289,25 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
                                 <td class="fw-600"><?php echo $fila['titulo_event']; ?></td>
                                 <td><span class="badge rounded-pill bg-light text-dark border px-3 py-2"><?php echo $fila['nombre_espacio']; ?></span></td>
                                 <td class="text-muted fw-bold"><?php echo date('d/m/Y', strtotime($fila['fecha_evento'])); ?></td>
-                                <td class="text-center"><span class="badge-status <?php echo $st_class; ?> shadow-sm"><?php echo $status_val; ?></span></td>
+                                <td class="text-center">
+                                    <span class="badge-status <?php echo $st_class; ?> shadow-sm"><?php echo $status_val; ?></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <button class="btn btn-sm btn-outline-primary border-0" onclick="verDetalleUsuario(<?php echo $id_sol; ?>)" title="Ver Detalle">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </button>
+
+                                        <?php if ($status_val == 'PENDIENTE'): ?>
+                                            <button class="btn btn-sm btn-outline-warning border-0" onclick="editarMiSolicitud(<?php echo $id_sol; ?>)" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger border-0" onclick="cancelarMiSolicitud(<?php echo $id_sol; ?>)" title="Cancelar">
+                                                <i class="bi bi-x-circle-fill"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -280,17 +325,24 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
     <script src="assets/js/gestion_reservas.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+    <script src="assets/js/gestion_reservas.js"></script>
+    <script src="assets/js/usuario_reservas.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <script>
-        <?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>
-            Swal.fire({
-                title: '¡Reservación Solicitada!',
-                text: 'Tu folio es <?php echo $_GET['folio']; ?>. Revisa el estado en tu tabla de mis reservaciones.',
-                icon: 'success',
-                confirmButtonColor: '#008f39'
-            });
-        <?php endif; ?>
+       <?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>
+    Swal.fire({
+        title: '¡Reservación Solicitada!',
+        text: 'Tu folio es <?php echo $_GET['folio']; ?>. Revisa el estado en tu tabla.',
+        icon: 'success',
+        confirmButtonColor: '#00a65a'
+    }).then((result) => {
+        // Esta línea borra los parámetros ?status=success... de la barra de direcciones
+        window.history.replaceState({}, document.title, window.location.pathname);
+    });
+<?php endif; ?>
     </script>
 </body>
+
 </html>

@@ -36,15 +36,19 @@
                             <input type="email" name="correo" class="form-control" placeholder="usuario@utm.mx" required>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Teléfono / WhatsApp</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-whatsapp"></i></span>
-                                <input type="tel" name="telefono" id="reg_tel" class="form-control border-start-0"
-                                    placeholder="4431234567" maxlength="10" required>
-                            </div>
-                            <div class="form-text" style="font-size: 0.7rem;">10 dígitos sin espacios.</div>
-                        </div>
+                     <div class="mb-3">
+    <label class="form-label small fw-bold text-muted">Teléfono / WhatsApp</label>
+    <div class="input-group">
+        <span class="input-group-text bg-white text-muted border-end-0">
+            <i class="bi bi-whatsapp"></i>
+        </span>
+        <input type="tel" name="telefono" id="reg_tel" class="form-control border-start-0" 
+               placeholder="443-123-4567" maxlength="12" required>
+    </div>
+    <div class="form-text d-flex justify-content-between" style="font-size: 0.7rem;">
+        <span>10 dígitos sin espacios.</span>
+    </div>
+</div>
 
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Carrera</label>

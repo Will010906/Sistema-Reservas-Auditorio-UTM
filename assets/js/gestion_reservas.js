@@ -21,13 +21,20 @@ function irAlCalendario(id, nombre, equipamiento) {
   document.getElementById("display_nombre_auditorio").innerText = nombre;
   document.getElementById("display_nombre_final").innerText = nombre;
 
-  // LIMPIEZA DE VISTA: Ocultar otros pasos y mostrar calendario
   document.getElementById("paso_catalogo").style.display = "none";
   document.getElementById("paso_formulario").style.display = "none";
   document.getElementById("paso_calendario").style.display = "block";
 
   setTimeout(() => {
     initCalendar();
+    
+    // SI ESTAMOS EDITANDO: Forzamos al calendario a ir a la fecha precargada
+    let fechaPrecargada = document.getElementById("input_fecha_evento").value;
+    if(fechaPrecargada && calendarInstance) {
+        calendarInstance.gotoDate(fechaPrecargada);
+        // Opcional: Disparar el click automático en esa fecha para ver horarios
+        actualizarDisponibilidad(); 
+    }
   }, 200);
 }
 
@@ -315,11 +322,38 @@ $(document).ready(function () {
   });
 });
 
+// --- LÓGICA DE FILTROS Y REPORTES SIRA ---
+
+// 1. Función para resetear todo el panel
 function limpiarFiltros() {
-  $(".check-filtro").prop("checked", false);
-  const table = $("#tablaMisReservas").DataTable();
-  table.search("").column(4).search("").draw();
+    // A. Resetear Checkboxes (Marcamos los activos, desmarcamos los finales)
+    $("#chkUrg, #chkPen, #chkTie").prop("checked", true);
+    $("#chkAce, #chkRec").prop("checked", false);
+
+    // B. Limpiar Rango de Fechas
+    document.getElementById('fecha_inicio').value = '';
+    document.getElementById('fecha_fin').value = '';
+
+    // C. Recargar la página para ver todo de nuevo (o llamar a tu función de filtrado)
+    location.reload(); 
+    console.log("Filtros limpiados.");
 }
+
+// 2. Escuchador para el botón PDF
+document.addEventListener("DOMContentLoaded", function () {
+    const btnPDF = document.getElementById('btnPDF');
+    if (btnPDF) {
+        btnPDF.addEventListener('click', function() {
+            // Capturamos las fechas para el reporte
+            const fInicio = document.getElementById('fecha_inicio').value;
+            const fFin = document.getElementById('fecha_fin').value;
+            
+            // Abrimos el generador pasándole los parámetros
+            const url = `modules/generar_reporte.php?inicio=${fInicio}&fin=${fFin}`;
+            window.open(url, '_blank');
+        });
+    }
+});
 
 // --- 5. LIMPIEZA DE MODAL ---
 

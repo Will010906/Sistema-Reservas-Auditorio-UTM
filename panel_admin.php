@@ -36,7 +36,7 @@ $rol_usuario = $_SESSION['rol'] ?? 'Admin';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<script src="assets/js/auth_check.js"></script>
+    <script src="assets/js/auth_check.js"></script>
     <style>
         :root {
             --sira-purple-dark: #2D1B33;
@@ -332,28 +332,36 @@ $rol_usuario = $_SESSION['rol'] ?? 'Admin';
         </div>
 
         <div class="bg-white p-3 mb-4 rounded-4 shadow-sm border-0">
-            <div class="row g-3 align-items-end">
-                <div class="col-lg-6">
-                    <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Filtrar por Estatus</label>
-                    <div class="d-flex flex-wrap gap-3">
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="URGENTE" id="chkUrg" checked><label class="form-check-label x-small fw-bold text-danger">Urgentes</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="PENDIENTE" id="chkPen" checked><label class="form-check-label x-small fw-bold text-warning">Pendientes</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="CON TIEMPO" id="chkTie" checked><label class="form-check-label x-small fw-bold text-success">A Tiempo</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="ACEPTADA" id="chkAce" checked><label class="form-check-label x-small fw-bold text-info">Aceptadas</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="RECHAZADA" id="chkRec" checked><label class="form-check-label x-small fw-bold text-secondary">Rechazadas</label></div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Rango de Fechas</label>
-                    <div class="input-group input-group-sm">
-                        <input type="date" id="fecha_inicio" class="form-control"><span class="input-group-text bg-white">→</span><input type="date" id="fecha_fin" class="form-control">
-                    </div>
-                </div>
-                <div class="col-lg-2">
-                    <button class="btn btn-stalked btn-dark btn-sm w-100 mb-1" onclick="resetFiltros()">Limpiar</button>
-                    <button class="btn btn-stalked btn-danger btn-sm w-100">PDF</button>
-                </div>
+           <div class="row g-3 align-items-end">
+    <div class="col-lg-7">
+        <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Filtrar por Estatus</label>
+        <div class="d-flex flex-wrap gap-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="chkTodos" checked>
+                <label class="form-check-label x-small fw-bold text-primary">TODOS</label>
             </div>
+            <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="URGENTE" id="chkUrg"><label class="form-check-label x-small fw-bold text-danger">Urgentes</label></div>
+            <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="PENDIENTE" id="chkPen"><label class="form-check-label x-small fw-bold text-warning">Pendientes</label></div>
+            <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="CON TIEMPO" id="chkTie"><label class="form-check-label x-small fw-bold text-success">A Tiempo</label></div>
+            <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="ACEPTADA" id="chkAce"><label class="form-check-label x-small fw-bold text-info">Aceptadas</label></div>
+            <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="RECHAZADA" id="chkRec"><label class="form-check-label x-small fw-bold text-secondary">Rechazadas</label></div>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Rango de Fechas</label>
+        <div class="d-flex align-items-center gap-1 bg-light p-1 rounded-3 border" style="max-width: 250px;">
+            <input type="date" id="fecha_inicio" class="form-control form-control-sm border-0 bg-transparent p-1" style="font-size: 0.7rem;">
+            <i class="bi bi-arrow-right text-muted small"></i>
+            <input type="date" id="fecha_fin" class="form-control form-control-sm border-0 bg-transparent p-1" style="font-size: 0.7rem;">
+        </div>
+    </div>
+
+    <div class="col-lg-2">
+        <button class="btn btn-stalked btn-dark btn-sm w-100 mb-1" onclick="resetFiltros()">Limpiar</button>
+        <button id="btnPDF" class="btn btn-stalked btn-danger btn-sm w-100" onclick="descargarReporte()">PDF</button>
+    </div>
+</div>
         </div>
 
         <div class="table-container">
@@ -408,54 +416,13 @@ $rol_usuario = $_SESSION['rol'] ?? 'Admin';
         </div>
     </div>
 
-    <div class="modal fade" id="bsModalDetalle" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
-                <div class="modal-header text-white" style="background-color: var(--sira-purple-dark); border-radius: 25px 25px 0 0;">
-                    <h5 class="modal-title fw-bold" id="detFolio">Detalle de Solicitud</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row">
-                        <div class="col-md-6 border-end">
-                            <label class="text-muted small fw-bold text-uppercase">Evento</label>
-                            <p class="fw-bold fs-5" id="detTituloEv">---</p>
-                            <label class="text-muted small fw-bold text-uppercase">Solicitante</label>
-                            <p id="detUsuarioNombre">---</p>
-                            <label class="text-muted small fw-bold text-uppercase">Auditorio</label>
-                            <p class="fw-bold text-primary" id="detAuditorio">---</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold text-uppercase">Fecha y Hora</label>
-                            <p id="detFechaEvento">--/--/----</p>
-                            <p class="small" id="detHorario">--:-- - --:--</p>
-                            <label class="text-muted small fw-bold text-uppercase">Descripción</label>
-                            <div class="p-2 bg-light rounded shadow-sm mb-3" id="detDescription" style="font-size: 0.9rem; min-height: 60px;">---</div>
-                        </div>
-                    </div>
-                    <hr class="my-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-7">
-                            <textarea id="motivoRechazo" class="form-control border-0 bg-light" rows="2" placeholder="Opcional: Motivo de rechazo..." style="border-radius: 12px;"></textarea>
-                        </div>
-                        <div class="col-md-5 d-flex gap-2">
-                            <button class="btn btn-success flex-fill fw-bold rounded-pill py-2 shadow-sm" onclick="actualizarEstado('Aceptada')">Aceptar</button>
-                            <button class="btn btn-danger flex-fill fw-bold rounded-pill py-2 shadow-sm" onclick="actualizarEstado('Rechazada')">Rechazar</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pb-4">
-                    <button class="btn btn-link text-danger text-decoration-none small" id="btnBorrarModal">Eliminar Solicitud</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include 'includes/modal_detalle.php'; ?>
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/admin_interactivo.js"></script>
-    
+
 </body>
 
 </html>
