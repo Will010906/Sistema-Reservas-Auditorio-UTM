@@ -10849,8 +10849,13 @@ p {
   border-radius: 100%;
 }
 
-#mainNav{
-    background-color:#2D1B33 !important;
+#mainNav {
+    /* Usamos RGBA: los primeros 3 números son tu Morado Profundo (45, 27, 51) */
+    /* El 0.8 es el nivel de transparencia (1 es sólido, 0 es invisible) */
+    background-color: rgba(45, 27, 51, 0.8) !important;
+    backdrop-filter: blur(10px); /* Esto le da un efecto de "vidrio esmerilado" muy moderno */
+    -webkit-backdrop-filter: blur(10px); /* Para que funcione en Safari/iPhone */
+    transition: background-color 0.3s ease; /* Para que el cambio sea suave */
 }
 #mainNav .navbar-toggler {
   padding: 0.75rem;
@@ -10924,7 +10929,8 @@ header.masthead {
   padding-bottom: 6rem;
   text-align: center;
   color: #fff;
-  background-image: url("../img/auditorio.jpg");
+  /* El linear-gradient crea una capa morada sobre la foto */
+  background-image: linear-gradient(rgba(45, 27, 51, 0.7), rgba(45, 27, 51, 0.7)), url("../img/auditorio.jpg");
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-position: center center;
