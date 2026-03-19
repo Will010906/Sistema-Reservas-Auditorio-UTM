@@ -280,6 +280,7 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
     <script src="assets/js/gestion_reservas.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 
     <script>
         <?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>

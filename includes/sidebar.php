@@ -1,12 +1,8 @@
 <?php
 /**
- * SIDEBAR SIRA - CORRECCIÓN SEGÚN BASE DE DATOS
- * Usando columna 'perfil' y valor 'administrador'
+ * SIDEBAR SIRA - CON CONFIRMACIÓN DE SALIDA
  */
 $pagina_actual = basename($_SERVER['PHP_SELF']);
-
-// 1. Usamos 'perfil' que es como aparece en tu captura de phpMyAdmin
-// Forzamos a minúsculas para que coincida con 'administrador'
 $perfil_usuario = isset($_SESSION['perfil']) ? strtolower($_SESSION['perfil']) : 'alumno'; 
 ?>
 
@@ -37,8 +33,11 @@ $perfil_usuario = isset($_SESSION['perfil']) ? strtolower($_SESSION['perfil']) :
             <a href="admin_usuarios.php" class="text-white opacity-25"><i class="bi bi-people fs-4"></i></a>
         <?php endif; ?>
     </div>
+    
     <div style="margin-top: auto; padding-bottom: 30px;">
-        <a href="modules/logout.php" class="text-white opacity-50"><i class="bi bi-box-arrow-left fs-4"></i></a>
+        <a href="javascript:void(0);" onclick="confirmarSalida()" class="text-white opacity-50" title="Cerrar Sesión">
+            <i class="bi bi-box-arrow-left fs-4"></i>
+        </a>
     </div>
 </div>
 
@@ -74,3 +73,5 @@ $perfil_usuario = isset($_SESSION['perfil']) ? strtolower($_SESSION['perfil']) :
         </nav>
     <?php endif; ?>
 </div>
+
+<script src="assets/js/auth.js"></script>
