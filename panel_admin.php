@@ -398,14 +398,14 @@ $rol_usuario = $_SESSION['rol'] ?? 'Admin';
                                 $txt = strtoupper($row['estado']);
                             }
                         ?>
-                            <tr>
+                            <tr class="solicitud-fila">
                                 <td class="ps-4 fw-bold" style="color: var(--sira-purple-primary);">#<?php echo $row['folio']; ?></td>
                                 <td>
                                     <div class="fw-bold"><?php echo $row['titulo_event']; ?></div>
                                     <div class="text-muted x-small">Por: <?php echo $row['nombre_usuario']; ?></div>
                                 </td>
                                 <td><span class="badge rounded-pill bg-light text-dark border px-3"><?php echo $row['nombre_espacio']; ?></span></td>
-                                <td class="fw-bold text-muted"><?php echo $row['fecha_evento']; ?></td>
+                                <td class="fw-bold text-muted date-cell"><?php echo trim($row['fecha_evento']); ?></td>
                                 <td class="text-center"><span class="badge-status <?php echo $st_class; ?> shadow-sm"><?php echo $txt; ?></span></td>
                                 <td class="text-center"><button class="btn btn-gestionar-sira btn-sm shadow-sm" onclick="gestionar(<?php echo $row['id_solicitud']; ?>)">Gestionar</button></td>
                             </tr>

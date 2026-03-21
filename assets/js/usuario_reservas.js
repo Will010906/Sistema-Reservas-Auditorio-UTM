@@ -104,6 +104,7 @@ window.cancelarMiSolicitud = function(id) {
 
 // 4. Función Editar (Modificar)
 window.editarMiSolicitud = function(id) {
+    // Feedback visual de carga
     Swal.fire({ title: 'Cargando datos...', didOpen: () => { Swal.showLoading() }, allowOutsideClick: false });
 
     fetch(`modules/get_detalle.php?id=${id}`)
@@ -112,18 +113,18 @@ window.editarMiSolicitud = function(id) {
             Swal.close();
             if(data.error) return Swal.fire('Error', data.error, 'error');
 
-            // Precarga de inputs
+            // --- A. LLENADO DE FORMULARIO ---
             $('input[name="titulo"]').val(data.titulo_event);
             $('textarea[name="descripcion"]').val(data.descripcion_event || data.descripcion);
             $('input[name="otros_servicios"]').val(data.otros_servicios || '');
             
-            // Logística (Hidden)
+            // Campos ocultos de logística
             $('#input_id_auditorio').val(data.id_auditorio);
             $('#input_fecha_evento').val(data.fecha_evento);
             $('#input_hora_inicio').val(data.hora_inicio);
             $('#input_hora_fin').val(data.hora_fin);
 
-            // Visualización tarjeta derecha
+            // --- B. PRECARGA VISUAL ---
             $('#display_nombre_final').text(data.nombre_espacio);
             const imgPreview = document.getElementById("img_final_preview");
             if (imgPreview) {
@@ -131,48 +132,39 @@ window.editarMiSolicitud = function(id) {
                 imgPreview.onerror = function() { this.src = 'assets/img/placeholder.jpg'; };
             }
 
-            // Equipamiento
-            const contenedorEquipos = document.getElementById("check_equipamiento_fijo");
-            if (contenedorEquipos && data.equipamiento_fijo) {
-                contenedorEquipos.innerHTML = data.equipamiento_fijo.split(',').map(item => 
-                    `<div class="small mb-1"><i class="bi bi-check-circle-fill text-primary me-1"></i>${item.trim()}</div>`
-                ).join('');
-            }
-
-            // Configuración del Formulario
+            // --- C. CONFIGURACIÓN DE MODO EDICIÓN ---
             $('#modalNuevaSolicitud .modal-title').text('Modificar Reservación: ' + data.folio);
             $('#modalNuevaSolicitud form').attr('action', 'modules/guardar_edicion_usuario.php');
             
+            // Inyectamos el ID de control
             if(!$('#id_editando').length) {
                 $('#modalNuevaSolicitud form').append(`<input type="hidden" name="id_editando" id="id_editando" value="${id}">`);
             } else {
                 $('#id_editando').val(id);
             }
 
-            // Ocultar elementos de navegación de wizard
-            $('.btn-link[onclick*="irAlCalendario"]').hide(); 
-            $('#paso_formulario .btn-link:contains("Anterior")').hide();
+            // --- D. LIMPIEZA DE INTERFAZ (OCULTAR BOTONES)
+            $('.btn-link[onclick*="irAlCalendario"]').hide(); // Enlace arriba
+            $('#paso_formulario .btn-link:contains("Anterior")').hide(); // Botón abajo
 
-            // Mostrar el paso final
+            // --- E. MOSTRAR PASO FINAL ---
             $('#paso_catalogo, #paso_calendario').hide();
             $('#paso_formulario').show();
 
-            const myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNuevaSolicitud'));
-            myModal.show();
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNuevaSolicitud')).show();
         });
 };
 
-// 5. Reset al cerrar el Modal
+// RESET AL CERRAR EL MODAL
 $('#modalNuevaSolicitud').on('hidden.bs.modal', function () {
     $('#id_editando').remove();
     $('#modalNuevaSolicitud form').attr('action', 'modules/procesar_solicitud.php');
     $('#modalNuevaSolicitud form')[0].reset();
     
-    // Restaurar visibilidad para nuevas solicitudes
+    // Restaurar visibilidad de navegación para nuevas solicitudes
     $('#paso_catalogo').show();
     $('#paso_formulario, #paso_calendario').hide();
     $('a.btn-link, button.btn-link').show(); 
-    
     $('#modalNuevaSolicitud .modal-title').text('Nueva Reservación');
 });
 
