@@ -29,11 +29,11 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="#services">Servicios</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#about">Sobre SIRA</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact">Contacto</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#catalogo">Catálogo</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#guia">Guía</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#equipo">Equipo</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
                         <li class="nav-item">
                             <a class="nav-link btn-login-nav" href="login.php">Iniciar Sesión</a>
                         </li>
@@ -46,150 +46,169 @@
             <div class="container">
                 <div class="masthead-subheading">¡BIENVENIDO A SIRA!</div>
                 <div class="masthead-heading text-uppercase">Tu evento empieza aquí</div>
-                <a class="btn btn-primary btn-xl text-uppercase" href="#services">Leer más</a>
+                <a class="btn btn-primary btn-xl text-uppercase" href="#servicios">Leer más</a>
             </div>
         </header>
         <!-- Servicios-->
-        <section class="page-section" id="services">
-            <div class="container">
-                <div class="text-center">
-                    <h2 class="section-heading text-uppercase">Servicios</h2>
-                    <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
-                </div>
-                <div class="row text-center">
-                    <div class="col-md-4">
-                        <span class="fa-stack fa-4x">
-                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                            <i class="fas fa-shopping-cart fa-stack-1x fa-inverse"></i>
-                        </span>
-                        <h4 class="my-3">Reserva en Línea </h4>
-                        <p class="text-muted">Consulta la disponibilidad en tiempo real y aparta tu fecha desde cualquier lugar.</p>
-                    </div>
-                    <div class="col-md-4">
-                        <span class="fa-stack fa-4x">
-                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                            <i class="fas fa-laptop fa-stack-1x fa-inverse"></i>
-                        </span>
-                        <h4 class="my-3">Gestión de Eventos</h4>
-                        <p class="text-muted">Sube los detalles de tu evento (nombre, requerimientos técnicos).</p>
-                    </div>
-                    <div class="col-md-4">
-                        <span class="fa-stack fa-4x">
-                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                            <i class="fas fa-lock fa-stack-1x fa-inverse"></i>
-                        </span>
-                        <h4 class="my-3">Soporte Técnico</h4>
-                        <p class="text-muted">Solicita equipo adicional como proyectores, micrófonos o iluminación especial.</p>
-                    </div>
-                </div>
+        <section class="page-section" id="servicios">
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-heading text-uppercase">Servicios</h2>
+            <h3 class="section-subheading text-muted">La plataforma integral para el control y reserva de auditorios en UTM.</h3>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <span class="fa-stack fa-4x">
+                    <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                    <i class="fas fa-calendar-check fa-stack-1x fa-inverse"></i>
+                </span>
+                <h4 class="my-3">Reserva en Línea</h4>
+                <p class="text-muted">Consulta la disponibilidad en tiempo real y aparta tu fecha desde cualquier lugar.</p>
             </div>
-        </section>
-        <!-- Portafolio Grid-->
-        <section class="page-section bg-light" id="portfolio">
+            <div class="col-md-4">
+                <span class="fa-stack fa-4x">
+                    <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                    <i class="fas fa-tasks fa-stack-1x fa-inverse"></i>
+                </span>
+                <h4 class="my-3">Gestión de Eventos</h4>
+                <p class="text-muted">Sube los detalles de tu evento (nombre, requerimientos técnicos).</p>
+            </div>
+            <div class="col-md-4">
+                <span class="fa-stack fa-4x">
+                    <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                    <i class="fas fa-microchip fa-stack-1x fa-inverse"></i>
+                </span>
+                <h4 class="my-3">Soporte Técnico</h4>
+                <p class="text-muted">Solicita equipo adicional como proyectores, micrófonos o iluminación especial.</p>
+            </div>
+        </div>
+    </div>
+</section>
+        <!-- catalogo Grid-->
+        <section class="page-section bg-light" id="catalogo">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="section-heading text-uppercase">Portafolio</h2>
-                    <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+                    <h2 class="section-heading text-uppercase">Catálogo de Espacios</h2>
+                    <h3 class="section-subheading text-muted">Descubre el espacio perfecto para tu próximo foro, conferencia o taller.<br> 
+                        En nuestro <strong>Catálogo de Espacios</strong> encontrarás auditorios con tecnología de punta y la capacidad exacta que tu proyecto requiere.</h3>
                 </div>
                 <div class="row">
                     <div class="col-lg-4 col-sm-6 mb-4">
-                        <!-- Portfolio item 1-->
-                        <div class="portfolio-item">
-                            <a class="portfolio-link" data-bs-toggle="modal" href="#portfolioModal1">
-                                <div class="portfolio-hover">
-                                    <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
+                        <!-- catalogo item 1-->
+                        <div class="catalogo-item">
+                            <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal1">
+                                <div class="catalogo-hover">
+                                    <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
                                 <img class="img-fluid" src="assets/img/portfolio/11.jpg" alt="..." />
                             </a>
-                            <div class="portfolio-caption">
-                                <div class="portfolio-caption-heading">Auditorio Principal</div>
-                                <div class="portfolio-caption-subheading text-muted">Capacidad para 150 personas, sonido envolvente</div>
+                            <div class="catalogo-caption">
+                                <div class="catalogo-caption-heading">Auditorio Principal</div>
+                                <div class="catalogo-caption-subheading text-muted">
+                                    Capacidad: 150 personas<br>
+                                    Ubicación: Edificio A
+                            </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-sm-6 mb-4">
-                        <!-- Portfolio item 2-->
-                        <div class="portfolio-item">
-                            <a class="portfolio-link" data-bs-toggle="modal" href="#portfolioModal2">
-                                <div class="portfolio-hover">
-                                    <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
+                        <!-- catalogo item 2-->
+                        <div class="catalogo-item">
+                            <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal2">
+                                <div class="catalogo-hover">
+                                    <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
                                 <img class="img-fluid" src="assets/img/portfolio/22.jpg" alt="..." />
                             </a>
-                            <div class="portfolio-caption">
-                                <div class="portfolio-caption-heading">Auditorio B</div>
-                                <div class="portfolio-caption-subheading text-muted">Capacidad para 100 personas</div>
+                            <div class="catalogo-caption">
+                                <div class="catalogo-caption-heading">Auditorio B</div>
+                                <div class="catalogo-caption-subheading text-muted">
+                                    Capacidad: 100 personas<br>
+                                    Ubicación: Edificio B
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-sm-6 mb-4">
-                        <!-- Portfolio item 3-->
-                        <div class="portfolio-item">
-                            <a class="portfolio-link" data-bs-toggle="modal" href="#portfolioModal3">
-                                <div class="portfolio-hover">
-                                    <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
+                        <!-- catalogo item 3-->
+                        <div class="catalogo-item">
+                            <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal3">
+                                <div class="catalogo-hover">
+                                    <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
                                 <img class="img-fluid" src="assets/img/portfolio/33.jpg" alt="..." />
                             </a>
-                            <div class="portfolio-caption">
-                                <div class="portfolio-caption-heading">Auditorio A</div>
-                                <div class="portfolio-caption-subheading text-muted">Capacidad para 100 personas</div>
+                            <div class="catalogo-caption">
+                                <div class="catalogo-caption-heading">Auditorio A</div>
+                                <div class="catalogo-caption-subheading text-muted">
+                                    Capacidad: 75 personas<br>
+                                    Ubicación: Edificio A
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-sm-6 mb-4 mb-lg-0">
-                        <!-- Portfolio item 4-->
-                        <div class="portfolio-item">
-                            <a class="portfolio-link" data-bs-toggle="modal" href="#portfolioModal4">
-                                <div class="portfolio-hover">
-                                    <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
+                        <!-- catalogo item 4-->
+                        <div class="catalogo-item">
+                            <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal4">
+                                <div class="catalogo-hover">
+                                    <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
                                 <img class="img-fluid" src="assets/img/portfolio/44.jpg" alt="..." />
                             </a>
-                            <div class="portfolio-caption">
-                                <div class="portfolio-caption-heading">Auditorio C</div>
-                                <div class="portfolio-caption-subheading text-muted">Capacidad para 120 personas</div>
+                            <div class="catalogo-caption">
+                                <div class="catalogo-caption-heading">Auditorio C</div>
+                                <div class="catalogo-caption-subheading text-muted">
+                                    Capacidad: 120 personas<br>
+                                    Ubicación: Edificio C
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-sm-6 mb-4 mb-sm-0">
-                        <!-- Portfolio item 5-->
-                        <div class="portfolio-item">
-                            <a class="portfolio-link" data-bs-toggle="modal" href="#portfolioModal5">
-                                <div class="portfolio-hover">
-                                    <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
+                        <!-- catalogo item 5-->
+                        <div class="catalogo-item">
+                            <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal5">
+                                <div class="catalogo-hover">
+                                    <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
                                 <img class="img-fluid" src="assets/img/portfolio/55.jpg" alt="..." />
                             </a>
-                            <div class="portfolio-caption">
-                                <div class="portfolio-caption-heading">Auditorio A-2</div>
-                                <div class="portfolio-caption-subheading text-muted">Capacidad para 70 personas</div>
+                            <div class="catalogo-caption">
+                                <div class="catalogo-caption-heading">Auditorio A-2</div>
+                                <div class="catalogo-caption-subheading text-muted">
+                                    Capacidad: 50 personas<br>
+                                    Ubicación: Edificio A
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-sm-6">
-                        <!-- Portfolio item 6-->
-                        <div class="portfolio-item">
-                            <a class="portfolio-link" data-bs-toggle="modal" href="#portfolioModal6">
-                                <div class="portfolio-hover">
-                                    <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
+                        <!-- catalogo item 6-->
+                        <div class="catalogo-item">
+                            <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal6">
+                                <div class="catalogo-hover">
+                                    <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
                                 <img class="img-fluid" src="assets/img/portfolio/66.jpg" alt="..." />
                             </a>
-                            <div class="portfolio-caption">
-                                <div class="portfolio-caption-heading">Auditorio D</div>
-                                <div class="portfolio-caption-subheading text-muted">Cpacidad para 150 personas</div>
+                            <div class="catalogo-caption">
+                                <div class="catalogo-caption-heading">Auditorio D</div>
+                                <div class="catalogo-caption-subheading text-muted">
+                                    Capacidad: 150 personas<br>
+                                    Ubicación: Edificio D
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <!-- About-->
-        <section class="page-section" id="about">
+        <!-- guia-->
+        <section class="page-section" id="guia">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="section-heading text-uppercase">Sobre SIRA</h2>
+                    <h2 class="section-heading text-uppercase">Guía de Reserva</h2>
                     <h3 class="section-subheading text-muted">Conoce como funciona SIRA</h3>
                 </div>
                 <ul class="timeline">
@@ -197,40 +216,40 @@
                         <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/about/1.jpg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
-                                <h4>Paso 1</h4>
-                                <h4 class="subheading">Inicia Sesión</h4>
+                                <h4>Paso 1:</h4>
+                                <h4 class="subheading">Acceso Institucional</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Inicia sesión con tu cuenta institucional.</p></div>
+                            <div class="timeline-body"><p class="text-muted">Ingresa con tus credenciales de la UTM para validar tu identidad académica.</p></div>
                         </div>
                     </li>
                     <li class="timeline-inverted">
                         <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/about/2.jpg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
-                                <h4>Paso 2</h4>
-                                <h4 class="subheading">Elige tu Auditorio</h4>
+                                <h4>Paso 2:</h4>
+                                <h4 class="subheading">Selección de Espacio</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Elige el auditorio y verifica que la fecha este libre.</p></div>
+                            <div class="timeline-body"><p class="text-muted">Explora los auditorios disponibles y verifica la disponibilidad en el calendario en tiempo real.</p></div>
                         </div>
                     </li>
                     <li>
                         <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/about/3.jpg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
-                                <h4>Paso 3</h4>
-                                <h4 class="subheading">Espera..</h4>
+                                <h4>Paso 3:</h4>
+                                <h4 class="subheading">Validación de Solicitud</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Espera la confirmación del administrador por la plataforma.</p></div>
+                            <div class="timeline-body"><p class="text-muted">El equipo administrativo revisará tu petición y recibirás una notificación de confirmación.</p></div>
                         </div>
                     </li>
                     <li class="timeline-inverted">
                         <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/about/4.jpg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
-                                <h4>Paso 4</h4>
-                                <h4 class="subheading">Disfruta</h4>
+                                <h4>Paso 4:</h4>
+                                <h4 class="subheading">Realización del Evento</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Disfruta tu evento.</p></div>
+                            <div class="timeline-body"><p class="text-muted">Coordina con soporte técnico y lleva a cabo tu actividad en la fecha programada.</p></div>
                         </div>
                     </li>
                     <li class="timeline-inverted">
@@ -247,87 +266,60 @@
                 </ul>
             </div>
         </section>
-        <!-- Team-->
-        <section class="page-section bg-light" id="team">
-            <div class="container">
-                <div class="text-center">
-                    <h2 class="section-heading text-uppercase">TEAM</h2>
-                    <h3 class="section-subheading text-muted">Administración / Contacto Directo</h3>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="team-member">
-                            <img class="mx-auto rounded-circle" src="assets/img/team/1.png" alt="..." />
-                            <h4>Cordinación de Eventos</h4>
-                            <p class="text-muted">Quién autoriza las fechas</p>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Parveen Anand Twitter Profile"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Parveen Anand Facebook Profile"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Parveen Anand LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="team-member">
-                            <img class="mx-auto rounded-circle" src="assets/img/team/2.png" alt="..." />
-                            <h4>Soporte Técnico</h4>
-                            <p class="text-muted">Quién se encarga de las luces y el auditorio</p>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Diana Petersen Twitter Profile"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Diana Petersen Facebook Profile"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Diana Petersen LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="team-member">
-                            <img class="mx-auto rounded-circle" src="assets/img/team/3.png" alt="..." />
-                            <h4>Mantenimiento</h4>
-                            <p class="text-muted">Responsable de la limpieza y el orden del lugar</p>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Larry Parker Twitter Profile"><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Larry Parker Facebook Profile"><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Larry Parker LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-8 mx-auto text-center"><p class="large text-muted">Para cualquier duda o aclaración contactanos.</p></div>
+        <!-- equipo-->
+        <section class="page-section bg-light" id="equipo">
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-heading text-uppercase">Equipo Responsable</h2>
+            <h3 class="section-subheading text-muted">Administración / Contacto Directo</h3>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="equipo-member text-center">
+                    <span class="fa-stack fa-4x">
+                        <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                        <i class="fas fa-users fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <h4>Coordinación de Eventos</h4>
+                    <p class="text-muted">Gestión y autorización de cronogramas institucionales.</p>
                 </div>
             </div>
-        </section>
-        <!-- Clients-->
-        <div class="py-5">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-3 col-sm-6 my-3">
-                        <a href="#!"><img class="img-fluid img-brand d-block mx-auto" src="assets/img/logos/microsoft.svg" alt="..." aria-label="Microsoft Logo" /></a>
-                    </div>
-                    <div class="col-md-3 col-sm-6 my-3">
-                        <a href="#!"><img class="img-fluid img-brand d-block mx-auto" src="assets/img/logos/google.svg" alt="..." aria-label="Google Logo" /></a>
-                    </div>
-                    <div class="col-md-3 col-sm-6 my-3">
-                        <a href="#!"><img class="img-fluid img-brand d-block mx-auto" src="assets/img/logos/facebook.svg" alt="..." aria-label="Facebook Logo" /></a>
-                    </div>
-                    <div class="col-md-3 col-sm-6 my-3">
-                        <a href="#!"><img class="img-fluid img-brand d-block mx-auto" src="assets/img/logos/ibm.svg" alt="..." aria-label="IBM Logo" /></a>
-                    </div>
+            <div class="col-lg-4">
+                <div class="equipo-member text-center">
+                    <span class="fa-stack fa-4x">
+                        <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                        <i class="fas fa-headset fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <h4>Soporte Técnico</h4>
+                    <p class="text-muted">Supervisión de sistemas audiovisuales y logística técnica.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="equipo-member text-center">
+                    <span class="fa-stack fa-4x">
+                        <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                        <i class="fas fa-wrench fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <h4>Mantenimiento</h4>
+                    <p class="text-muted">Aseguramiento de la infraestructura y condiciones del espacio.</p>
                 </div>
             </div>
         </div>
+    </div>
+</section>
+        
         <!-- Contacto-->
-        <section class="page-section" id="contact">
+        <section class="page-section" id="contacto">
             <div class="container">
                 <div class="text-center">
                     <h2 class="section-heading text-uppercase">Contactanos</h2>
                     <h3 class="section-subheading text-muted">
-                        Ubicación: Edificio A, Planta Baja
-                        Horarios: Lunes a Viernes de 9:00 AM a 3:00 PM
+                        <strong>Ubicación: </strong>Edificio A, Planta Baja.<br>
+                        <strong>Horarios: </strong>Lunes a Viernes de 9:00 AM a 3:00 PM
                     </h3>
                 </div>
-                <!-- * * * * * * * * * * * * * * *-->
-                <!-- * * SB Forms Contact Form * *-->
-                <!-- * * * * * * * * * * * * * * *-->
-                <!-- This form is pre-integrated with SB Forms.-->
-                <!-- To make this form functional, sign up at-->
-                <!-- https://startbootstrap.com/solution/contact-forms-->
                 <!-- to get an API token!-->
-                <form id="contactForm" data-sb-form-api-token="API_TOKEN">
+                <form id="contactoForm" data-sb-form-api-token="API_TOKEN">
                     <div class="row align-items-stretch mb-5">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -364,7 +356,7 @@
                             <div class="fw-bolder">¡Envío de Formulario Exitoso!</div>
                             Ingresa a 
                             <br />
-                            <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+                            <a href="https://startbootstrap.com/solution/contacto-forms">https://startbootstrap.com/solution/contacto-forms</a>
                         </div>
                     </div>
                     <!-- Submit error message-->
@@ -381,7 +373,7 @@
         <footer class="footer py-4">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-4 text-lg-start">Copyright &copy; Your Website 2023</div>
+                    <div class="col-lg-4 text-lg-start">Copyright &copy; Universidad Tecnológica de Morelia 2026</div>
                     <div class="col-lg-4 my-3 my-lg-0">
                         <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -394,212 +386,6 @@
                 </div>
             </div>
         </footer>
-        <!-- Portfolio Modals-->
-        <!-- Portfolio item 1 modal popup-->
-        <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="close-modal" data-bs-dismiss="modal"><img src="assets/img/close-icon.svg" alt="Close modal" /></div>
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="modal-body">
-                                    <!-- Project details-->
-                                    <h2 class="text-uppercase">Project Name</h2>
-                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p>
-                                    <img class="img-fluid d-block mx-auto" src="assets/img/portfolio/1.jpg" alt="..." />
-                                    <p>Use this area to describe your project. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
-                                    <ul class="list-inline">
-                                        <li>
-                                            <strong>Client:</strong>
-                                            Threads
-                                        </li>
-                                        <li>
-                                            <strong>Category:</strong>
-                                            Illustration
-                                        </li>
-                                    </ul>
-                                    <button class="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
-                                        <i class="fas fa-xmark me-1"></i>
-                                        Close Project
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Portfolio item 2 modal popup-->
-        <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="close-modal" data-bs-dismiss="modal"><img src="assets/img/close-icon.svg" alt="Close modal" /></div>
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="modal-body">
-                                    <!-- Project details-->
-                                    <h2 class="text-uppercase">Project Name</h2>
-                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p>
-                                    <img class="img-fluid d-block mx-auto" src="assets/img/portfolio/2.jpg" alt="..." />
-                                    <p>Use this area to describe your project. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
-                                    <ul class="list-inline">
-                                        <li>
-                                            <strong>Client:</strong>
-                                            Explore
-                                        </li>
-                                        <li>
-                                            <strong>Category:</strong>
-                                            Graphic Design
-                                        </li>
-                                    </ul>
-                                    <button class="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
-                                        <i class="fas fa-xmark me-1"></i>
-                                        Close Project
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Portfolio item 3 modal popup-->
-        <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="close-modal" data-bs-dismiss="modal"><img src="assets/img/close-icon.svg" alt="Close modal" /></div>
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="modal-body">
-                                    <!-- Project details-->
-                                    <h2 class="text-uppercase">Project Name</h2>
-                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p>
-                                    <img class="img-fluid d-block mx-auto" src="assets/img/portfolio/3.jpg" alt="..." />
-                                    <p>Use this area to describe your project. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
-                                    <ul class="list-inline">
-                                        <li>
-                                            <strong>Client:</strong>
-                                            Finish
-                                        </li>
-                                        <li>
-                                            <strong>Category:</strong>
-                                            Identity
-                                        </li>
-                                    </ul>
-                                    <button class="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
-                                        <i class="fas fa-xmark me-1"></i>
-                                        Close Project
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Portfolio item 4 modal popup-->
-        <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="close-modal" data-bs-dismiss="modal"><img src="assets/img/close-icon.svg" alt="Close modal" /></div>
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="modal-body">
-                                    <!-- Project details-->
-                                    <h2 class="text-uppercase">Project Name</h2>
-                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p>
-                                    <img class="img-fluid d-block mx-auto" src="assets/img/portfolio/4.jpg" alt="..." />
-                                    <p>Use this area to describe your project. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
-                                    <ul class="list-inline">
-                                        <li>
-                                            <strong>Client:</strong>
-                                            Lines
-                                        </li>
-                                        <li>
-                                            <strong>Category:</strong>
-                                            Branding
-                                        </li>
-                                    </ul>
-                                    <button class="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
-                                        <i class="fas fa-xmark me-1"></i>
-                                        Close Project
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Portfolio item 5 modal popup-->
-        <div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="close-modal" data-bs-dismiss="modal"><img src="assets/img/close-icon.svg" alt="Close modal" /></div>
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="modal-body">
-                                    <!-- Project details-->
-                                    <h2 class="text-uppercase">Project Name</h2>
-                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p>
-                                    <img class="img-fluid d-block mx-auto" src="assets/img/portfolio/5.jpg" alt="..." />
-                                    <p>Use this area to describe your project. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
-                                    <ul class="list-inline">
-                                        <li>
-                                            <strong>Client:</strong>
-                                            Southwest
-                                        </li>
-                                        <li>
-                                            <strong>Category:</strong>
-                                            Website Design
-                                        </li>
-                                    </ul>
-                                    <button class="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
-                                        <i class="fas fa-xmark me-1"></i>
-                                        Close Project
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Portfolio item 6 modal popup-->
-        <div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="close-modal" data-bs-dismiss="modal"><img src="assets/img/close-icon.svg" alt="Close modal" /></div>
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="modal-body">
-                                    <!-- Project details-->
-                                    <h2 class="text-uppercase">Project Name</h2>
-                                    <p class="item-intro text-muted">Lorem ipsum dolor sit amet consectetur.</p>
-                                    <img class="img-fluid d-block mx-auto" src="assets/img/portfolio/6.jpg" alt="..." />
-                                    <p>Use this area to describe your project. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
-                                    <ul class="list-inline">
-                                        <li>
-                                            <strong>Client:</strong>
-                                            Window
-                                        </li>
-                                        <li>
-                                            <strong>Category:</strong>
-                                            Photography
-                                        </li>
-                                    </ul>
-                                    <button class="btn btn-primary btn-xl text-uppercase" data-bs-dismiss="modal" type="button">
-                                        <i class="fas fa-xmark me-1"></i>
-                                        Close Project
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
