@@ -74,4 +74,6 @@ $perfil_usuario = isset($_SESSION['perfil']) ? strtolower($_SESSION['perfil']) :
     <?php endif; ?>
 </div>
 
-<script src="assets/js/auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="assets/js/auth_check.js"></script>

@@ -1,34 +1,44 @@
 <?php
 /**
- * MÓDULO DE AUTO-REGISTRO (PÚBLICO)
- * Proyecto: Sistema de Reservación de Auditorios - UTM
- * Descripción: Permite a los alumnos crear su propia cuenta. Por defecto asigna el perfil 'Usuario'.
+ * MÓDULO DE AUTO-REGISTRO (PÚBLICO) - PROTEGIDO
  */
 include '../config/db_local.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Limpieza de datos básicos
-    $matricula = mysqli_real_escape_string($conexion, $_POST['matricula']);
-    $nombre = mysqli_real_escape_string($conexion, $_POST['nombre']);
-    $correo = mysqli_real_escape_string($conexion, $_POST['correo']);
-    $telefono = mysqli_real_escape_string($conexion, $_POST['telefono']);
-    $carrera = mysqli_real_escape_string($conexion, $_POST['carrera']);
+    // 1. Saneamiento de datos con limpieza de nulos (??)
+    $matricula = mysqli_real_escape_string($conexion, $_POST['matricula'] ?? '');
+    $nombre    = mysqli_real_escape_string($conexion, $_POST['nombre'] ?? '');
+    $correo    = mysqli_real_escape_string($conexion, $_POST['correo'] ?? '');
+    $telefono  = mysqli_real_escape_string($conexion, $_POST['telefono'] ?? '');
+    $carrera   = mysqli_real_escape_string($conexion, $_POST['carrera'] ?? '');
     
-    // Cifrado de contraseña para protección de datos personales
+    // 2. VERIFICACIÓN DE MATRÍCULA EXISTENTE
+    $sql_check = "SELECT matricula FROM usuarios WHERE matricula = '$matricula'";
+    $res_check = mysqli_query($conexion, $sql_check);
+
+    if (mysqli_num_rows($res_check) > 0) {
+        // Si ya existe, avisamos sin romper el flujo
+        echo "<script>
+            alert('Error: La matrícula $matricula ya se encuentra registrada.');
+            window.history.back();
+        </script>";
+        exit();
+    }
+
+    // 3. Cifrado de contraseña
     $password_plano = $_POST['password'];
     $password_hash = password_hash($password_plano, PASSWORD_DEFAULT);
-
-    // Perfil asignado por defecto para registros externos
     $perfil = 'Usuario';
 
+    // 4. Inserción segura
     $query = "INSERT INTO usuarios (matricula, nombre, correo_electronico, password, telefono, perfil, carrera_area) 
-    VALUES ('$matricula', '$nombre', '$correo', '$password_hash', '$telefono', '$perfil', '$carrera')";
+              VALUES ('$matricula', '$nombre', '$correo', '$password_hash', '$telefono', '$perfil', '$carrera')";
 
     if (mysqli_query($conexion, $query)) {
-        // Alerta de éxito y redirección al login
         echo "<script>alert('Registro exitoso. Ya puedes iniciar sesión.'); window.location='../index.php';</script>";
     } else {
-        echo "Error: " . mysqli_error($conexion);
+        // Error genérico de base de datos
+        echo "<script>alert('Error interno en el servidor. Inténtalo más tarde.'); window.history.back();</script>";
     }
 }
 ?>

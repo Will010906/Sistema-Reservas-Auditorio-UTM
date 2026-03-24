@@ -1,9 +1,9 @@
 /**
  * GESTIÓN DE USUARIOS - SIRA UTM
- * Lógica para búsqueda y control de modales
+ * Lógica unificada para búsqueda, edición y eliminación.
  */
 
-// Filtro de búsqueda rápida en la tabla
+// Búsqueda en tiempo real
 document.getElementById('buscadorUsuarios')?.addEventListener('keyup', function() {
     let valor = this.value.toLowerCase();
     let filas = document.querySelectorAll('#tablaUsuarios tbody tr');
@@ -12,15 +12,26 @@ document.getElementById('buscadorUsuarios')?.addEventListener('keyup', function(
     });
 });
 
-/**
- * Función para EDITAR usuario (Carga datos y abre modal)
- */
+// Preparar Modal para Nuevo Usuario
+function prepararNuevoUsuario() {
+    const form = document.getElementById('formUsuario');
+    if (!form) return;
+    
+    document.getElementById('tituloModalUsuario').innerText = 'Registrar Nuevo Usuario';
+    form.action = 'modules/registro_usuario_admin.php';
+    form.reset();
+
+    if (document.getElementById('bloque_matricula')) document.getElementById('bloque_matricula').style.display = 'block';
+    if (document.getElementById('bloque_password')) document.getElementById('bloque_password').style.display = 'block';
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUsuario')).show();
+}
+
+// Cargar datos para Editar Usuario
 function editarUsuario(user) {
-    // 1. Cambiar textos del modal
     document.getElementById('tituloModalUsuario').innerText = 'Editar Usuario';
     document.getElementById('formUsuario').action = 'modules/editar_usuario.php';
 
-    // 2. Llenar los datos básicos (Aseguramos que no fallen si son null)
     document.getElementById('user_id').value = user.id_usuario || '';
     document.getElementById('user_nombre').value = user.nombre || '';
     document.getElementById('user_correo').value = user.correo_electronico || '';
@@ -29,54 +40,27 @@ function editarUsuario(user) {
     document.getElementById('user_carrera').value = user.carrera_area || '';
     document.getElementById('user_perfil').value = user.perfil || '';
 
-    // 3. Control de bloques (Aquí es donde daba el error de la línea 40)
-    const bMatricula = document.getElementById('bloque_matricula');
-    const bPassword = document.getElementById('bloque_password');
+    if (document.getElementById('bloque_matricula')) document.getElementById('bloque_matricula').style.display = 'block';
+    if (document.getElementById('bloque_password')) document.getElementById('bloque_password').style.display = 'none';
 
-    if (bMatricula) bMatricula.style.display = 'block';
-    if (bPassword) bPassword.style.display = 'none';
-
-    // 4. Abrir modal
-    var modalElem = document.getElementById('modalUsuario');
-    var modalInstance = bootstrap.Modal.getOrCreateInstance(modalElem);
-    modalInstance.show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUsuario')).show();
 }
 
-/**
- * Función para NUEVO usuario (Limpia campos y abre modal)
- */
-function prepararNuevoUsuario() {
-    document.getElementById('tituloModalUsuario').innerText = 'Registrar Nuevo Usuario';
-    document.getElementById('formUsuario').action = 'modules/registro_usuario.php';
-    document.getElementById('formUsuario').reset();
-
-    // Mostrar ambos bloques para el registro
-    document.getElementById('bloque_matricula').style.display = 'block';
-    document.getElementById('bloque_password').style.display = 'block';
-
-    var modalElem = document.getElementById('modalUsuario');
-    var modalInstance = bootstrap.Modal.getOrCreateInstance(modalElem);
-    modalInstance.show();
-}
-
-/**
- * Función para ELIMINAR usuario
- */
+// Función de Eliminación Segura
 function eliminarUsuario(id) {
-    if (confirm("¿Estás SEGURO de eliminar este usuario?")) {
-        const datos = new FormData();
-        datos.append('id', id);
-        datos.append('accion', 'eliminar_usuario');
-
-        fetch('modules/acciones_usuarios.php', {
-            method: 'POST',
-            body: datos
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) location.reload();
-            else alert("Error: " + data.error);
-        })
-        .catch(error => console.error('Error:', error));
-    }
+    Swal.fire({
+        title: '¿Eliminar usuario?',
+        text: "Esta acción es permanente y el usuario perderá acceso.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#5B3D66',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `modules/eliminar_usuario.php?id=${id}`;
+        }
+    });
 }

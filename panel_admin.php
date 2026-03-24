@@ -421,6 +421,7 @@ $rol_usuario = $_SESSION['rol'] ?? 'Admin';
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/auth_check.js"></script>
     <script src="assets/js/admin_interactivo.js"></script>
 
 </body>
