@@ -1,7 +1,7 @@
 <?php
-
 /**
  * VISTA DE LOGIN - SIRA UTM
+ * Actualizado: Integración con Autenticación JWT y SweetAlert2.
  */
 ?>
 <!DOCTYPE html>
@@ -16,6 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* Mantengo tus variables y estilos originales para no romper el diseño */
         :root {
             --sira-purple-deep: #5B3D66;
             --sira-purple-med: #845C93;
@@ -92,17 +93,13 @@
         .custom-link {
             color: var(--sira-purple-med);
             font-size: 0.85rem;
+            text-decoration: none;
             transition: all 0.3s ease;
         }
 
         .custom-link:hover {
             color: var(--sira-purple-deep);
             text-decoration: underline !important;
-        }
-
-        .form-check-input:checked {
-            background-color: var(--sira-purple-deep);
-            border-color: var(--sira-purple-deep);
         }
 
         .border-top-custom {
@@ -123,7 +120,7 @@
                     <p class="text-muted small">Gestión de Auditorios UTM</p>
                 </div>
 
-                <form id="loginForm" action="modules/autenticacion.php" method="POST" novalidate>
+                <form id="loginForm" novalidate>
                     <div class="mb-4 text-start">
                         <label for="matricula" class="form-label form-label-custom">Matrícula / Id trabajador</label>
                         <div class="input-group">
@@ -147,10 +144,6 @@
                         </div>
                     </div>
 
-
-
-
-
                     <button type="submit" id="btnEntrar" class="btn btn-sira btn-lg w-100 fw-bold rounded-pill">
                         ACCEDER AL SISTEMA
                     </button>
@@ -158,7 +151,7 @@
 
                 <div class="mt-5 text-center border-top-custom pt-3">
                     <p class="text-muted small mb-0">¿Eres nuevo en la plataforma? <br>
-                        <a href="registro.php" class="text-decoration-none fw-bold custom-link">Crea tu cuenta aquí</a>
+                        <a href="registro.php" class="fw-bold custom-link">Crea tu cuenta aquí</a>
                     </p>
                 </div>
             </div>

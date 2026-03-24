@@ -1,3 +1,9 @@
+<?php
+/**
+ * VISTA: REGISTRO DE USUARIOS - SIRA UTM
+ * Actualizado: Integración asíncrona con API y validación visual.
+ */
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -15,12 +21,12 @@
             <div class="col-md-5">
                 <div class="card shadow-lg border-0 rounded-4 p-4">
                     <div class="text-center mb-4">
-                        <img src="assets/img/logo_app_web_RA.png" style="max-width: 70px;">
+                        <img src="assets/img/logo_app_web_RA.png" style="max-width: 70px;" alt="UTM Logo">
                         <h4 class="fw-bold mt-3">Crea tu cuenta</h4>
                         <p class="text-muted small">Portal de Reservas UTM</p>
                     </div>
 
-                    <form id="registroForm" action="modules/procesar_registro.php" method="POST" novalidate>
+                    <form id="registroForm" novalidate>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Nombre Completo</label>
                             <input type="text" name="nombre" class="form-control" placeholder="Ej. Andrea Urueta" required>
@@ -36,19 +42,17 @@
                             <input type="email" name="correo" class="form-control" placeholder="usuario@utm.mx" required>
                         </div>
 
-                     <div class="mb-3">
-    <label class="form-label small fw-bold text-muted">Teléfono / WhatsApp</label>
-    <div class="input-group">
-        <span class="input-group-text bg-white text-muted border-end-0">
-            <i class="bi bi-whatsapp"></i>
-        </span>
-        <input type="tel" name="telefono" id="reg_tel" class="form-control border-start-0" 
-               placeholder="443-123-4567" maxlength="12" required>
-    </div>
-    <div class="form-text d-flex justify-content-between" style="font-size: 0.7rem;">
-        <span>10 dígitos sin espacios.</span>
-    </div>
-</div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Teléfono / WhatsApp</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-muted border-end-0">
+                                    <i class="bi bi-whatsapp"></i>
+                                </span>
+                                <input type="tel" name="telefono" id="reg_tel" class="form-control border-start-0" 
+                                       placeholder="4431234567" maxlength="10" required>
+                            </div>
+                            <div class="form-text" style="font-size: 0.7rem;">10 dígitos sin guiones ni espacios.</div>
+                        </div>
 
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Carrera</label>
@@ -57,11 +61,11 @@
                                 <option value="Enfermería">Enfermería</option>
                                 <option value="Electromovilidad">Electromovilidad</option>
                                 <option value="Asesor Financiero">Asesor Financiero</option>
-                                <option value="Tecnologías de la Información e Innovación Digital">Tecnologías de la Información e Innovación Digital</option>
+                                <option value="Tecnologías de la Información">Tecnologías de la Información</option>
                                 <option value="Mecatrónica">Mecatrónica</option>
                                 <option value="Mantenimiento Industrial">Mantenimiento Industrial</option>
                                 <option value="Gastronomía">Gastronomía</option>
-                                <option value="Energía y Desarrollo Sostenible">Energía y Desarrollo Sostenible</option>
+                                <option value="Energía Sostenible">Energía Sostenible</option>
                                 <option value="Diseño Textil y Moda">Diseño Textil y Moda</option>
                                 <option value="Biotecnología">Biotecnología</option>
                             </select>
@@ -70,15 +74,15 @@
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Contraseña</label>
                             <input type="password" name="password" id="reg_pass" class="form-control" placeholder="••••••••" required>
-                            <div class="form-text" style="font-size: 0.7rem;">Mín. 8 caracteres, números y un símbolo.</div>
+                            <div class="form-text" style="font-size: 0.7rem;">Mín. 8 caracteres, letras y números.</div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2 mt-2" style="background-color: #5B3D66; border: none;">
+                        <button type="submit" id="btnRegistro" class="btn btn-primary w-100 rounded-pill fw-bold py-2 mt-2" style="background-color: #5B3D66; border: none;">
                             REGISTRARME
                         </button>
 
                         <div class="text-center mt-3">
-                            <a href="login.php" class="small text-decoration-none text-muted">¿Ya tienes cuenta? Inicia sesión</a>
+                            <a href="index.php" class="small text-decoration-none text-muted">¿Ya tienes cuenta? Inicia sesión</a>
                         </div>
                     </form>
                 </div>

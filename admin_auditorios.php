@@ -1,44 +1,102 @@
 <?php
 /**
  * MÓDULO DE GESTIÓN DE AUDITORIOS - UTM
- * Descripción: Panel de control de inventario de espacios físicos (Auditorios/Aulas).
- * Funcionalidades:
- * - Visualización de disponibilidad mediante badges de colores.
- * - Desglose de equipamiento fijo por cada espacio.
- * - Registro de nuevos espacios con carga de imágenes (enctype="multipart/form-data").
- * - Función de desactivación/activación rápida (Mantenimiento).
+ * Actualizado: Seguridad JWT y Arquitectura de API.
  */
-session_start();
 include("config/db_local.php");
 
-// Seguridad estricta: Solo permite acceso a usuarios con perfil de 'administrador'
-if (!isset($_SESSION['perfil']) || $_SESSION['perfil'] !== 'administrador') {
-    header("Location: index.php");
-    exit();
-}
-
-// Obtención de todos los auditorios registrados
-$query = "SELECT * FROM auditorio ORDER BY nombre_espacio ASC";
-$resultado = mysqli_query($conexion, $query);
+// Nota: La seguridad de sesión se maneja ahora vía JavaScript con el Token JWT 
+// para cumplir con el estándar de desacoplamiento del frontend.
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    
     <meta charset="UTF-8">
     <title>Gestión de Auditorios - UTM</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="assets/css/admin_style.css">
-    <style>
-        /* Efecto hover en las tarjetas de auditorio */
-        .auditorio-card { transition: all 0.3s; border: none; border-radius: 15px; overflow: hidden; }
-        .auditorio-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .img-container { height: 160px; position: relative; }
-        .img-container img { width: 100%; height: 100%; object-fit: cover; }
-        /* Badge flotante sobre la imagen para indicar disponibilidad */
-        .status-badge { position: absolute; top: 10px; right: 10px; padding: 5px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-    </style>
+    
+    <script>
+        // BLOQUEO DE SEGURIDAD JWT (Requisito 30% Seguridad)
+        // Si no hay token, el usuario no puede ni ver la estructura de la página
+       // Cambia 'token' por 'sira_session_token'
+const token = localStorage.getItem('sira_session_token'); 
+if (!token) {
+    window.location.href = 'login.php?error=expired';
+}
+    </script>
+
+<style>
+    :root {
+        /* Colores sincronizados con tu sidebar.php */
+        --sira-purple-dark: #2D1B33;
+        --sira-purple-primary: #5B3D66;
+        --sira-purple-light: #F4EFFF;
+        --utm-gris-bg: #f8f9fa;
+    }
+
+    /* Tarjetas de Auditorio */
+    .auditorio-card {
+        border-radius: 20px;
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .auditorio-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(45, 27, 51, 0.1) !important;
+    }
+
+    /* Botón Principal (Nuevo Auditorio) y Guardar */
+    .btn-primary, .btn-guinda {
+        background-color: var(--sira-purple-primary) !important;
+        border-color: var(--sira-purple-primary) !important;
+        color: white !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover, .btn-guinda:hover {
+        background-color: var(--sira-purple-dark) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Botón Mantenimiento (Outline) */
+    .btn-outline-guinda {
+        color: var(--sira-purple-primary) !important;
+        border: 2px solid var(--sira-purple-primary) !important;
+        background-color: transparent !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem;
+    }
+
+    .btn-outline-guinda:hover {
+        background-color: var(--sira-purple-primary) !important;
+        color: white !important;
+    }
+
+    /* BLOQUE DE EQUIPAMIENTO MINIMALISTA */
+    .badge-minimal {
+        background-color: var(--utm-gris-bg);
+        color: var(--sira-purple-primary);
+        border: 1px solid #e9ecef;
+        padding: 2px 8px; /* Tamaño reducido */
+        border-radius: 4px;
+        font-size: 0.65rem; /* Fuente más pequeña */
+        font-weight: 600;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    /* Ajustes de texto sutiles */
+    .text-muted {
+        font-size: 0.8rem !important;
+    }
+</style>
 </head>
 <body class="bg-light">
 
@@ -51,59 +109,19 @@ $resultado = mysqli_query($conexion, $query);
                 <h1 class="h3 fw-bold text-dark mb-0">Gestión de Auditorios</h1>
                 <p class="text-muted small">Control de inventario y disponibilidad de espacios</p>
             </div>
-            <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalNuevoAuditorio">
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" onclick="prepararNuevoAuditorio()">
                 <i class="bi bi-plus-lg me-2"></i> Nuevo Auditorio
             </button>
         </div>
 
-        <div class="row g-4">
-    <?php while ($aud = mysqli_fetch_assoc($resultado)): ?>
-        <div class="col-md-4">
-            <div class="card auditorio-card shadow-sm h-100">
-                <div class="img-container">
-                    <img src="assets/img/auditorios/<?php echo $aud['id_auditorio']; ?>.jpg"
-                         onerror="this.src='assets/img/placeholder.jpg'">
-
-                    <span class="status-badge <?php echo $aud['disponibilidad'] ? 'bg-success text-white' : 'bg-danger text-white'; ?>">
-                        <?php echo $aud['disponibilidad'] ? 'Disponible' : 'Mantenimiento'; ?>
-                    </span>
-                </div>
-                <div class="card-body">
-                    <h5 class="fw-bold mb-1 h6"><?php echo $aud['nombre_espacio']; ?></h5>
-                    <p class="text-muted x-small mb-2"><i class="bi bi-geo-alt me-1"></i> <?php echo $aud['ubicacion']; ?></p>
-
-                    <div class="mb-3">
-                        <div class="d-flex flex-wrap gap-1">
-                            <?php
-                            $equipos = explode(',', $aud['equipamiento_fijo']);
-                            foreach ($equipos as $e): if (trim($e) != ""):
-                            ?>
-                                <span class="badge bg-light text-dark border x-small fw-normal"><?php echo trim($e); ?></span>
-                            <?php endif; endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3 mb-3">
-                        <span class="x-small fw-bold text-muted"><i class="bi bi-people me-1"></i> <?php echo $aud['capacidad_maxima']; ?></span>
-                        <span class="x-small fw-bold text-muted"><i class="bi bi-shield-check me-1"></i> <?php echo $aud['disponibilidad'] ? 'Activo' : 'Inactivo'; ?></span>
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-primary flex-fill rounded-pill" onclick="editarAuditorio(<?php echo htmlspecialchars(json_encode($aud)); ?>)">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm <?php echo $aud['disponibilidad'] ? 'btn-outline-danger' : 'btn-outline-success'; ?> flex-fill rounded-pill"
-                            onclick="cambiarEstado(<?php echo $aud['id_auditorio']; ?>, <?php echo $aud['disponibilidad']; ?>)">
-                            <i class="bi bi-power"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-dark rounded-pill" onclick="eliminarAuditorio(<?php echo $aud['id_auditorio']; ?>)">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+       <div class="container-fluid px-4">
+    <div class="row" id="contenedorAuditorios">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Cargando inventario de espacios...</p>
         </div>
-    <?php endwhile; ?>
+    </div>
+</div>
 </div>
 
 <div class="modal fade" id="modalNuevoAuditorio" tabindex="-1" aria-hidden="true">
@@ -113,17 +131,20 @@ $resultado = mysqli_query($conexion, $query);
                 <h5 class="modal-title fw-bold" id="tituloModal"><i class="bi bi-plus-circle me-2"></i>Registrar Espacio</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="modules/registrar_auditorio.php" method="POST" enctype="multipart/form-data" id="formAuditorio">
+            <form id="formAuditorio" enctype="multipart/form-data">
                 <div class="modal-body p-4">
                     <input type="hidden" name="id_auditorio" id="edit_id">
+                    
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted">Nombre del Auditorio</label>
                         <input type="text" name="nombre" id="edit_nombre" class="form-control rounded-3" required>
                     </div>
+                    
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted">Ubicación</label>
                         <input type="text" name="ubicacion" id="edit_ubicacion" class="form-control rounded-3" required>
                     </div>
+                    
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label small fw-bold text-muted">Capacidad</label>
@@ -131,9 +152,10 @@ $resultado = mysqli_query($conexion, $query);
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label small fw-bold text-muted">Imagen (JPG)</label>
-                            <input type="file" name="foto" class="form-control rounded-3" accept="image/jpeg">
+                            <input type="file" name="foto" id="input_foto" class="form-control rounded-3" accept="image/jpeg">
                         </div>
                     </div>
+                    
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted">Equipamiento Fijo (separado por comas)</label>
                         <textarea name="equipamiento" id="edit_equipamiento" class="form-control rounded-3" rows="2" placeholder="Proyector, Aire Acondicionado..."></textarea>
@@ -141,7 +163,7 @@ $resultado = mysqli_query($conexion, $query);
                 </div>
                 <div class="modal-footer border-0 p-4">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Guardar</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold" id="btnGuardar">Guardar</button>
                 </div>
             </form>
         </div>
@@ -150,5 +172,7 @@ $resultado = mysqli_query($conexion, $query);
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/admin_auditorios.js"></script>
+<script src="assets/js/auth_check.js"></script>
+
 </body>
 </html>

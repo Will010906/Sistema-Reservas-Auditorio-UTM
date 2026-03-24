@@ -1,27 +1,10 @@
 <?php
-
 /**
  * PANEL DE USUARIO - SIRA UTM
- * Versión Sinergia Final: Contadores dinámicos y Filtros optimizados.
+ * Actualizado: Seguridad JWT, Contadores Asíncronos y Tabla Dinámica.
  */
-session_start();
 include("config/db_local.php");
-
-if (!isset($_SESSION['id_usuario'])) {
-    header("Location: index.php");
-    exit();
-}
-$id_user = $_SESSION['id_usuario'];
-
-// --- CONSULTAS DE CONTADORES DINÁMICOS ---
-$res_acep = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'ACEPTADA'");
-$aceptadas = mysqli_fetch_assoc($res_acep)['t'];
-
-$res_pend = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'PENDIENTE'");
-$pendientes = mysqli_fetch_assoc($res_pend)['t'];
-
-$res_rech = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE id_usuario = '$id_user' AND estado = 'RECHAZADA'");
-$rechazadas = mysqli_fetch_assoc($res_rech)['t'];
+// Nota: La seguridad y la identidad del usuario se manejan vía Token JWT en el cliente.
 ?>
 
 <!DOCTYPE html>
@@ -36,6 +19,8 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
+     <script src="assets/js/auth_check.js"></script>
+
     <style>
         :root {
             --sira-purple-dark: #2D1B33;
@@ -46,161 +31,43 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
             --grad-rejected: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%);
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--sira-bg);
-            margin: 0;
-            color: #2D2D2D;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--sira-bg); margin: 0; color: #2D2D2D; }
+        .main-content { margin-left: 310px; padding: 30px 40px; width: calc(100% - 310px); }
 
-        .main-content {
-            margin-left: 310px;
-            padding: 30px 40px;
-            width: calc(100% - 310px);
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 28px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
-        }
+        .table-container { background: white; border-radius: 28px; padding: 30px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03); }
 
         .btn-nueva-solicitud {
-            background-color: var(--sira-purple-primary);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            padding: 12px 28px;
-            font-weight: 700;
+            background-color: var(--sira-purple-primary); color: white; border: none;
+            border-radius: 16px; padding: 12px 28px; font-weight: 700;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 20px rgba(91, 61, 102, 0.2);
-            display: flex;
-            align-items: center;
+            box-shadow: 0 10px 20px rgba(91, 61, 102, 0.2); display: flex; align-items: center;
         }
 
-        .btn-nueva-solicitud:hover {
-            background-color: var(--sira-purple-dark);
-            transform: translateY(-4px);
-            color: white;
-            box-shadow: 0 15px 30px rgba(91, 61, 102, 0.3);
-        }
+        .btn-nueva-solicitud:hover { background-color: var(--sira-purple-dark); transform: translateY(-4px); color: white; }
 
         .card-user {
-            border: none;
-            border-radius: 20px;
-            padding: 15px 20px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04);
-            height: 105px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            border: none; border-radius: 20px; padding: 15px 20px; position: relative;
+            overflow: hidden; transition: 0.3s; box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04);
+            height: 105px; display: flex; flex-direction: column; justify-content: center;
         }
 
-        .card-user .count {
-            font-size: 2.2rem;
-            font-weight: 800;
-            line-height: 1;
-            z-index: 2;
-            color: white;
-        }
+        .card-user .count { font-size: 2.2rem; font-weight: 800; line-height: 1; z-index: 2; color: white; }
+        .card-user h6 { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; z-index: 2; color: white; }
 
-        .card-user h6 {
-            font-size: 0.6rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            z-index: 2;
-            color: white;
-        }
+        .bg-pend { background: var(--grad-pending); }
+        .bg-pend h6, .bg-pend .count { color: #2D1B33; }
+        .bg-acep { background: var(--grad-accepted); }
+        .bg-rech { background: var(--grad-rejected); }
 
-        .bg-pend {
-            background: var(--grad-pending);
-        }
+        .watermark { position: absolute; bottom: -5px; right: -5px; font-size: 3.2rem; opacity: 0.12; transform: rotate(-10deg); color: white; }
+        .badge-status { padding: 6px 12px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; min-width: 105px; text-align: center; display: inline-block; }
+        
+        .st-pendiente { background: var(--grad-pending); color: #2D1B33 !important; }
+        .st-aceptada { background: var(--grad-accepted); color: white !important; }
+        .st-rechazada { background: var(--grad-rejected); color: white !important; }
 
-        .bg-pend h6,
-        .bg-pend .count {
-            color: #2D1B33;
-        }
-
-        .bg-acep {
-            background: var(--grad-accepted);
-        }
-
-        .bg-rech {
-            background: var(--grad-rejected);
-        }
-
-        .watermark {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            font-size: 3.2rem;
-            opacity: 0.12;
-            transform: rotate(-10deg);
-            color: white;
-        }
-
-        .badge-status {
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            min-width: 105px;
-            text-align: center;
-            display: inline-block;
-        }
-
-        .st-pendiente {
-            background: var(--grad-pending);
-            color: #2D1B33 !important;
-        }
-
-        .st-aceptada {
-            background: var(--grad-accepted);
-            color: white !important;
-        }
-
-        .st-rechazada {
-            background: var(--grad-rejected);
-            color: white !important;
-        }
-
-        .dataTables_filter {
-            display: none;
-        }
-
-        /* Forzar la primera letra del mes a Mayúscula y mejorar el estilo */
-        .fc .fc-toolbar-title {
-            text-transform: capitalize !important;
-            font-weight: 800 !important;
-            color: var(--sira-purple-dark);
-            font-size: 1.5rem !important;
-        }
-
-        /* También para los días de la semana (opcional) */
-        .fc-col-header-cell-cushion {
-            text-transform: capitalize !important;
-            text-decoration: none !important;
-            font-weight: 700;
-            color: var(--sira-purple-primary);
-        }
-
-        /* Mejorar el aspecto de los botones del calendario */
-        .fc .fc-button-primary {
-            background-color: var(--sira-purple-primary) !important;
-            border-color: var(--sira-purple-primary) !important;
-            border-radius: 10px !important;
-            text-transform: capitalize;
-        }
-
-        .fc .fc-button-primary:hover {
-            background-color: var(--sira-purple-dark) !important;
-        }
+        /* Estilos Calendario */
+        .fc .fc-toolbar-title { text-transform: capitalize !important; font-weight: 800 !important; color: var(--sira-purple-dark); font-size: 1.5rem !important; }
     </style>
 </head>
 
@@ -211,9 +78,9 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
                 <h1 class="h2 mb-1" style="font-weight: 800; color: var(--sira-purple-dark);">Mis Reservaciones</h1>
-                <p class="text-muted small">Hola, <strong><?php echo explode(' ', $_SESSION['nombre'])[0]; ?></strong> • Gestiona tus solicitudes.</p>
+                <p class="text-muted small">Hola, <strong id="nombreSaludo">Usuario</strong> • Gestiona tus solicitudes.</p>
             </div>
-            <button class="btn btn-nueva-solicitud shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaSolicitud">
+            <button class="btn btn-nueva-solicitud shadow-sm" onclick="abrirModalNuevaReservacion()">
                 <i class="bi bi-plus-lg me-2"></i> Nueva Solicitud
             </button>
         </div>
@@ -222,19 +89,19 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
             <div class="col-md-4">
                 <div class="card-user bg-pend">
                     <h6>En Revisión</h6>
-                    <div class="count"><?php echo $pendientes; ?></div><i class="bi bi-clock-history watermark"></i>
+                    <div class="count" id="countPendientes">0</div><i class="bi bi-clock-history watermark"></i>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card-user bg-acep">
                     <h6>Aprobadas</h6>
-                    <div class="count"><?php echo $aceptadas; ?></div><i class="bi bi-check-circle-fill watermark"></i>
+                    <div class="count" id="countAprobadas">0</div><i class="bi bi-check-circle-fill watermark"></i>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card-user bg-rech">
                     <h6>Rechazadas</h6>
-                    <div class="count"><?php echo $rechazadas; ?></div><i class="bi bi-x-circle-fill watermark"></i>
+                    <div class="count" id="countRechazadas">0</div><i class="bi bi-x-circle-fill watermark"></i>
                 </div>
             </div>
         </div>
@@ -273,43 +140,13 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php
-                        $sql = "SELECT s.*, a.nombre_espacio FROM solicitudes s 
-            JOIN auditorio a ON s.id_auditorio = a.id_auditorio 
-            WHERE s.id_usuario = '$id_user' ORDER BY s.id_solicitud DESC";
-                        $resultado = mysqli_query($conexion, $sql);
-                        while ($fila = mysqli_fetch_assoc($resultado)):
-                            $status_val = strtoupper($fila['estado']);
-                            $id_sol = $fila['id_solicitud'];
-                            $st_class = ($status_val == 'ACEPTADA') ? 'st-aceptada' : (($status_val == 'RECHAZADA') ? 'st-rechazada' : 'st-pendiente');
-                        ?>
-                            <tr>
-                                <td class="ps-4 fw-bold" style="color: var(--sira-purple-primary);">#<?php echo $fila['folio']; ?></td>
-                                <td class="fw-600"><?php echo $fila['titulo_event']; ?></td>
-                                <td><span class="badge rounded-pill bg-light text-dark border px-3 py-2"><?php echo $fila['nombre_espacio']; ?></span></td>
-                                <td class="text-muted fw-bold"><?php echo date('d/m/Y', strtotime($fila['fecha_evento'])); ?></td>
-                                <td class="text-center">
-                                    <span class="badge-status <?php echo $st_class; ?> shadow-sm"><?php echo $status_val; ?></span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <button class="btn btn-sm btn-outline-primary border-0" onclick="verDetalleUsuario(<?php echo $id_sol; ?>)" title="Ver Detalle">
-                                            <i class="bi bi-eye-fill"></i>
-                                        </button>
-
-                                        <?php if ($status_val == 'PENDIENTE'): ?>
-                                            <button class="btn btn-sm btn-outline-warning border-0" onclick="editarMiSolicitud(<?php echo $id_sol; ?>)" title="Editar">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger border-0" onclick="cancelarMiSolicitud(<?php echo $id_sol; ?>)" title="Cancelar">
-                                                <i class="bi bi-x-circle-fill"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
+                    <tbody id="contenedorMisReservas">
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="mt-2 text-muted small">Cargando tus solicitudes...</p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -322,27 +159,10 @@ $rechazadas = mysqli_fetch_assoc($res_rech)['t'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="assets/js/gestion_reservas.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="assets/js/gestion_reservas.js"></script>
+    
     <script src="assets/js/usuario_reservas.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-    <script>
-       <?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>
-    Swal.fire({
-        title: '¡Reservación Solicitada!',
-        text: 'Tu folio es <?php echo $_GET['folio']; ?>. Revisa el estado en tu tabla.',
-        icon: 'success',
-        confirmButtonColor: '#00a65a'
-    }).then((result) => {
-        // Esta línea borra los parámetros ?status=success... de la barra de direcciones
-        window.history.replaceState({}, document.title, window.location.pathname);
-    });
-<?php endif; ?>
-    </script>
 </body>
 
 </html>

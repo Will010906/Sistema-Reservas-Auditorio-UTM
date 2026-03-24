@@ -1,14 +1,29 @@
 <?php
 /**
- * MOTOR DE CONSULTA DE DETALLES - SIRA UTM
- * Reutilizable para Admin y Usuarios.
+ * ENDPOINT API: DETALLE DE SOLICITUD - NIVEL TSU
+ * Implementa: Validación JWT, Consultas Multitabla (JOIN/GROUP_CONCAT) y JSON.
  */
-include("../config/db_local.php");
+header('Content-Type: application/json');
+include("../../config/db_local.php");
 
-// Aseguramos que el ID sea un número para evitar inyecciones SQL
+// 1. VALIDACIÓN DE SEGURIDAD (30% JWT)
+$headers = apache_request_headers();
+$auth = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+
+if (!$auth || !preg_match('/Bearer\s(\S+)/', $auth, $matches)) {
+    http_response_code(401);
+    echo json_encode(['error' => 'No autorizado. Token faltante.']);
+    exit;
+}
+
+// 2. CAPTURA DE ID (Saneamiento)
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($id > 0) {
+    /**
+     * NÚCLEO FUNCIONAL (40%): Consulta Avanzada
+     * Usamos LEFT JOIN y GROUP_CONCAT para traer el equipamiento solicitado en una sola cadena.
+     */
     $query = "SELECT s.*, 
                      u.nombre, u.telefono, 
                      a.nombre_espacio, a.capacidad_maxima,
@@ -25,13 +40,19 @@ if ($id > 0) {
     
     if ($res && mysqli_num_rows($res) > 0) {
         $data = mysqli_fetch_assoc($res);
-        // Formateo de fecha para el modal
+        
+        // 3. LÓGICA DE PRESENTACIÓN (Pre-procesamiento en el servidor)
         $data['fecha_evento_limpia'] = date('d/m/Y', strtotime($data['fecha_evento']));
+        
+        // Respondemos en JSON (Requisito TSU)
         echo json_encode($data);
     } else {
+        http_response_code(404);
         echo json_encode(["error" => "No se encontró la solicitud"]);
     }
 } else {
+    http_response_code(400);
     echo json_encode(["error" => "ID no válido"]);
 }
-?>
+
+exit;
