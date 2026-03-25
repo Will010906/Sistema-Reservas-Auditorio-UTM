@@ -84,15 +84,23 @@ if (contenedorEquipos) {
 
         // 3. BITÁCORA DE CIERRE (COHERENCIA CON USUARIO)
         // Si el docente ya reportó el cierre, el admin debe verlo aquí.
-        const seccionBitacora = document.getElementById("seccionBitacoraAdmin");
-        if (seccionBitacora) {
-            if (data.incidentes_cierre) {
-                seccionBitacora.style.display = "block";
-                document.getElementById("detBitacoraTexto").innerText = `"${data.incidentes_cierre}"`;
-            } else {
-                seccionBitacora.style.display = "none";
-            }
-        }
+      const seccionBitacora = document.getElementById("seccionBitacoraAdmin");
+
+if (seccionBitacora) {
+    // Si la solicitud es 'PENDIENTE', forzamos que se vea para poder Aceptar/Rechazar
+    // O si ya tiene incidentes reportados, también la mostramos
+    if (data.estado === 'Pendiente' || data.incidentes_cierre) {
+        seccionBitacora.style.display = "block";
+        
+        // Si no hay incidentes aún, limpiamos el texto para que no se vea el "---"
+        document.getElementById("detBitacoraTexto").innerText = data.incidentes_cierre 
+            ? `"${data.incidentes_cierre}"` 
+            : "Esperando reporte de cierre del solicitante.";
+    } else {
+        // Si ya está aceptada y no hay incidentes, la ocultamos para no estorbar
+        seccionBitacora.style.display = "none";
+    }
+}
 
         // 4. WhatsApp Dinámico
         const btnWA = document.getElementById("btnWhatsApp");
