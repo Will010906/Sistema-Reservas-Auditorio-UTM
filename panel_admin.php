@@ -1,30 +1,10 @@
 <?php
-session_start();
-// Validación de seguridad
-if (!isset($_SESSION['nombre'])) {
-    header("Location: index.php");
-    exit();
-}
+
+/**
+ * PANEL DE ADMINISTRACIÓN - SIRA UTM 
+ * Ajustado para coincidir con los IDs de admin_interactivo.js
+ */
 include 'config/db_local.php';
-
-// --- SECCIÓN: PENDIENTES POR GESTIONAR ---
-$res_urg = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE prioridad = 'Urgente' AND estado = 'Pendiente'");
-$urgentes = mysqli_fetch_assoc($res_urg)['t'];
-
-$res_dem = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE prioridad = 'Pendiente' AND estado = 'Pendiente'");
-$demorados = mysqli_fetch_assoc($res_dem)['t'];
-
-// Cambio de lógica: Esta tarjeta es ahora "A Tiempo" y debe ser VERDE.
-$res_tiem = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE prioridad = 'Con tiempo' AND estado = 'Pendiente'");
-$a_tiempo = mysqli_fetch_assoc($res_tiem)['t'];
-
-// --- SECCIÓN: HISTORIAL DE DECISIONES ---
-// Cambio de lógica: Esta tarjeta es "Aceptadas" (Historial) y debe ser AZUL.
-$res_acep = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE estado = 'Aceptada'");
-$total_aceptadas = mysqli_fetch_assoc($res_acep)['t'];
-
-$res_rech = mysqli_query($conexion, "SELECT COUNT(*) as t FROM solicitudes WHERE estado = 'Rechazada'");
-$total_rechazadas = mysqli_fetch_assoc($res_rech)['t'];
 ?>
 
 <!DOCTYPE html>
@@ -33,279 +13,347 @@ $total_rechazadas = mysqli_fetch_assoc($res_rech)['t'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrador - UTM</title>
+    <title>SIRA - Dashboard Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <script src="assets/js/auth_check.js"></script>
+
     <style>
+        :root {
+            --sira-purple-dark: #2D1B33;
+            --sira-purple-primary: #5B3D66;
+            --sira-bg: #EBEFF2;
+            --grad-urgent: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%);
+            --grad-pending: linear-gradient(135deg, #FFD93D 0%, #F9A825 100%);
+            --grad-ontime: linear-gradient(135deg, #6BCB77 0%, #46A351 100%);
+            --grad-accepted: linear-gradient(135deg, #42A5F5 0%, #1E88E5 100%);
+            --grad-rejected: linear-gradient(135deg, #B0BEC5 0%, #78909C 100%);
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--sira-bg);
+            margin: 0;
+            color: #2D2D2D;
         }
 
-        .card-custom {
+        .activity-bar {
+            background-color: var(--sira-purple-dark);
+            width: 80px;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 25px;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .side-bar {
+            background-color: #FDFBFF;
+            width: 230px;
+            min-height: 100vh;
+            position: fixed;
+            left: 80px;
+            top: 0;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 30px 15px;
+            z-index: 1000;
+        }
+
+        .main-content {
+            margin-left: 310px;
+            padding: 30px 40px;
+            width: calc(100% - 310px);
+        }
+
+        .card-sira {
             border: none;
-            border-radius: 15px;
-            transition: transform 0.2s;
+            border-radius: 20px;
+            padding: 12px 15px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04);
+            height: 95px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .card-custom:hover {
-            transform: translateY(-5px);
+        .card-sira .count {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1;
+            z-index: 2;
+            color: white;
+        }
+
+        .card-sira h6 {
+            font-size: 0.55rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            z-index: 2;
+            margin-bottom: 2px;
+            color: white;
+        }
+
+        .watermark {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            font-size: 3.2rem;
+            opacity: 0.15;
+            transform: rotate(-10deg);
+            color: white;
+        }
+
+        .bg-urg {
+            background: var(--grad-urgent);
+        }
+
+        .bg-pen {
+            background: var(--grad-pending);
+        }
+
+        .bg-pen h6,
+        .bg-pen .count,
+        .bg-pen .watermark {
+            color: #2D1B33;
+        }
+
+        .bg-ont {
+            background: var(--grad-ontime);
+        }
+
+        .bg-acc {
+            background: var(--grad-accepted);
+        }
+
+        .bg-rej {
+            background: var(--grad-rejected);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
         }
 
         .badge-status {
-            padding: 0.5em 1em;
-            border-radius: 50px;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            font-weight: 700;
+            min-width: 105px;
+            text-align: center;
+            display: inline-block;
         }
 
-        .x-small {
-            font-size: 0.7rem;
+        .st-urgente {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%) !important;
+            color: white !important;
         }
 
-        /* Definición de colores para el semáforo y el historial */
-        .card-urgent {
-            background-color: #dc3545;
-            color: white;
+        .st-aceptada {
+            background: var(--grad-accepted);
+            color: white !important;
         }
 
-        /* Rojo */
-        .card-pending {
-            background-color: #ffc107;
-            color: #212529;
+        .st-rechazada {
+            background: var(--grad-rejected);
+            color: white !important;
         }
 
-        /* Amarillo */
-        .card-on-time {
-            background-color: #198754;
-            color: white;
+        .st-demorada {
+            background: linear-gradient(135deg, #FFD93D 0%, #F9A825 100%) !important;
+            color: #2D1B33 !important;
         }
 
-        /* Verde - Semáforo */
-        .card-accepted {
-            background-color: #0dcaf0;
-            color: white;
+        .st-atiempo {
+            background: linear-gradient(135deg, #6BCB77 0%, #46A351 100%) !important;
+            color: white !important;
         }
 
-        /* Azul Info - Historial */
-        .card-rejected {
-            background-color: #6c757d;
-            color: white;
+        .user-header-profile {
+            background: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
-        /* Gris - Historial */
+        /* Botón Gestionar con Identidad UTM */
+        .btn-gestionar-sira {
+            background-color: transparent !important;
+            border: 1.2px solid var(--sira-purple-primary) !important;
+            color: var(--sira-purple-primary) !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            padding: 6px 16px !important;
+            border-radius: 50px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .btn-gestionar-sira:hover {
+            background-color: var(--sira-purple-primary) !important;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(91, 61, 102, 0.2) !important;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="container py-5">
+    <?php include 'includes/sidebar.php'; ?>
+
+    <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="h3 mb-0 text-gray-800">Panel Administrador</h1>
-                <p class="text-muted">Bienvenido, <?php echo $_SESSION['nombre']; ?></p>
+                <h1 class="fw-800 h3 mb-0" style="color: var(--sira-purple-dark);">Panel Administrador</h1>
+                <p class="text-muted x-small mb-0">UTM • Sistema de Reservación de Auditorios</p>
             </div>
-            <button class="btn btn-outline-danger btn-sm" onclick="location.href='modules/logout.php'">Cerrar Sesión</button>
-        </div>
-
-        <div class="row g-4 mb-5">
-            <div class="col-md-9">
-                <div class="row g-3 h-100">
-                    <div class="col-md-4">
-                        <div class="card card-custom card-urgent shadow h-100">
-                            <div class="card-body d-flex flex-column justify-content-center text-center">
-                                <h6 class="text-uppercase small opacity-75">Urgentes</h6>
-                                <div class="display-5 fw-bold"><?php echo $urgentes; ?></div>
-                                <p class="mb-0 x-small mt-2 text-white-50">Atención inmediata</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card card-custom card-pending shadow h-100">
-                            <div class="card-body d-flex flex-column justify-content-center text-center">
-                                <h6 class="text-uppercase small opacity-75">Pendientes</h6>
-                                <div class="display-5 fw-bold"><?php echo $demorados; ?></div>
-                                <p class="mb-0 x-small mt-2 text-muted">Prioridad normal</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card card-custom card-on-time shadow h-100">
-                            <div class="card-body d-flex flex-column justify-content-center text-center">
-                                <h6 class="text-uppercase small opacity-75">A Tiempo</h6>
-                                <div class="display-5 fw-bold"><?php echo $a_tiempo; ?></div>
-                                <p class="mb-0 x-small mt-2 text-white-50">Eventos lejanos</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="user-header-profile" id="perfilUsuarioHeader">
+                <div class="text-end d-none d-md-block">
+                    <div class="fw-bold small" style="font-size: 0.75rem;" id="nombreAdmin">Cargando...</div>
+                    <small class="text-muted fw-bold" style="font-size: 0.55rem;">ADMINISTRADOR</small>
                 </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="d-flex flex-column gap-3 h-100">
-                    <div class="card card-custom card-accepted shadow-sm flex-fill d-flex align-items-center justify-content-center">
-                        <div class="card-body py-3 text-center w-100">
-                            <h6 class="text-uppercase x-small mb-1 opacity-75">Aceptadas</h6>
-                            <div class="h3 fw-bold mb-0"><?php echo $total_aceptadas; ?></div>
-                        </div>
-                    </div>
-                    <div class="card card-custom card-rejected shadow-sm flex-fill d-flex align-items-center justify-content-center">
-                        <div class="card-body py-3 text-center w-100">
-                            <h6 class="text-uppercase x-small mb-1 opacity-75">Rechazadas</h6>
-                            <div class="h3 fw-bold mb-0"><?php echo $total_rechazadas; ?></div>
-                        </div>
-                    </div>
+                <div id="inicialAvatar" style="width: 32px; height: 32px; background: var(--sira-purple-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                    U
                 </div>
             </div>
         </div>
 
-        <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
-            <div class="card-body">
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-4">
-                        <label class="form-label small fw-bold text-muted">Desde:</label>
-                        <div class="input-group input-group-sm">
-                            <input type="date" id="fecha_inicio" class="form-control border-end-0" style="border-radius: 10px 0 0 10px;">
-                            <span class="input-group-text bg-white border-start-0" style="border-radius: 0 10px 10px 0;">📅</span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small fw-bold text-muted">Hasta:</label>
-                        <div class="input-group input-group-sm">
-                            <input type="date" id="fecha_fin" class="form-control border-end-0" style="border-radius: 10px 0 0 10px;">
-                            <span class="input-group-text bg-white border-start-0" style="border-radius: 0 10px 10px 0;">📅</span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <button id="btnFiltrar" class="btn btn-primary btn-sm w-100 fw-bold shadow-sm" style="border-radius: 10px; height: 38px;">
-                            Filtrar Solicitudes
-                        </button>
-                    </div>
+        <div class="row g-3 mb-4">
+            <div class="col">
+                <div class="card-sira bg-urg">
+                    <h6>Urgentes</h6>
+                    <div class="count" id="countUrgentes">0</div>
+                    <i class="bi bi-exclamation-octagon watermark"></i>
+                </div>
+            </div>
+            <div class="col">
+        <div class="card-sira bg-pen">
+            <h6>Demoradas</h6>
+            <div class="count" id="countDemoradas">0</div> 
+            <i class="bi bi-clock-history watermark"></i>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card-sira bg-ont">
+            <h6>A Tiempo</h6>
+            <div class="count" id="countAtiempo">0</div>
+            <i class="bi bi-check2-circle watermark"></i>
+        </div>
+    </div>
+            <div class="col">
+                <div class="card-sira bg-acc">
+                    <h6>Aceptadas</h6>
+                    <div class="count" id="countAceptadas">0</div>
+                    <i class="bi bi-hand-thumbs-up watermark"></i>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card-sira bg-rej">
+                    <h6>Rechazadas</h6>
+                    <div class="count" id="countRechazadas">0</div>
+                    <i class="bi bi-hand-thumbs-down watermark"></i>
                 </div>
             </div>
         </div>
 
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body">
-                <h5 class="mb-3">Tabla de Gestión</h5>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle" id="tablaSolicitudes">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Folio</th>
-                                <th>Solicitante</th>
-                                <th>Auditorio</th>
-                                <th>Fecha Evento</th>
-                                <th>Estatus</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $query = "SELECT 
-            s.*, 
-            u.nombre as nombre_usuario, 
-            a.nombre_espacio 
-          FROM solicitudes s
-          JOIN usuarios u ON s.id_usuario = u.id_usuario
-          JOIN auditorio a ON s.id_auditorio = a.id_auditorio";
-                            $resultado = mysqli_query($conexion, $query);
-                            while ($row = mysqli_fetch_assoc($resultado)) {
-                                // 1. Lógica de COLORES adaptada a las tarjetas
-                                if ($row['estado'] == 'Pendiente') {
-                                    // Seguimos el semáforo de las tarjetas de arriba
-                                    if ($row['prioridad'] == 'Urgente') {
-                                        $bg_status = 'bg-danger text-white'; // Rojo (Igual a tarjeta Urgente)
-                                    } elseif ($row['prioridad'] == 'Pendiente') {
-                                        $bg_status = 'bg-warning text-dark';  // Amarillo (Igual a tarjeta Pendientes)
-                                    } else {
-                                        $bg_status = 'bg-success text-white'; // Verde (Igual a tarjeta A Tiempo)
-                                    }
-                                } else {
-                                    // Seguimos los colores del Historial
-                                    if ($row['estado'] == 'Aceptada') {
-                                        $bg_status = 'bg-info text-white';    // Azul (Igual a tarjeta Aceptadas)
-                                    } else {
-                                        $bg_status = 'bg-secondary text-white'; // Gris (Igual a tarjeta Rechazadas)
-                                    }
-                                }
 
-                                // 2. Lógica de TEXTO
-                                $texto_mostrar = ($row['estado'] == 'Pendiente') ? $row['prioridad'] : $row['estado'];
-
-                                echo "<tr>
-        <td class='fw-bold text-primary'>{$row['folio']}</td>
-        <td>
-            <div class='fw-bold' style='color: #2d3436;'>{$row['titulo_event']}</div>
-            <div class='text-muted' style='font-size: 0.85rem;'>
-                <i class='bi bi-person-fill'></i> Solicitó: {$row['nombre_usuario']}
-            </div>
-        </td>
-        <td>
-    <span class='badge rounded-pill bg-light text-dark border px-3'>
-        {$row['nombre_espacio']}
-    </span>
-</td>
-        <td class='small'>{$row['fecha_evento']}</td>
-        <td><span class='badge-status {$bg_status}'>" . strtoupper($texto_mostrar) . "</span></td>
-        <td>
-            <button class='btn btn-sm btn-primary shadow-sm' onclick='gestionar({$row['id_solicitud']})'>
-                Gestionar
-            </button>
-        </td>
-      </tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+        <div class="bg-white p-3 mb-4 rounded-4 shadow-sm border-0">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-7">
+                    <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Filtrar por Estatus</label>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="chkTodos" checked>
+                            <label class="form-check-label x-small fw-bold text-primary">TODOS</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="URGENTE" id="chkUrg">
+                            <label class="form-check-label x-small fw-bold text-danger">Urgentes</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="DEMORADA" id="chkDem">
+                            <label class="form-check-label x-small fw-bold text-warning">Demoradas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="A TIEMPO" id="chkTie">
+                            <label class="form-check-label x-small fw-bold text-success">A Tiempo</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="ACEPTADA" id="chkAce">
+                            <label class="form-check-label x-small fw-bold text-info">Aceptadas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="RECHAZADA" id="chkRec">
+                            <label class="form-check-label x-small fw-bold text-secondary">Rechazadas</label>
+                        </div>
+                    </div>
                 </div>
+                <div class="col-lg-3">
+                    <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Rango de Fechas</label>
+                    <div class="d-flex align-items-center gap-1 bg-light p-1 rounded-3 border">
+                        <input type="date" id="fecha_inicio" class="form-control form-control-sm border-0 bg-transparent p-1" style="font-size: 0.7rem;">
+                        <i class="bi bi-arrow-right text-muted small"></i>
+                        <input type="date" id="fecha_fin" class="form-control form-control-sm border-0 bg-transparent p-1" style="font-size: 0.7rem;">
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <button class="btn btn-dark btn-sm w-100 mb-1 rounded-3 fw-bold" onclick="resetFiltros()">Limpiar</button>
+                    <button id="btnPDF" class="btn btn-danger btn-sm w-100 rounded-3 fw-bold" onclick="descargarReporte()">PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="tablaSolicitudes" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr class="text-muted x-small fw-bold text-uppercase">
+                            <th class="ps-4">Folio</th>
+                            <th>Evento / Solicitante</th>
+                            <th>Auditorio</th>
+                            <th>Fecha</th>
+                            <th class="text-center">Estatus</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contenedorSolicitudes">
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="mt-2 text-muted">Sincronizando reservaciones...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="bsModalDetalle" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">Revisión de Solicitud</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row g-4">
-                        <div class="col-md-6 border-end">
-                            <h4 class="fw-bold mb-3" id="detFolio"></h4>
-                            <p class="mb-1 text-muted small">Fecha de Registro</p>
-                            <p class="fw-bold" id="detFechaSol"></p>
-                            <p class="mb-1 text-muted small text-primary">Fecha del Evento</p>
-                            <p class="fw-bold" id="detFechaEvento" style="color: #0d6efd;"></p>
-                            <p class="mb-1 text-muted small">Estado Actual</p>
-                            <p id="detEstado"></p>
-                            <hr>
-                            <div class="d-flex gap-2 mb-3">
-                                <button class="btn btn-danger flex-fill" onclick="actualizarEstado('Rechazada')">Rechazar</button>
-                                <button class="btn btn-success flex-fill" onclick="actualizarEstado('Aceptada')">Aprobar</button>
-                            </div>
-                            <label class="form-label small text-muted">Comentarios / Motivo de rechazo:</label>
-                            <textarea id="motivoRechazo" class="form-control" rows="3" placeholder="Escribe aquí..."></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-primary fw-bold text-uppercase small">Usuario Solicitante</h6>
-                            <p class="h5 mb-3" id="detUsuarioNombre"></p>
-                            <p class="mb-1 text-muted small">Evento</p>
-                            <p class="fw-bold" id="detTituloEv"></p>
-                            <p class="mb-1 text-muted small">Descripción</p>
-                            <div class="bg-light p-3 rounded" id="detDescripcion" style="min-height: 100px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include 'includes/modal_detalle.php'; ?>
 
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/admin_interactivo.js"></script>
-
+    <link rel="stylesheet" href="assets/css/style.css">
 </body>
 
 </html>

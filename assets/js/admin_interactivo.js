@@ -1,121 +1,413 @@
-// Variables globales
+/**
+ * LÓGICA INTERACTIVA DEL PANEL - NIVEL TSU
+ * Estado: Producción Segura (JWT + Async/Await)
+ */
+
+/* global Swal, bootstrap */
+
 let idSeleccionado = null;
-let bsModal = null; 
+let bsModal = null;
 
 /**
- * 1. FUNCIÓN PARA ABRIR EL MODAL Y CARGAR DATOS
+ * GESTIÓN DE DETALLES
+ * Obtiene datos del servidor usando el estándar Bearer Token
  */
-function gestionar(id) {
+/**
+ * GESTIÓN DE DETALLES - SIRA UTM
+ * Actualizado: Soporte para Bitácora de Cierre y Equipamiento Especial
+ */
+async function gestionar(id) {
     idSeleccionado = id;
-    
+
     if (!bsModal) {
-        const modalElement = document.getElementById('bsModalDetalle');
-        if (modalElement) {
-            bsModal = new bootstrap.Modal(modalElement);
-        } else {
-            console.error("No se encontró el modal con ID: bsModalDetalle");
-            return;
-        }
+        const modalElement = document.getElementById("bsModalDetalle");
+        if (modalElement) bsModal = new bootstrap.Modal(modalElement);
     }
 
-    fetch(`modules/get_detalle.php?id=${id}`)
-        .then(res => res.json())
-        .then(data => {
-            const llenar = (id, texto) => {
-                const el = document.getElementById(id);
-                if (el) el.innerText = texto;
-            };
-
-            llenar('detFolio', "Folio: " + (data.folio || ''));
-            llenar('detFechaSol', data.fecha_registro || '');
-            
-            // --- DATO NUEVO: FECHA DEL EVENTO ---
-            llenar('detFechaEvento', data.fecha_evento || ''); 
-            
-            llenar('detEstado', data.estado || '');
-            llenar('detUsuarioNombre', data.nombre || '');
-            llenar('detTituloEv', data.titulo_event || '');
-            llenar('detDescripcion', data.descripcion || '');
-            
-            bsModal.show();
+    try {
+        const response = await fetch(`api/solicitudes/get_detalle.php?id=${id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}`,
+                'Content-Type': 'application/json'
+            }
         });
+
+        if (response.status === 401) return manejarErrorAutenticacion();
+        const data = await response.json();
+
+        // 1. Llenado de textos básicos
+       document.getElementById("detFolio").innerText = "Folio: " + (data.folio || 'N/A');
+document.getElementById("detTituloEv").innerText = data.titulo_event;
+
+// --- CAMBIO AQUÍ: Agregamos el ROL al lado del nombre ---
+const nombre = data.nombre_usuario || data.nombre || 'Sin nombre';
+const rol = data.perfil ? `(${data.perfil.toUpperCase()})` : ''; 
+document.getElementById("detUsuarioNombre").innerText = `${nombre} ${rol}`;
+
+document.getElementById("detAuditorio").innerText = data.nombre_espacio;
+
+// --- CAMBIO AQUÍ: Aseguramos que pinte el número de la DB ---
+document.getElementById("detAsistentes").innerText = `👥 ${data.num_asistentes || 0} asistentes aprox.`;
+
+document.getElementById("detFechaEvento").innerText = data.fecha_evento_limpia || data.fecha_evento;
+document.getElementById("detHorario").innerText = `${data.hora_inicio} a ${data.hora_fin}`;
+document.getElementById("detDescription").innerText = data.descripcion;
+
+        // 2. EQUIPAMIENTO ESPECIAL (EXTRAS)
+      // 2. EQUIPAMIENTO ESPECIAL (EXTRAS)
+// En lugar de buscar 'equipos_solicitados', buscamos 'otros_servicios'
+// En admin_interactivo.js
+// admin_interactivo.js - Dentro de gestionar(id)
+// admin_interactivo.js
+// 2. EQUIPAMIENTO ESPECIAL (EXTRAS)
+const contenedorEquipos = document.getElementById("detEquipamiento");
+
+// Usamos 'extras_texto' (que viene del alias en tu PHP) o 'otros_servicios'
+const extras = data.extras_texto || data.otros_servicios || '';
+
+if (contenedorEquipos) {
+    if (extras && extras.trim() !== "" && extras.toLowerCase() !== 'sin requerimientos extras') {
+        // Convertimos el texto "Laptop, Sonido" en Badges elegantes
+        const listaExtras = extras.split(', ');
+        contenedorEquipos.innerHTML = listaExtras.map(e => 
+            `<span class="badge bg-purple-soft text-purple border-purple-light me-1 shadow-sm" 
+                   style="background-color: #f3e5f5; color: #5B3D66; border: 1px solid #d1c4e9; padding: 5px 10px;">
+                ${e}
+            </span>`
+        ).join('');
+    } else {
+        // Si no hay datos, mostramos el mensaje por defecto
+        contenedorEquipos.innerHTML = '<span class="text-muted small italic">Sin requerimientos extras.</span>';
+    }
 }
 
-/**
- * 2. FUNCIÓN PARA CERRAR EL MODAL
- */
-function cerrarModal() {
-    if (bsModal) {
-        bsModal.hide();
+        // 3. BITÁCORA DE CIERRE (COHERENCIA CON USUARIO)
+        // Si el docente ya reportó el cierre, el admin debe verlo aquí.
+      const seccionBitacora = document.getElementById("seccionBitacoraAdmin");
+
+if (seccionBitacora) {
+    // Si la solicitud es 'PENDIENTE', forzamos que se vea para poder Aceptar/Rechazar
+    // O si ya tiene incidentes reportados, también la mostramos
+    if (data.estado === 'Pendiente' || data.incidentes_cierre) {
+        seccionBitacora.style.display = "block";
+        
+        // Si no hay incidentes aún, limpiamos el texto para que no se vea el "---"
+        document.getElementById("detBitacoraTexto").innerText = data.incidentes_cierre 
+            ? `"${data.incidentes_cierre}"` 
+            : "Esperando reporte de cierre del solicitante.";
+    } else {
+        // Si ya está aceptada y no hay incidentes, la ocultamos para no estorbar
+        seccionBitacora.style.display = "none";
+    }
+}
+
+        // 4. WhatsApp Dinámico
+        const btnWA = document.getElementById("btnWhatsApp");
+        if (data.telefono) {
+            btnWA.href = `https://wa.me/52${data.telefono.replace(/\D/g, "")}`;
+            btnWA.style.display = "inline-block";
+        } else {
+            btnWA.style.display = "none";
+        }
+
+        bsModal.show();
+
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        Swal.fire('Error', 'No se pudo obtener la información de la base de datos.', 'error');
     }
 }
 
 /**
- * 3. FUNCIÓN PARA ACTUALIZAR EL ESTADO (APROBAR/RECHAZAR)
+ * MOTOR DE FILTRADO (Corregido para Badges Dinámicos)
  */
-function actualizarEstado(nuevoEstado) {
-    if (!idSeleccionado) return;
+function aplicarFiltros() {
+    const inicio = document.getElementById("fecha_inicio")?.value;
+    const fin = document.getElementById("fecha_fin")?.value;
+    const chkTodos = document.getElementById("chkTodos");
+    const todosActivo = chkTodos ? chkTodos.checked : true;
 
-    // Obtenemos el texto del motivo de rechazo/comentario
-    const motivo = document.getElementById('motivoRechazo').value;
+    // Array de estatus seleccionados (ej: ["URGENTE", "DEMORADA"])
+    const seleccionados = todosActivo 
+        ? [] 
+        : Array.from(document.querySelectorAll(".filter-check:checked")).map(cb => cb.value.toUpperCase());
 
-    fetch('modules/actualizar_estado.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            id: idSeleccionado, 
-            estado: nuevoEstado,
-            comentario: motivo // Enviamos el comentario a la DB
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("¡Solicitud " + nuevoEstado + " con éxito!");
-            location.reload(); 
-        } else {
-            alert("Error al actualizar.");
+    const filas = document.querySelectorAll(".solicitud-fila");
+
+    filas.forEach((fila) => {
+        // 1. Filtro de Fechas
+        const celdaFecha = fila.querySelector(".date-cell")?.innerText.trim();
+        let cumpleFecha = true;
+        if (inicio && fin) cumpleFecha = (celdaFecha >= inicio && celdaFecha <= fin);
+
+        // 2. Filtro de Semáforo (Basado en el texto del Badge)
+        const badge = fila.querySelector(".badge-status");
+        let cumpleEstatus = true;
+
+        if (badge && !todosActivo) {
+            const textoEstado = badge.innerText.trim().toUpperCase();
+            // Comprobamos si el texto del semáforo está en la lista de marcados
+            cumpleEstatus = seleccionados.includes(textoEstado);
         }
+
+        // Aplicar visibilidad final
+        fila.style.display = (cumpleFecha && cumpleEstatus) ? "" : "none";
     });
 }
 
 /**
- * 4. LÓGICA DE FILTRADO POR FECHAS
+ * CARGAR DASHBOARD
  */
-document.getElementById('btnFiltrar')?.addEventListener('click', () => {
-    const inicio = document.getElementById('fecha_inicio').value;
-    const fin = document.getElementById('fecha_fin').value;
+async function cargarDashboard() {
+    try {
+        const response = await fetch('api/solicitudes/get_solicitudes.php', {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}` }
+        });
 
-    if (!inicio || !fin) {
-        alert("Selecciona ambas fechas para filtrar.");
+        if (response.status === 401) return manejarErrorAutenticacion();
+
+        const data = await response.json();
+
+        // Llenar contadores de las Cards
+        if (data.stats) {
+            document.getElementById("countUrgentes").innerText   = data.stats.urgentes || 0;
+            document.getElementById('countDemoradas').innerText = data.stats.demoradas;
+            document.getElementById("countAtiempo").innerText     = data.stats.atiempo || 0;
+            document.getElementById("countAceptadas").innerText   = data.stats.aceptadas || 0;
+            document.getElementById("countRechazadas").innerText  = data.stats.rechazadas || 0;
+        }
+
+        // Llenar tabla dinámicamente
+        const contenedor = document.getElementById("contenedorSolicitudes");
+        if (contenedor && data.solicitudes) {
+            contenedor.innerHTML = "";
+           data.solicitudes.forEach(sol => {
+    // Definimos la clase de color según la prioridad visual
+    // Dentro de data.solicitudes.forEach(sol => { ...
+
+// Creamos la clase CSS: st-urgente, st-atiempo, st-aceptada, etc.
+const claseStatus = sol.prioridad_visual.replace(" ", "").toLowerCase(); 
+
+contenedor.innerHTML += `
+    <tr class="solicitud-fila">
+        <td class="ps-4 fw-bold" style="color: #5B3D66;">#${sol.folio}</td>
+        <td>
+            <div class="fw-bold">${sol.titulo_event}</div>
+            <div class="text-muted x-small">Por: ${sol.nombre_usuario || 'Docente UTM'}</div>
+        </td>
+        <td><span class="badge rounded-pill bg-light text-dark border px-3">${sol.nombre_espacio || 'Auditorio'}</span></td>
+        <td class="fw-bold text-muted date-cell">${sol.fecha_evento}</td>
+        <td class="text-center">
+            <span class="badge-status st-${claseStatus} shadow-sm">
+                ${sol.prioridad_visual.toUpperCase()}
+            </span>
+        </td>
+        <td class="text-center">
+            <button class="btn btn-gestionar-sira btn-sm shadow-sm" onclick="gestionar(${sol.id_solicitud})">
+                <i class="bi bi-folder2-open me-1"></i> Gestionar
+            </button>
+        </td>
+    </tr>`;
+});
+        }
+        
+        aplicarFiltros(); 
+
+    } catch (error) {
+        console.error("Error al cargar dashboard:", error);
+    }
+}
+
+/**
+ * AUXILIAR: Seguridad
+ */
+function manejarErrorAutenticacion() {
+    localStorage.removeItem('sira_session_token');
+    Swal.fire({
+        icon: 'error',
+        title: 'Sesión no válida',
+        text: 'Por seguridad reingresa al sistema.',
+        confirmButtonColor: '#5B3D66'
+    }).then(() => {
+        window.location.href = 'login.php';
+    });
+}
+
+// --- EVENTOS ---
+// --- EVENTOS DE FILTRADO SINCRONIZADOS ---
+document.addEventListener("DOMContentLoaded", () => {
+    const chkTodos = document.getElementById("chkTodos");
+    const filtrosIndividuales = document.querySelectorAll(".filter-check");
+
+    // 1. Si marco "TODOS", desmarco los individuales
+    chkTodos?.addEventListener("change", function() {
+        if (this.checked) {
+            filtrosIndividuales.forEach(cb => cb.checked = false);
+        }
+        aplicarFiltros();
+    });
+
+    // 2. Si marco uno individual, desmarco "TODOS"
+    filtrosIndividuales.forEach(cb => {
+        cb.addEventListener("change", function() {
+            if (this.checked && chkTodos) {
+                chkTodos.checked = false;
+            }
+            // Si desmarco todos los individuales, vuelvo a marcar "TODOS"
+            const algunoMarcado = Array.from(filtrosIndividuales).some(i => i.checked);
+            if (!algunoMarcado && chkTodos) chkTodos.checked = true;
+            
+            aplicarFiltros();
+        });
+    });
+
+    // Escuchar cambios en las fechas
+    document.querySelectorAll("#fecha_inicio, #fecha_fin").forEach(el => {
+        el.addEventListener("change", aplicarFiltros);
+    });
+
+    cargarDashboard(); 
+    cargarPerfilHeader();
+});
+
+window.resetFiltros = function () {
+    const chkTodos = document.getElementById("chkTodos");
+    if (chkTodos) chkTodos.checked = true;
+    document.querySelectorAll(".filter-check").forEach(cb => cb.checked = false);
+    document.getElementById("fecha_inicio").value = "";
+    document.getElementById("fecha_fin").value = "";
+    aplicarFiltros();
+};
+
+window.descargarReporte = function () {
+    const fInicio = document.getElementById('fecha_inicio').value;
+    const fFin = document.getElementById('fecha_fin').value;
+    const token = localStorage.getItem('sira_session_token'); // Token correcto
+
+    if (!token) {
+        return Swal.fire('Error', 'Sesión no válida', 'error');
+    }
+
+    // Si no hay fechas, avisamos (o puedes dejar que mande todo el histórico)
+    if (!fInicio || !fFin) {
+        Swal.fire({
+            title: '¿Exportar todo?',
+            text: "No has seleccionado un rango de fechas. Se exportará el histórico completo.",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, exportar todo',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open(`api/reportes/generar_reporte.php?token=${token}`, '_blank');
+            }
+        });
         return;
     }
 
-    fetch(`modules/filtrar_solicitudes.php?inicio=${inicio}&fin=${fin}`)
-        .then(res => res.json())
-        .then(data => {
-            const tbody = document.querySelector('#tablaSolicitudes tbody');
-            tbody.innerHTML = ""; // Limpiamos la tabla
-            
-            data.forEach(sol => {
-                // Determinamos la clase del badge según el estado
-                const badgeClass = (sol.estado === 'Urgente') ? 'bg-danger' : 
-                                   (sol.estado === 'Pendiente' ? 'bg-warning text-dark' : 'bg-success');
+    // CORRECCIÓN: Ruta a la subcarpeta reportes
+    window.open(`api/reportes/generar_reporte.php?inicio=${fInicio}&fin=${fFin}&token=${token}`, '_blank');
+};
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="fw-bold">${sol.folio}</td>
-                        <td>${sol.titulo_event}</td>
-                        <td>ID Auditorio: ${sol.id_auditorio}</td>
-                        <td>${sol.fecha_evento}</td>
-                        <td><span class="badge-status ${badgeClass}">${sol.estado}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="gestionar(${sol.id_solicitud})">
-                                Gestionar
-                            </button>
-                        </td>
-                    </tr>`;
-            });
+/**
+ * ACTUALIZA EL PERFIL DE LA ESQUINA (JWT DECODER)
+ */
+function cargarPerfilHeader() {
+    const token = localStorage.getItem('sira_session_token');
+    
+    if (token) {
+        try {
+            // Decodificamos la parte central del JWT (Payload)
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const payload = JSON.parse(atob(base64));
+
+            // 1. Ponemos el nombre del Admin
+            const nombreElemento = document.getElementById("nombreAdmin");
+            if (nombreElemento && payload.nombre) {
+                nombreElemento.innerText = payload.nombre;
+            }
+
+            // 2. Generamos la inicial dinámica para el avatar
+            const avatarElemento = document.getElementById("inicialAvatar");
+            if (avatarElemento && payload.nombre) {
+                avatarElemento.innerText = payload.nombre.charAt(0).toUpperCase();
+            }
+
+        } catch (error) {
+            console.error("Error al decodificar perfil:", error);
+        }
+    }
+}
+
+/**
+ * PROCESAR SOLICITUD (Aceptar/Rechazar)
+ * @param {string} nuevoEstado - 'ACEPTADA' o 'RECHAZADA'
+ */
+async function procesarSolicitud(nuevoEstado) {
+    const notas = document.querySelector('textarea[placeholder*="Opcional"]').value.trim();
+    
+    // Feedback visual
+    Swal.fire({ title: 'Procesando...', didOpen: () => Swal.showLoading() });
+
+    try {
+        const response = await fetch('api/solicitudes/gestion_solicitudes.php', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}`
+            },
+           body: JSON.stringify({
+    id: idSeleccionado, 
+    estado: nuevoEstado,
+    // CAMBIO AQUÍ: de 'observaciones' a 'observaciones_admin'
+    observaciones_admin: notas 
+})
         });
-});
 
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire('¡Éxito!', `La solicitud ha sido ${nuevoEstado.toLowerCase()}.`, 'success')
+                .then(() => location.reload());
+        } else {
+            throw new Error(data.error);
+        }
+    } catch (error) {
+        Swal.fire('Error', error.message, 'error');
+    }
+}
+
+/**
+ * ELIMINAR SOLICITUD PERMANENTEMENTE
+ */
+async function eliminarSolicitudDesdeModal() {
+    const confirmacion = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción eliminará el folio permanentemente.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar'
+    });
+
+    if (confirmacion.isConfirmed) {
+        try {
+            const response = await fetch(`api/solicitudes/gestion_solicitudes.php?id=${idSeleccionado}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}`
+                }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                Swal.fire('Eliminado', 'El registro desapareció del sistema.', 'success')
+                    .then(() => location.reload());
+            }
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo eliminar.', 'error');
+        }
+    }
+}

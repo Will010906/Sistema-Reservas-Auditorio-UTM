@@ -1,153 +1,128 @@
-/* assets/css/style.css */
+/* Importar fuente moderna (Inter) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-:root {
-    --primary-color: #007bff; /* Azul institucional */
-    --secondary-color: #6c757d;
-    --success-color: #28a745; /* Verde para el semáforo/aceptadas */
-    --warning-color: #ffc107; /* Amarillo para pendientes */
-    --danger-color: #dc3545;  /* Rojo para urgentes/rechazadas */
-    --bg-color: #f4f7f6;
-    --text-color: #333;
-}
-
+/* Estilos generales del fondo y la letra */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0;
-    padding: 0;
 }
 
-/* Estilo para el Login (Módulo 1) */
+/* El cuadro principal del Login (La Tarjeta) */
 .login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
-    margin: 100px auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+/* Título principal */
+.login-container h2 {
     text-align: center;
-}
-
-/* Estilos de Formulario (Módulo 5) */
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-input, select, textarea {
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-button {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Semáforo de Prioridad (Módulo 2 y 4) */
-.status-urgent { color: white; background-color: var(--danger-color); padding: 5px; border-radius: 4px; }
-.status-process { color: white; background-color: var(--warning-color); padding: 5px; border-radius: 4px; }
-.status-ok { color: white; background-color: var(--success-color); padding: 5px; border-radius: 4px; }
-
-/* Menú de Navegación (Header) */
-nav {
-    background: #222;
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-nav ul {
-    list-style: none;
-    display: flex;
-    margin: 0;
-}
-
-nav ul li { margin-left: 20px; }
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-}
-
-/* PANEL USUARIO */
-
-.dashboard-container{
-    padding: 30px;
-}
-
-.dashboard-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.new-btn{
-    background-color: var(--success-color);
-    padding: 10px 15px;
-}
-.status-cards{
-    display: flex;
-    gap: 20px;
+    color: #1a202c;
+    font-weight: 700;
+    font-size: 1.5rem;
     margin-bottom: 30px;
+    letter-spacing: -0.5px;
 }
 
-.card{
-    flex: 1;
-    padding: 20px;
-    border-radius: 6px;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 15px;
+/* Estilos para las etiquetas (Matrícula, Contraseña) */
+.login-container label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.card .number{
-    font-size: 24px;
-    font-weight: bold;
-    background: rgba(255,255,255,0.2);
-    padding: 10px 15px;
-    border-radius: 50%;
-}
-
-.card.green{ background: var(--success-color); }
-.card.yellow{ background: var(--warning-color); }
-.card.red{ background: var(--danger-color); }
-.table-container{
-    background: white;
-    padding: 20px;
-    border-radius: 6px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-}
-
-table{
+/* Cajas de texto (Inputs) */
+.login-container input[type="text"],
+.login-container input[type="password"] {
     width: 100%;
-    border-collapse: collapse;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
-table th{
-    background: #f1f1f1;
-    padding: 10px;
-    text-align: left;
+/* Efecto cuando haces clic en la caja de texto */
+.login-container input[type="text"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #008a45; /* Verde UTM */
+    background-color: #ffffff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 138, 69, 0.1);
 }
 
-table td{
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+/* Botón de Entrar */
+.login-container button {
+    width: 100%;
+    background-color: #008a45; /* Verde UTM */
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+/* Efecto al pasar el mouse por el botón */
+.login-container button:hover {
+    background-color: #006b35;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 107, 53, 0.3);
+}
+
+/* Efecto al dar clic en el botón */
+.login-container button:active {
+    transform: translateY(0);
+}
+
+/* Definición de la alerta SIRA Purple Transparentosa */
+.alert-sira-purple {
+    /* Fondo morado con 10% de opacidad (transparentoso) */
+    background-color: rgba(91, 61, 102, 0.1) !important; 
+    /* Borde morado sólido pero sutil */
+    border: 1.5px solid rgba(91, 61, 102, 0.3) !important;
+    /* Color de texto morado oscuro para contraste */
+    color: #2D1B33 !important;
+    /* Redondeado suave de 16px */
+    border-radius: 16px !important;
+    /* Espaciado interno generoso */
+    padding: 1rem 1.25rem !important;
+    /* Sombra muy sutil para dar profundidad */
+    box-shadow: 0 4px 12px rgba(91, 61, 102, 0.05);
+}
+
+/* Estilo para el título de la alerta */
+.alert-sira-purple h6 {
+    color: #5B3D66 !important; /* Morado principal */
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+/* Estilo para el texto del reporte */
+.alert-sira-purple p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0;
 }

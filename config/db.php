@@ -1,14 +1,13 @@
 <?php
-$servername = "192.168.99.3";
-$username = "user_equipo11";
-$password = "user_secret_password11";
-$dbname = "proyecto_equipo11_db";
-$port = 3311;
+$servername = "mysql";
+$username   = "user_equipo11";
+$password   = "user_secret_password11"; // Asegúrate que sea la que usaste en Adminer
+$dbname     = "proyecto_equipo11_db";
 
-// Conexión incluyendo el puerto
-$conexion = mysqli_connect( $servername, $username, $password, $dbname, $port );
+// Intentar la conexión sin especificar puerto (usará 3306 por defecto)
+$conexion = mysqli_connect($servername, $username, $password, $dbname);
 
 if (!$conexion) {
-    die("Error de conexión al servidor remoto: " . mysqli_connect_error());
+    die("Error de conexión: " . mysqli_connect_error());
 }
-
+?>
