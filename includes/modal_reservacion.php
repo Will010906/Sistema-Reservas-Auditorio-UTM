@@ -79,11 +79,13 @@
                                 <h6 class="fw-800 text-uppercase small mb-1 mt-4" style="color: var(--sira-purple-primary); font-size: 0.7rem;">Disponibilidad (Haz clic para definir inicio y fin):</h6>
                                 <p class="text-muted small mb-3" id="fecha_seleccionada_txt">Selecciona un día para ver bloques</p>
 
-                                <div id="grid_horarios" class="d-flex flex-wrap gap-2 mb-2"></div>
+                                <div id="grid_horarios" class="d-flex flex-wrap gap-2 mb-2">
+    </div>
 
-                                <div id="msj_error_rango" class="alert alert-warning small rounded-3 border-0 mt-2" style="display: none;">
-                                    <i class="bi bi-exclamation-circle-fill me-2"></i> No puedes seleccionar un rango que incluya horas ya ocupadas.
-                                </div>
+<div id="msj_error_rango" class="alerta-limite mt-3" style="display: none;">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> 
+    <span id="msj_error_rango_texto">La reserva máxima permitida es de 6 horas.</span>
+</div>
 
                                 <div class="mt-auto border-top pt-4">
                                     <button id="btnConfirmarHorario" class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-sm" disabled onclick="irAlFormularioFinal()">
@@ -96,65 +98,78 @@
                 </div>
 
                 <div id="paso_formulario" class="p-5" style="display: none;">
-                    <button class="btn btn-sm text-primary fw-bold mb-4 p-0" onclick="irAlCalendario(auditorioSeleccionado, '')">
-                        <i class="bi bi-arrow-left"></i> Cambiar horario
-                    </button>
+    <button class="btn btn-sm text-primary fw-bold mb-4 p-0" onclick="irAlCalendario(auditorioSeleccionado, '')">
+        <i class="bi bi-arrow-left"></i> Cambiar horario
+    </button>
 
-                    <form action="modules/procesar_solicitud.php" method="POST">
-                        <input type="hidden" name="id_auditorio" id="input_id_auditorio">
-                        <input type="hidden" name="fecha_evento" id="input_fecha_evento">
-                        <input type="hidden" name="hora_inicio" id="input_hora_inicio">
-                        <input type="hidden" name="hora_fin" id="input_hora_fin">
+    <form id="formNuevaReservacion">
+        <input type="hidden" id="id_editando" name="id_editando">
+        <input type="hidden" name="id_auditorio" id="input_id_auditorio">
+        <input type="hidden" name="fecha_evento" id="input_fecha_evento">
+        <input type="hidden" name="hora_inicio" id="input_hora_inicio">
+        <input type="hidden" name="hora_fin" id="input_hora_fin">
 
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre del Evento</label>
-                                <input type="text" name="titulo" class="form-control border-0 shadow-sm p-3 rounded-4 mb-3" placeholder="Ingresa el nombre del evento" required>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label small fw-bold text-muted text-uppercase">Nombre del Evento</label>
+                <input type="text" name="titulo" class="form-control border-0 shadow-sm p-3 rounded-4 mb-3" placeholder="Ingresa el nombre del evento" required>
 
-                                <label class="form-label small fw-bold text-muted text-uppercase">Razón de la Solicitud</label>
-                                <textarea name="descripcion" class="form-control border-0 shadow-sm p-3 rounded-4 mb-3" rows="3" placeholder="Describe brevemente tu evento..." required></textarea>
+                <label class="form-label small fw-bold text-muted text-uppercase">Asistentes Aproximados</label>
+                <div class="input-group mb-3 shadow-sm rounded-4 overflow-hidden">
+                    <span class="input-group-text border-0 bg-white"><i class="bi bi-people text-primary"></i></span>
+                    <input type="number" name="num_asistentes" class="form-control border-0 p-3" placeholder="¿Cuántas personas asistirán?" min="1" required>
+                </div>
 
-                                <label class="form-label small fw-bold text-muted text-uppercase">Otros requerimientos (Opcional)</label>
-                                <input type="text" name="otros_servicios" class="form-control border-0 shadow-sm p-3 rounded-4" placeholder="Ej. Cafetería, sillas extra, etc.">
-                            </div>
+                <label class="form-label small fw-bold text-muted text-uppercase">Razón de la Solicitud</label>
+                <textarea name="descripcion" class="form-control border-0 shadow-sm p-3 rounded-4 mb-3" rows="3" placeholder="Describe brevemente tu evento..." required></textarea>
 
-                            <div class="col-md-6">
-                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
-                                    <div style="height: 140px; width: 100%; overflow: hidden; background: #f8f9fa;">
-                                        <img id="img_final_preview" src="assets/img/placeholder.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+                <label class="form-label small fw-bold text-muted text-uppercase">Otros requerimientos (Opcional)</label>
+                <input type="text" name="otros_servicios" class="form-control border-0 shadow-sm p-3 rounded-4" placeholder="Ej. Cafetería, sillas extra, etc.">
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
+                    <div style="height: 140px; width: 100%; overflow: hidden; background: #f8f9fa;">
+                        <img id="img_final_preview" src="assets/img/placeholder.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span id="display_nombre_final" class="fw-bold text-dark small text-uppercase">Auditorio</span>
+                            <span class="badge bg-primary rounded-pill" style="font-size: 0.6rem;">Confirmado</span>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-6 border-end">
+                                <label class="extra-small fw-bold text-primary d-block mb-2 text-uppercase" style="font-size: 0.65rem;">INCLUYE:</label>
+                                <div id="check_equipamiento_fijo" class="extra-small text-muted" style="min-height: 50px; font-size: 0.7rem;">
                                     </div>
-
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <span id="display_nombre_final" class="fw-bold text-dark small text-uppercase">Auditorio</span>
-                                            <span class="badge bg-primary rounded-pill" style="font-size: 0.6rem;">Confirmado</span>
-                                        </div>
-
-                                        <div class="row g-2">
-                                            <div class="col-6 border-end">
-                                                <label class="extra-small fw-bold text-primary d-block mb-2">INCLUYE:</label>
-                                                <div id="check_equipamiento_fijo" class="extra-small text-muted" style="min-height: 50px;">
-                                                </div>
-                                            </div>
-                                            <div class="col-6 ps-3">
-                                                <label class="extra-small fw-bold text-success d-block mb-2">EXTRAS:</label>
-                                                <div class="form-check extra-small p-0 m-0" style="font-size: 0.65rem;">
-                                                    <input class="form-check-input ms-0 me-1" type="checkbox" name="extras[]" value="Laptop"> Laptop<br>
-                                                    <input class="form-check-input ms-0 me-1" type="checkbox" name="extras[]" value="Grabacion"> Grabación
-                                                </div>
-                                            </div>
-                                        </div>
+                            </div>
+                            <div class="col-6 ps-3">
+                                <label class="extra-small fw-bold text-success d-block mb-2 text-uppercase" style="font-size: 0.65rem;">EXTRAS:</label>
+                                <div class="form-check extra-small p-0 m-0" style="font-size: 0.7rem;">
+                                    <div class="mb-1">
+                                        <input class="form-check-input ms-0 me-2" type="checkbox" name="extras[]" value="Laptop" id="checkLaptop">
+                                        <label for="checkLaptop">Laptop</label>
+                                    </div>
+                                    <div>
+                                        <input class="form-check-input ms-0 me-2" type="checkbox" name="extras[]" value="Grabacion" id="checkGrabacion">
+                                        <label for="checkGrabacion">Grabación</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="mt-5 d-flex justify-content-between align-items-center">
-                            <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" onclick="irAlCalendario(auditorioSeleccionado, '')">Anterior</button>
-                            <button type="submit" class="btn btn-success px-5 py-3 rounded-pill fw-bold shadow">Aceptar</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex justify-content-between align-items-center border-top pt-4">
+            <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" onclick="irAlCalendario(auditorioSeleccionado, '')">Anterior</button>
+            <button type="submit" class="btn btn-success px-5 py-3 rounded-pill fw-bold shadow">Aceptar</button>
+        </div>
+    </form>
+</div>
             </div>
         </div>
     </div>

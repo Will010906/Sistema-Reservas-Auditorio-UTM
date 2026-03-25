@@ -30,7 +30,7 @@ try {
 
     switch ($metodo) {
 
-        case 'POST': // --- CREAR NUEVA RESERVACIÓN ---
+        case 'POST': 
             if (!$data) throw new Exception("No se recibieron datos.");
 
             // Generación de Folio Consecutivo
@@ -46,10 +46,10 @@ try {
             $h_ini  = mysqli_real_escape_string($conexion, $data['hora_inicio']);
             $h_fin  = mysqli_real_escape_string($conexion, $data['hora_fin']);
             $otros  = mysqli_real_escape_string($conexion, $data['otros_servicios'] ?? '');
+            $asistentes = isset($data['num_asistentes']) ? intval($data['num_asistentes']) : 0;
 
-            $sql = "INSERT INTO solicitudes (id_usuario, id_auditorio, folio, titulo_event, descripcion, fecha_evento, hora_inicio, hora_fin, otros_servicios, estado, fecha_registro) 
-                    VALUES ('$id_user_token', '$id_aud', '$folio', '$titulo', '$desc', '$fecha', '$h_ini', '$h_fin', '$otros', 'PENDIENTE', NOW())";
-            
+            $sql = "INSERT INTO solicitudes (id_usuario, id_auditorio, folio, titulo_event, descripcion, fecha_evento, hora_inicio, hora_fin, otros_servicios, num_asistentes, estado, fecha_registro) 
+                    VALUES ('$id_user_token', '$id_aud', '$folio', '$titulo', '$desc', '$fecha', '$h_ini', '$h_fin', '$otros', '$asistentes', 'PENDIENTE', NOW())";
             if (mysqli_query($conexion, $sql)) {
                 echo json_encode(["success" => true, "message" => "Reservación creada.", "folio" => $folio]);
             } else { throw new Exception(mysqli_error($conexion)); }
@@ -63,7 +63,7 @@ try {
             $estado = mysqli_real_escape_string($conexion, $data['estado']);
             $motivo = mysqli_real_escape_string($conexion, $data['observaciones_admin'] ?? '');
 
-            $sql = "UPDATE solicitudes SET estado = '$estado', observaciones_admin = '$motivo' WHERE id_solicitud = $id";
+           $sql = "UPDATE solicitudes SET estado = '$estado', observaciones_admin = '$motivo' WHERE id_solicitud = $id";
             
             if (mysqli_query($conexion, $sql)) {
                 // Buscamos datos para WhatsApp
@@ -73,21 +73,63 @@ try {
             } else { throw new Exception(mysqli_error($conexion)); }
             break;
 
-        case 'DELETE': // --- CANCELAR/ELIMINAR SOLICITUD ---
-            $id_sol = isset($data['id']) ? intval($data['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
-            
-            if ($perfil_user === 'administrador') {
+        case 'PUT': 
+    if (!$data) throw new Exception("No hay datos para actualizar.");
+
+    // Aseguramos que el ID se reciba del campo 'id_editando' que manda el JS
+    $id_sol = intval($data['id_editando']);
+    $titulo = mysqli_real_escape_string($conexion, $data['titulo']);
+    $desc   = mysqli_real_escape_string($conexion, $data['descripcion']);
+    $otros  = mysqli_real_escape_string($conexion, $data['otros_servicios'] ?? '');
+    $asistentes = isset($data['num_asistentes']) ? intval($data['num_asistentes']) : 0;
+
+    // Corregimos el WHERE: Quitamos la restricción de fecha para que te deje editar abril
+  // En api/solicitudes/gestion_solicitudes.php
+$sql = "UPDATE solicitudes 
+                    SET titulo_event = '$titulo', descripcion = '$desc', otros_servicios = '$otros', num_asistentes = '$asistentes' 
+                    WHERE id_solicitud = $id_sol 
+                    AND id_usuario = '$id_user_token' 
+                    AND (estado LIKE 'PENDIENTE%' OR estado LIKE 'Pendiente%')";
+
+    if (mysqli_query($conexion, $sql)) {
+        if (mysqli_affected_rows($conexion) > 0) {
+            echo json_encode(["success" => true, "message" => "Cambios guardados."]);
+        } else {
+            // Si llega aquí, es porque el ID no existe o el estado cambió en la DB
+            throw new Exception("No se realizaron cambios. Verifica que la solicitud siga PENDIENTE.");
+        }
+    } else { 
+        throw new Exception(mysqli_error($conexion)); 
+    }
+    break;
+
+     case 'DELETE': // --- CANCELAR/ELIMINAR SOLICITUD ---
+            $id_sol = isset($_GET['id']) ? intval($_GET['id']) : 0;
+            if ($id_sol <= 0) throw new Exception("ID de solicitud no válido.");
+
+            // LÓGICA HÍBRIDA
+            if ($perfil_user === 'administrador' || $perfil_user === 'subdirector') {
+                // EL ADMIN BORRA LO QUE SEA
                 $sql = "DELETE FROM solicitudes WHERE id_solicitud = $id_sol";
             } else {
-                // Usuario solo borra la suya y si está PENDIENTE
-                $sql = "DELETE FROM solicitudes WHERE id_solicitud = $id_sol AND id_usuario = '$id_user_token' AND estado = 'PENDIENTE'";
+                // EL USUARIO (DOCENTE/ALUMNO) SOLO BORRA LA SUYA Y SI ESTÁ PENDIENTE
+                $sql = "DELETE FROM solicitudes 
+                        WHERE id_solicitud = $id_sol 
+                        AND id_usuario = '$id_user_token' 
+                        AND estado = 'Pendiente'";
             }
 
             if (mysqli_query($conexion, $sql)) {
                 if (mysqli_affected_rows($conexion) > 0) {
                     echo json_encode(["success" => true, "message" => "Solicitud eliminada."]);
-                } else { throw new Exception("No tienes permiso o la solicitud ya no es editable."); }
-            } else { throw new Exception(mysqli_error($conexion)); }
+                } else { 
+                    // Mensaje personalizado según el perfil
+                    $msg = ($perfil_user === 'administrador') ? "La solicitud no existe." : "No tienes permiso o la solicitud ya fue procesada.";
+                    throw new Exception($msg); 
+                }
+            } else { 
+                throw new Exception(mysqli_error($conexion)); 
+            }
             break;
 
         default:

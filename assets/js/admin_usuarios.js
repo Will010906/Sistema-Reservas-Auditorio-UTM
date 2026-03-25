@@ -103,20 +103,23 @@ async function eliminarUsuario(id) {
 document.getElementById('formUsuario')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const formData = new FormData(this);
-    // IMPORTANTE: Asegúrate de que los nombres coincidan con el PHP
-    const datos = {
-     id_usuario: formData.get('id_usuario') ? parseInt(formData.get('id_usuario')) : null,
-        nombre: formData.get('nombre'),
-        matricula: formData.get('matricula'),
-        telefono: formData.get('telefono'),
-        correo_electronico: formData.get('correo_electronico'), // Nombre exacto del PHP
-        carrera_area: formData.get('carrera_area'),
-        perfil: formData.get('perfil'),
-        password: formData.get('password')
-    };
+// Dentro del evento 'submit' de tu formUsuario
+const formData = new FormData(this);
+const idInput = document.getElementById('user_id').value;
 
-    const metodo = datos.id_usuario ? 'PUT' : 'POST'; 
+// Construimos el objeto asegurando que no haya valores nulos extraños
+const datos = {
+    id_usuario: idInput ? idInput.toString() : null, // Convertimos a string para el PHP
+    nombre: formData.get('nombre').trim(),
+    matricula: formData.get('matricula').trim(),
+    telefono: formData.get('telefono').trim(),
+    correo_electronico: formData.get('correo_electronico').trim(),
+    carrera_area: formData.get('carrera_area'),
+    perfil: formData.get('perfil'),
+    password: formData.get('password') || "" // Enviamos cadena vacía si no hay cambio
+};
+
+const metodo = datos.id_usuario ? 'PUT' : 'POST';
 
     try {
         const response = await fetch('api/admin/gestion_usuarios.php', {

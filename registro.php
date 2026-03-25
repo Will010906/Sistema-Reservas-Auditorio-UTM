@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VISTA: REGISTRO DE USUARIOS - SIRA UTM
  * Actualizado: Integración asíncrona con API y validación visual.
@@ -12,7 +13,6 @@
     <title>SIRA - Registro de Alumnos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="assets/css/login_style.css">
 </head>
 
 <body class="bg-light d-flex align-items-center vh-100">
@@ -38,8 +38,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">Correo Institucional</label>
-                            <input type="email" name="correo" class="form-control" placeholder="usuario@utm.mx" required>
+                            <label class="form-label small fw-bold">Correo Electrónico</label>
+                            <input type="email" name="correo" class="form-control" placeholder="tu@correo.com" required>
+                            <div class="form-text" style="font-size: 0.7rem;">Puedes usar tu correo personal o institucional.</div>
                         </div>
 
                         <div class="mb-3">
@@ -48,8 +49,8 @@
                                 <span class="input-group-text bg-white text-muted border-end-0">
                                     <i class="bi bi-whatsapp"></i>
                                 </span>
-                                <input type="tel" name="telefono" id="reg_tel" class="form-control border-start-0" 
-                                       placeholder="4431234567" maxlength="10" required>
+                                <input type="tel" name="telefono" id="reg_tel" class="form-control border-start-0"
+                                    placeholder="4431234567" maxlength="12" required>
                             </div>
                             <div class="form-text" style="font-size: 0.7rem;">10 dígitos sin guiones ni espacios.</div>
                         </div>
@@ -58,16 +59,16 @@
                             <label class="form-label small fw-bold">Carrera</label>
                             <select name="carrera" class="form-select" required>
                                 <option value="" selected disabled>Selecciona tu carrera...</option>
-                                <option value="Enfermería">Enfermería</option>
-                                <option value="Electromovilidad">Electromovilidad</option>
-                                <option value="Asesor Financiero">Asesor Financiero</option>
-                                <option value="Tecnologías de la Información">Tecnologías de la Información</option>
-                                <option value="Mecatrónica">Mecatrónica</option>
-                                <option value="Mantenimiento Industrial">Mantenimiento Industrial</option>
-                                <option value="Gastronomía">Gastronomía</option>
-                                <option value="Energía Sostenible">Energía Sostenible</option>
-                                <option value="Diseño Textil y Moda">Diseño Textil y Moda</option>
-                                <option value="Biotecnología">Biotecnología</option>
+                               <option value="Enfermería">Enfermería</option>
+                                    <option value="Electromovilidad">Electromovilidad</option>
+                                    <option value="Asesor Financiero">Asesor Financiero</option>
+                                    <option value="Tecnologías de la Información e Innovación Digital">Tecnologías de la Información e Innovación Digital</option>
+                                    <option value="Mecatrónica">Mecatrónica</option>
+                                    <option value="Mantenimiento Industrial">Mantenimiento Industrial</option>
+                                    <option value="Gastronomía">Gastronomía</option>
+                                    <option value="Energía y Desarrollo Sostenible">Energía y Desarrollo Sostenible</option>
+                                    <option value="Diseño Textil y Moda">Diseño Textil y Moda</option>
+                                    <option value="Biotecnología">Biotecnología</option>
                             </select>
                         </div>
 

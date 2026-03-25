@@ -1,7 +1,6 @@
 <?php
 /**
  * API: GESTIÓN INTEGRAL DE USUARIOS - SIRA UTM
- * Centraliza: Registro (POST), Edición (PUT) y Eliminación (DELETE).
  */
 header('Content-Type: application/json');
 include '../../config/db_local.php';
@@ -33,7 +32,6 @@ switch ($metodo) {
         exit; 
 
     case 'POST': // --- REGISTRO DE NUEVO USUARIO ---
-        // Validamos que los campos esenciales no estén vacíos
         if (empty($data['nombre']) || empty($data['correo_electronico'])) {
             echo json_encode(['success' => false, 'error' => 'Nombre y correo son obligatorios.']);
             exit;
@@ -46,27 +44,22 @@ switch ($metodo) {
         $car = mysqli_real_escape_string($conexion, $data['carrera_area'] ?? '');
         $per = mysqli_real_escape_string($conexion, $data['perfil'] ?? 'alumno');
         
-        // Encriptación segura (Mínimo 60 caracteres en la columna 'password' de tu DB)
         $pass_plano = !empty($data['password']) ? $data['password'] : '12345678';
         $pass_hash = password_hash($pass_plano, PASSWORD_DEFAULT);
 
         $sql = "INSERT INTO usuarios (matricula, nombre, correo_electronico, telefono, password, perfil, carrera_area, estatus) 
                 VALUES ('$mat', '$nom', '$cor', '$tel', '$pass_hash', '$per', '$car', 1)";
         
-        if (mysqli_query($conexion, $sql)) {
-            echo json_encode(['success' => true, 'message' => "Usuario '$nom' registrado con éxito."]);
-        } else {
-            $error_mysql = mysqli_error($conexion);
-            // Manejo de error por si la matrícula o correo ya existen
-            if (strpos($error_mysql, 'Duplicate entry') !== false) {
-                $error_mysql = "La matrícula o el correo ya están registrados en la UTM.";
-            }
-            echo json_encode(['success' => false, 'error' => $error_mysql]);
-        }
-        exit;
+        ejecutarSimple($conexion, $sql, "Usuario '$nom' registrado con éxito.");
+        break;
 
     case 'PUT': // --- EDICIÓN ---
-        $id  = intval($data['id_usuario']);
+        $id  = intval($data['id_usuario'] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'error' => 'ID de usuario inválido.']);
+            exit;
+        }
+
         $nom = mysqli_real_escape_string($conexion, $data['nombre']);
         $mat = mysqli_real_escape_string($conexion, $data['matricula']);
         $tel = mysqli_real_escape_string($conexion, $data['telefono']);
@@ -79,40 +72,36 @@ switch ($metodo) {
         ejecutarSimple($conexion, $sql, "Usuario actualizado correctamente.");
         break;
 
-   case 'DELETE': // --- ELIMINACIÓN ---
-        // 1. Validar que el ID llegó y convertirlo a número
+    case 'DELETE': // --- ELIMINACIÓN ---
         $id_usuario = isset($data['id_usuario']) ? intval($data['id_usuario']) : 0;
 
         if ($id_usuario > 0) {
             $sql = "DELETE FROM usuarios WHERE id_usuario = $id_usuario";
-            
-            // 2. Ejecutar y capturar cualquier error de MySQL
-            if (mysqli_query($conexion, $sql)) {
-                echo json_encode(['success' => true, 'message' => "Usuario eliminado."]);
-            } else {
-                $mysql_error = mysqli_error($conexion);
-                // Manejo de llaves foráneas por si tiene reservaciones
-                $mensaje_error = (strpos($mysql_error, 'foreign key') !== false) 
-                    ? "No se puede eliminar: El usuario tiene reservaciones en el SIRA." 
-                    : "Error de base de datos: " . $mysql_error;
-                
-                echo json_encode(['success' => false, 'error' => $mensaje_error]);
-            }
+            ejecutarSimple($conexion, $sql, "Usuario eliminado permanentemente.");
         } else {
-            echo json_encode(['success' => false, 'error' => "ID de usuario inválido o no recibido."]);
+            echo json_encode(['success' => false, 'error' => "ID de usuario no recibido."]);
         }
-        exit;
+        break;
 
+    default:
+        echo json_encode(['success' => false, 'error' => 'Método no permitido']);
+        break;
+} // <--- FIN DEL SWITCH
+
+/**
+ * FUNCIÓN AUXILIAR FUERA DEL SWITCH
+ */
 function ejecutarSimple($conexion, $sql, $msg) {
     if (mysqli_query($conexion, $sql)) {
         echo json_encode(['success' => true, 'message' => $msg]);
     } else {
         $error = mysqli_error($conexion);
-        if (strpos($error, 'foreign key constraint') !== false) {
-            $error = "No se puede eliminar: El usuario tiene reservaciones activas.";
+        if (strpos($error, 'foreign key') !== false) {
+            $error = "No se puede eliminar: El usuario tiene reservaciones activas en el sistema.";
+        } elseif (strpos($error, 'Duplicate entry') !== false) {
+            $error = "La matrícula o el correo ya existen en la base de datos.";
         }
         echo json_encode(['success' => false, 'error' => $error]);
     }
     exit;
-}
 }

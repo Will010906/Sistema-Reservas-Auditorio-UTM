@@ -1,34 +1,34 @@
 <?php
-/**
- * ENDPOINT API: DISPONIBILIDAD DE HORARIOS - NIVEL TSU
- * Implementa: Validación JWT, Filtrado de Solicitudes y Respuesta JSON.
- */
+// Limpiamos cualquier salida previa para asegurar que solo salga JSON
+ob_clean(); 
 header('Content-Type: application/json');
-include("../config/db_local.php");
 
-// 1. VALIDACIÓN DE SEGURIDAD (30% JWT)
-// Evita que bots o usuarios externos consulten la agenda de la universidad
+// 1. Ruta corregida hacia la conexión
+require_once "../../config/db_local.php"; 
+
+if (!isset($conexion)) {
+    echo json_encode(['error' => 'Error: No se pudo conectar a la base de datos UTM.']);
+    exit;
+}
+
+// 2. Validación de Token JWT (Requisito TSU)
 $headers = apache_request_headers();
 $auth = $headers['Authorization'] ?? $headers['authorization'] ?? null;
 
 if (!$auth) {
     http_response_code(401);
-    echo json_encode(['error' => 'No autorizado. Inicia sesión para consultar disponibilidad.']);
+    echo json_encode(['error' => 'Sesión no válida.']);
     exit;
 }
 
-// 2. CAPTURA Y SANEAMIENTO DE PARÁMETROS (GET)
+// 3. Captura de parámetros
 $id_auditorio = isset($_GET['id']) ? mysqli_real_escape_string($conexion, $_GET['id']) : null;
 $fecha = isset($_GET['fecha']) ? mysqli_real_escape_string($conexion, $_GET['fecha']) : null;
 
 $ocupados = [];
 
 if ($id_auditorio && $fecha) {
-    /**
-     * NÚCLEO FUNCIONAL (40%): Lógica de traslapes
-     * Solo consideramos solicitudes 'ACEPTADA' o 'PENDIENTE'.
-     * Las rechazadas liberan el espacio automáticamente.
-     */
+    // Consulta optimizada
     $sql = "SELECT hora_inicio, hora_fin FROM solicitudes 
             WHERE id_auditorio = '$id_auditorio' 
             AND fecha_evento = '$fecha' 
@@ -36,18 +36,19 @@ if ($id_auditorio && $fecha) {
             
     $res = mysqli_query($conexion, $sql);
     
+    if (!$res) {
+        echo json_encode(['error' => mysqli_error($conexion)]);
+        exit;
+    }
+
     while ($fila = mysqli_fetch_assoc($res)) {
         $ocupados[] = [
-            'inicio' => $fila['hora_inicio'],
-            'fin'    => $fila['hora_fin']
+            'inicio' => substr($fila['hora_inicio'], 0, 5), // HH:MM
+            'fin'    => substr($fila['hora_fin'], 0, 5)
         ];
     }
-    
-    // 3. RESPUESTA EN JSON (Requisito TSU)
     echo json_encode($ocupados);
 } else {
-    http_response_code(400);
-    echo json_encode(["error" => "Parámetros de auditorio o fecha incompletos"]);
+    echo json_encode([]); // Devolvemos array vacío si no hay datos
 }
-
 exit;

@@ -93,3 +93,36 @@ body {
 .login-container button:active {
     transform: translateY(0);
 }
+
+/* Definición de la alerta SIRA Purple Transparentosa */
+.alert-sira-purple {
+    /* Fondo morado con 10% de opacidad (transparentoso) */
+    background-color: rgba(91, 61, 102, 0.1) !important; 
+    /* Borde morado sólido pero sutil */
+    border: 1.5px solid rgba(91, 61, 102, 0.3) !important;
+    /* Color de texto morado oscuro para contraste */
+    color: #2D1B33 !important;
+    /* Redondeado suave de 16px */
+    border-radius: 16px !important;
+    /* Espaciado interno generoso */
+    padding: 1rem 1.25rem !important;
+    /* Sombra muy sutil para dar profundidad */
+    box-shadow: 0 4px 12px rgba(91, 61, 102, 0.05);
+}
+
+/* Estilo para el título de la alerta */
+.alert-sira-purple h6 {
+    color: #5B3D66 !important; /* Morado principal */
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+/* Estilo para el texto del reporte */
+.alert-sira-purple p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0;
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PANEL DE ADMINISTRACIÓN - SIRA UTM 
  * Ajustado para coincidir con los IDs de admin_interactivo.js
@@ -16,9 +17,9 @@ include 'config/db_local.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+
     <script src="assets/js/auth_check.js"></script>
-    
+
     <style>
         :root {
             --sira-purple-dark: #2D1B33;
@@ -38,50 +39,178 @@ include 'config/db_local.php';
             color: #2D2D2D;
         }
 
-        .activity-bar { background-color: var(--sira-purple-dark); width: 80px; min-height: 100vh; position: fixed; left: 0; top: 0; z-index: 1001; display: flex; flex-direction: column; align-items: center; padding-top: 25px; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1); }
-        .side-bar { background-color: #FDFBFF; width: 230px; min-height: 100vh; position: fixed; left: 80px; top: 0; border-right: 1px solid rgba(0, 0, 0, 0.05); padding: 30px 15px; z-index: 1000; }
-        .main-content { margin-left: 310px; padding: 30px 40px; width: calc(100% - 310px); }
+        .activity-bar {
+            background-color: var(--sira-purple-dark);
+            width: 80px;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 25px;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
 
-        .card-sira { border: none; border-radius: 20px; padding: 15px 20px; position: relative; overflow: hidden; transition: 0.3s; box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04); height: 105px; display: flex; flex-direction: column; justify-content: center; }
-        .card-sira .count { font-size: 2.2rem; font-weight: 800; line-height: 1; z-index: 2; color: white; }
-        .card-sira h6 { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; z-index: 2; margin-bottom: 2px; color: white; }
-        .watermark { position: absolute; bottom: -5px; right: -5px; font-size: 3.2rem; opacity: 0.15; transform: rotate(-10deg); color: white; }
+        .side-bar {
+            background-color: #FDFBFF;
+            width: 230px;
+            min-height: 100vh;
+            position: fixed;
+            left: 80px;
+            top: 0;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 30px 15px;
+            z-index: 1000;
+        }
 
-        .bg-urg { background: var(--grad-urgent); }
-        .bg-pen { background: var(--grad-pending); }
-        .bg-pen h6, .bg-pen .count, .bg-pen .watermark { color: #2D1B33; }
-        .bg-ont { background: var(--grad-ontime); }
-        .bg-acc { background: var(--grad-accepted); }
-        .bg-rej { background: var(--grad-rejected); }
+        .main-content {
+            margin-left: 310px;
+            padding: 30px 40px;
+            width: calc(100% - 310px);
+        }
 
-        .table-container { background: white; border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03); }
-        .badge-status { padding: 6px 12px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; min-width: 105px; text-align: center; display: inline-block; }
-        .st-urgente { background: var(--grad-urgent); color: white !important; }
-        .st-aceptada { background: var(--grad-accepted); color: white !important; }
-        .st-rechazada { background: var(--grad-rejected); color: white !important; }
-        .st-pendiente { background: var(--grad-pending) !important; color: #2D1B33 !important; }
-        .st-tiempo { background: var(--grad-ontime) !important; color: white !important; }
+        .card-sira {
+            border: none;
+            border-radius: 20px;
+            padding: 12px 15px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04);
+            height: 95px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-        .user-header-profile { background: white; padding: 6px 16px; border-radius: 50px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        .card-sira .count {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1;
+            z-index: 2;
+            color: white;
+        }
+
+        .card-sira h6 {
+            font-size: 0.55rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            z-index: 2;
+            margin-bottom: 2px;
+            color: white;
+        }
+
+        .watermark {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            font-size: 3.2rem;
+            opacity: 0.15;
+            transform: rotate(-10deg);
+            color: white;
+        }
+
+        .bg-urg {
+            background: var(--grad-urgent);
+        }
+
+        .bg-pen {
+            background: var(--grad-pending);
+        }
+
+        .bg-pen h6,
+        .bg-pen .count,
+        .bg-pen .watermark {
+            color: #2D1B33;
+        }
+
+        .bg-ont {
+            background: var(--grad-ontime);
+        }
+
+        .bg-acc {
+            background: var(--grad-accepted);
+        }
+
+        .bg-rej {
+            background: var(--grad-rejected);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        }
+
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            min-width: 105px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .st-urgente {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%) !important;
+            color: white !important;
+        }
+
+        .st-aceptada {
+            background: var(--grad-accepted);
+            color: white !important;
+        }
+
+        .st-rechazada {
+            background: var(--grad-rejected);
+            color: white !important;
+        }
+
+        .st-demorada {
+            background: linear-gradient(135deg, #FFD93D 0%, #F9A825 100%) !important;
+            color: #2D1B33 !important;
+        }
+
+        .st-atiempo {
+            background: linear-gradient(135deg, #6BCB77 0%, #46A351 100%) !important;
+            color: white !important;
+        }
+
+        .user-header-profile {
+            background: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
 
         /* Botón Gestionar con Identidad UTM */
-.btn-gestionar-sira {
-    background-color: transparent !important;
-    border: 1.2px solid var(--sira-purple-primary) !important;
-    color: var(--sira-purple-primary) !important;
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
-    padding: 6px 16px !important;
-    border-radius: 50px !important;
-    transition: all 0.3s ease !important;
-}
+        .btn-gestionar-sira {
+            background-color: transparent !important;
+            border: 1.2px solid var(--sira-purple-primary) !important;
+            color: var(--sira-purple-primary) !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            padding: 6px 16px !important;
+            border-radius: 50px !important;
+            transition: all 0.3s ease !important;
+        }
 
-.btn-gestionar-sira:hover {
-    background-color: var(--sira-purple-primary) !important;
-    color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(91, 61, 102, 0.2) !important;
-}
+        .btn-gestionar-sira:hover {
+            background-color: var(--sira-purple-primary) !important;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(91, 61, 102, 0.2) !important;
+        }
     </style>
 </head>
 
@@ -107,41 +236,44 @@ include 'config/db_local.php';
         </div>
 
         <div class="row g-3 mb-4">
-            <div class="col-md-9">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="card-sira bg-urg">
-                            <h6>Urgentes</h6>
-                            <div class="count" id="countUrgentes">0</div><i class="bi bi-exclamation-octagon watermark"></i>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card-sira bg-pen">
-                            <h6>Pendientes</h6>
-                            <div class="count" id="countPendientes">0</div><i class="bi bi-clock-history watermark"></i>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card-sira bg-ont">
-                            <h6>A Tiempo</h6>
-                            <div class="count" id="countAtiempo">0</div><i class="bi bi-check2-circle watermark"></i>
-                        </div>
-                    </div>
+            <div class="col">
+                <div class="card-sira bg-urg">
+                    <h6>Urgentes</h6>
+                    <div class="count" id="countUrgentes">0</div>
+                    <i class="bi bi-exclamation-octagon watermark"></i>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="d-flex flex-column gap-2 h-100">
-                    <div class="card-sira bg-acc flex-fill">
-                        <h6>Aceptadas</h6>
-                        <div class="count" style="font-size: 1.6rem;" id="countAceptadas">0</div><i class="bi bi-hand-thumbs-up watermark" style="font-size: 2.2rem;"></i>
-                    </div>
-                    <div class="card-sira bg-rej flex-fill">
-                        <h6>Rechazadas</h6>
-                        <div class="count" style="font-size: 1.6rem;" id="countRechazadas">0</div><i class="bi bi-hand-thumbs-down watermark" style="font-size: 2.2rem;"></i>
-                    </div>
+            <div class="col">
+        <div class="card-sira bg-pen">
+            <h6>Demoradas</h6>
+            <div class="count" id="countDemoradas">0</div> 
+            <i class="bi bi-clock-history watermark"></i>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card-sira bg-ont">
+            <h6>A Tiempo</h6>
+            <div class="count" id="countAtiempo">0</div>
+            <i class="bi bi-check2-circle watermark"></i>
+        </div>
+    </div>
+            <div class="col">
+                <div class="card-sira bg-acc">
+                    <h6>Aceptadas</h6>
+                    <div class="count" id="countAceptadas">0</div>
+                    <i class="bi bi-hand-thumbs-up watermark"></i>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card-sira bg-rej">
+                    <h6>Rechazadas</h6>
+                    <div class="count" id="countRechazadas">0</div>
+                    <i class="bi bi-hand-thumbs-down watermark"></i>
                 </div>
             </div>
         </div>
+
 
         <div class="bg-white p-3 mb-4 rounded-4 shadow-sm border-0">
             <div class="row g-3 align-items-end">
@@ -152,11 +284,26 @@ include 'config/db_local.php';
                             <input class="form-check-input" type="checkbox" id="chkTodos" checked>
                             <label class="form-check-label x-small fw-bold text-primary">TODOS</label>
                         </div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="URGENTE" id="chkUrg"><label class="form-check-label x-small fw-bold text-danger">Urgentes</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="PENDIENTE" id="chkPen"><label class="form-check-label x-small fw-bold text-warning">Pendientes</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="CON TIEMPO" id="chkTie"><label class="form-check-label x-small fw-bold text-success">A Tiempo</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="ACEPTADA" id="chkAce"><label class="form-check-label x-small fw-bold text-info">Aceptadas</label></div>
-                        <div class="form-check"><input class="form-check-input filter-check" type="checkbox" value="RECHAZADA" id="chkRec"><label class="form-check-label x-small fw-bold text-secondary">Rechazadas</label></div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="URGENTE" id="chkUrg">
+                            <label class="form-check-label x-small fw-bold text-danger">Urgentes</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="DEMORADA" id="chkDem">
+                            <label class="form-check-label x-small fw-bold text-warning">Demoradas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="A TIEMPO" id="chkTie">
+                            <label class="form-check-label x-small fw-bold text-success">A Tiempo</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="ACEPTADA" id="chkAce">
+                            <label class="form-check-label x-small fw-bold text-info">Aceptadas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input filter-check" type="checkbox" value="RECHAZADA" id="chkRec">
+                            <label class="form-check-label x-small fw-bold text-secondary">Rechazadas</label>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-3">
@@ -206,5 +353,7 @@ include 'config/db_local.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/admin_interactivo.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
 </body>
+
 </html>
