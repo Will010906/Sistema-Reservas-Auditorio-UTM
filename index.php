@@ -32,7 +32,7 @@
                         <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
                         <li class="nav-item"><a class="nav-link" href="#catalogo">Catálogo</a></li>
                         <li class="nav-item"><a class="nav-link" href="#guia">Guía</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#equipo">Equipo</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#registro">Registrate</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
                         <li class="nav-item">
                             <a class="nav-link btn-login-nav" href="login.php">Iniciar Sesión</a>
@@ -266,47 +266,55 @@
                 </ul>
             </div>
         </section>
-        <!-- equipo-->
-        <section class="page-section bg-light" id="equipo">
+        <!-- registro-->
+        <section class="page-section bg-light" id="registro">
     <div class="container">
         <div class="text-center">
-            <h2 class="section-heading text-uppercase">Equipo Responsable</h2>
-            <h3 class="section-subheading text-muted">Administración / Contacto Directo</h3>
+            <h2 class="section-heading text-uppercase">¿No formas parte de de la comunidad UTM?</h2>
+            <h3 class="section-subheading text-muted">Registra tu cuenta externa para solicitar acceso a nuestros espacios.</h3>
         </div>
         <div class="row">
             <div class="col-lg-4">
-                <div class="equipo-member text-center">
+                <div class="registro-member text-center">
                     <span class="fa-stack fa-4x">
                         <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                        <i class="fas fa-users fa-stack-1x fa-inverse"></i>
-                    </span>
-                    <h4>Coordinación de Eventos</h4>
-                    <p class="text-muted">Gestión y autorización de cronogramas institucionales.</p>
+                        <i class="fas fa-user-plus fa-stack-1x fa-inverse"></i> </span>
+                        <h4><strong>Crea tu Perfil</strong></h4>
+                        <p class="text-muted">Proporciona tus datos básicos <br> y de contacto.</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="registro-member text-center">
+                        <span class="fa-stack fa-4x">
+                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                            <i class="fas fa-id-card fa-stack-1x fa-inverse"></i> </span>
+                            <h4><strong>Verificación</strong></h4>
+                            <p class="text-muted">Nuestro equipo validará tu identidad para permitirte realizar solicitudes.</p>
+                        </div>
+                    </div>
+
+                <div class="col-lg-4">
+                    <div class="registro-member text-center">
+                        <span class="fa-stack fa-4x">
+                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                            <i class="fas fa-calendar-check fa-stack-1x fa-inverse"></i> </span>
+                            <h4><strong>Reserva</strong></h4>
+                            <p class="text-muted">Una vez aprobado, podrás gestionar tus eventos igual que un usuario institucional.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <br><br>
+                        <p class="large text-muted">¿Listo para comenzar?</p>
+                        <a class="btn btn-primary btn-xl text-uppercase" href="registro_externo.php">
+                            <strong>Crear Cuenta de Visitante</strong>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="equipo-member text-center">
-                    <span class="fa-stack fa-4x">
-                        <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                        <i class="fas fa-headset fa-stack-1x fa-inverse"></i>
-                    </span>
-                    <h4>Soporte Técnico</h4>
-                    <p class="text-muted">Supervisión de sistemas audiovisuales y logística técnica.</p>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="equipo-member text-center">
-                    <span class="fa-stack fa-4x">
-                        <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                        <i class="fas fa-wrench fa-stack-1x fa-inverse"></i>
-                    </span>
-                    <h4>Mantenimiento</h4>
-                    <p class="text-muted">Aseguramiento de la infraestructura y condiciones del espacio.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+        </section>
         
         <!-- Contacto-->
         <section class="page-section" id="contacto">
@@ -319,53 +327,48 @@
                     </h3>
                 </div>
                 <!-- to get an API token!-->
-                <form id="contactoForm" data-sb-form-api-token="API_TOKEN">
+                    <form action="enviar_correo.php" method="POST">
                     <div class="row align-items-stretch mb-5">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <!-- Name input-->
-                                <input class="form-control" id="name" type="text" placeholder="Tu Nombre *" data-sb-validations="required" />
+                                <input class="form-control" id="nombre" name="nombre" type="text" placeholder="Tu Nombre *" data-sb-validations="required" />
                                 <div class="invalid-feedback" data-sb-feedback="name:required">Nombre requerido</div>
                             </div>
                             <div class="form-group">
                                 <!-- Email address input-->
-                                <input class="form-control" id="email" type="email" placeholder="Tu Email *" data-sb-validations="required,email" />
+                                <input class="form-control" id="email" name="email" type="email" placeholder="Tu Email *" data-sb-validations="required,email" />
                                 <div class="invalid-feedback" data-sb-feedback="email:required">Email requerido</div>
                                 <div class="invalid-feedback" data-sb-feedback="email:email">Email no valido</div>
                             </div>
                             <div class="form-group mb-md-0">
                                 <!-- Phone number input-->
-                                <input class="form-control" id="phone" type="tel" placeholder="Tu Número *" data-sb-validations="required" />
+                                <input class="form-control" id="phone" name="phone" type="tel" placeholder="Tu Número *" data-sb-validations="required" />
                                 <div class="invalid-feedback" data-sb-feedback="phone:required">Número requerido</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group form-group-textarea mb-md-0">
                                 <!-- Message input-->
-                                <textarea class="form-control" id="message" placeholder="Tus Dudas *" data-sb-validations="required"></textarea>
+                                <textarea class="form-control" id="message" name="message" placeholder="Tus Dudas *" data-sb-validations="required"></textarea>
                                 <div class="invalid-feedback" data-sb-feedback="message:required">El mensaje es requerido</div>
                             </div>
                         </div>
                     </div>
-                    <!-- Submit success message-->
-                    <!---->
-                    <!-- This is what your users will see when the form-->
                     <!-- has successfully submitted-->
                     <div class="d-none" id="submitSuccessMessage">
                         <div class="text-center text-white mb-3">
                             <div class="fw-bolder">¡Envío de Formulario Exitoso!</div>
-                            Ingresa a 
-                            <br />
-                            <a href="https://startbootstrap.com/solution/contacto-forms">https://startbootstrap.com/solution/contacto-forms</a>
                         </div>
                     </div>
-                    <!-- Submit error message-->
-                    <!---->
-                    <!-- This is what your users will see when there is-->
                     <!-- an error submitting the form-->
                     <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error de envío</div></div>
                     <!-- Submit Button-->
-                    <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase disabled" id="submitButton" type="submit">Enviar Mensaje</button></div>
+                    <div class="text-center">
+                        <button class="btn btn-primary btn-xl text-uppercase" type="submit">
+                            Enviar Mensaje
+                        </button>
+                </div>
                 </form>
             </div>
         </section>
@@ -395,6 +398,5 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="assets/js/pagina.js"></script>
-        <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
     </body>
 </html>
