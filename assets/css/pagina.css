@@ -11248,25 +11248,29 @@ header.masthead .masthead-heading {
 
 section#contacto {
   background-color: #2D1B33; /* El morado que usas en el hover del catálogo */
-  background-image: none !important; /* Opcional: la textura de mapa de la plantilla */
+  background-image: linear-gradient(135deg, #2D1B33, #4A2C52);; /* Opcional: la textura de mapa de la plantilla */
   background-repeat: no-repeat;
   background-position: center;
-  padding: 100px 0;
+  padding: 120px 0 100px 0;
 }
+
 section#contacto .section-heading {
-  color: #fff; 
+  color: #ffffff !important; 
 }
 section#contacto form#contactoForm .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 30px;
 }
 section#contacto form#contactoForm .form-group input,
 section#contacto form#contactoForm .form-group textarea {
-  padding: 1.25rem;
+  /*padding: 1.25rem;*/
+  resize: none;
 }
 section#contacto form#contactoForm .form-group input.form-control {
-  height: auto;
+  /*height: auto;*/
+  padding: 16px;
+  border-radius: 8px;
 }
-section#contacto form#contactForm .form-group-textarea {
+section#contacto form#contactoForm .form-group-textarea {
   height: 100%;
 }
 section#contacto form#contactoForm .form-group-textarea textarea {
@@ -11277,8 +11281,10 @@ section#contacto form#contactoForm p.help-block {
   margin: 0;
 }
 section#contacto form#contactoForm .form-control:focus {
-  border-color: #845C93;
-  box-shadow: none;
+  /*border-color: #845C93;
+  box-shadow: none;*/
+  border: 2px solid #845C93;
+  box-shadow: 0 0 8px rgba(132, 92, 147, 0.5);
 }
 section#contacto form#contactoForm ::-webkit-input-placeholder {
   font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";

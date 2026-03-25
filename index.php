@@ -327,7 +327,7 @@
                     </h3>
                 </div>
                 <!-- to get an API token!-->
-                    <form action="enviar_correo.php" method="POST">
+                    <form id="contactoForm" action="enviar_correo.php" method="POST">
                     <div class="row align-items-stretch mb-5">
                         <div class="col-md-6">
                             <div class="form-group">
