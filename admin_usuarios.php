@@ -51,6 +51,34 @@ if (!token) {
     background-color: #4a3254 !important; /* Un tono más oscuro para el hover */
     border-color: #4a3254 !important;
 }
+/* Colores de Roles SIRA Premium */
+.sira-badge-admin { 
+    background-color: #f8d7da !important; 
+    color: #842029 !important; 
+    border: 1px solid #f5c2c7;
+    font-weight: 800;
+}
+
+.sira-badge-sub { 
+    background-color: #fff3cd !important; 
+    color: #856404 !important; 
+    border: 1px solid #ffeeba;
+    font-weight: 800;
+}
+
+.sira-badge-doc { 
+    background-color: #cfe2ff !important; 
+    color: #084298 !important; 
+    border: 1px solid #b6d4fe;
+    font-weight: 800;
+}
+
+.sira-badge-alu { 
+    background-color: #d1e7dd !important; 
+    color: #0f5132 !important; 
+    border: 1px solid #badbcc;
+    font-weight: 800;
+}
     </style>
 </head>
 
@@ -88,7 +116,6 @@ if (!token) {
                                 <tr class="small text-muted text-uppercase">
                                     <th class="ps-4">Usuario</th>
                                     <th>Matrícula</th>
-                                    <th>Contacto</th>
                                     <th>Teléfono</th>
                                     <th>Área / Carrera</th>
                                     <th>Rol</th>

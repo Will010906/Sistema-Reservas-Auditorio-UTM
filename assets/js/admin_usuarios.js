@@ -10,7 +10,9 @@ document.getElementById('buscadorUsuarios')?.addEventListener('keyup', function(
     let valor = this.value.toLowerCase();
     let filas = document.querySelectorAll('#tablaUsuarios tbody tr');
     filas.forEach(fila => {
-        fila.style.display = fila.innerText.toLowerCase().includes(valor) ? "" : "none";
+        // Verifica si el texto de la fila contiene lo buscado
+        const coincide = fila.innerText.toLowerCase().includes(valor);
+        fila.style.setProperty('display', coincide ? '' : 'none', 'important');
     });
 });
 
@@ -174,72 +176,65 @@ async function cargarUsuarios() {
     if (!cuerpoTabla) return;
 
     try {
-        // 1. Petición GET a tu API
-// BUSCA ESTA LÍNEA (alrededor de la 158):
-const response = await fetch("api/admin/gestion_usuarios.php", {
-    method: 'GET',
-    headers: {
-        // CAMBIA 'token' por 'sira_session_token' o viceversa. 
-        // Usa el que definiste en tu login. Si en el PHP usas 'token', úsalo aquí:
-        'Authorization': `Bearer ${localStorage.getItem("token")}` 
-    }
-});
+        const response = await fetch("api/admin/gestion_usuarios.php", {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+        });
 
         if (response.status === 401) return manejarSesionExpirada();
-
         const data = await response.json();
         
-        // 2. Limpiar el spinner de "Sincronizando..."
         cuerpoTabla.innerHTML = ""; 
 
         if (data.length === 0) {
-            cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No se encontraron usuarios registrados.</td></tr>';
+            cuerpoTabla.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No se encontraron usuarios.</td></tr>';
             return;
         }
 
-        // 3. Renderizar cada fila con el diseño de círculos (avatars)
-        data.forEach(user => {
-            // Generar iniciales para el avatar (Ej: Wilmer A -> WA)
-            const iniciales = user.nombre ? user.nombre.split(' ').map(n => n[0]).join('').substring(0, 2) : '??';
-            
-            // Badge de Rol con estilo institucional
-            const badgeClass = user.perfil === 'administrador' ? 'bg-primary-subtle text-primary' : 
-                              user.perfil === 'subdirector' ? 'bg-warning-subtle text-warning-emphasis' : 'bg-light text-dark border';
+     data.forEach(user => {
+    const iniciales = user.nombre ? user.nombre.split(' ').map(n => n[0]).join('').substring(0, 2) : '??';
+    
+    // Asignamos una clase única por rol para el color de fondo personalizado
+    const roleClass = {
+        'administrador': 'sira-badge-admin',
+        'subdirector': 'sira-badge-sub',
+        'docente': 'sira-badge-doc',
+        'alumno': 'sira-badge-alu'
+    }[user.perfil.toLowerCase()] || 'bg-light text-dark';
 
-            cuerpoTabla.innerHTML += `
-                <tr>
-                    <td class="ps-4">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar-circle-sm me-3">${iniciales}</div>
-                            <div>
-                                <div class="fw-bold text-dark">${user.nombre}</div>
-                                <div class="text-muted x-small">${user.correo_electronico}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><code class="fw-bold" style="color: #5B3D66;">${user.matricula || 'N/A'}</code></td>
-                    <td><small class="text-muted">${user.correo_electronico}</small></td>
-                    <td>${user.telefono || '<span class="text-muted">---</span>'}</td>
-                    <td><span class="small">${user.carrera_area}</span></td>
-                    <td><span class="badge ${badgeClass} text-uppercase px-2 py-1" style="font-size: 0.65rem;">${user.perfil}</span></td>
-                    <td class="text-center">
-                        <div class="btn-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
-                            <button class="btn btn-sm btn-white border-end" onclick='editarUsuario(${JSON.stringify(user)})' title="Editar">
-                                <i class="bi bi-pencil-square text-primary"></i>
-                            </button>
-                            <button class="btn btn-sm btn-white" onclick="eliminarUsuario(${user.id_usuario})" title="Eliminar">
-                                <i class="bi bi-trash3 text-danger"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>`;
-        });
+    cuerpoTabla.innerHTML += `
+        <tr>
+            <td class="ps-4">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-circle-sm me-3">${iniciales}</div>
+                    <div>
+                        <div class="fw-bold text-dark" style="font-size: 0.9rem;">${user.nombre}</div>
+                        <div class="text-muted x-small">${user.correo_electronico}</div>
+                    </div>
+                </div>
+            </td>
+            <td><code class="fw-bold text-primary" style="font-size:0.75rem;">${user.matricula || 'N/A'}</code></td>
+            <td><span class="text-muted small">${user.telefono || '---'}</span></td>
+            <td><span class="small text-muted">${user.carrera_area}</span></td>
+            
+            <td><span class="badge ${roleClass} text-uppercase px-3 py-1" style="font-size: 0.6rem; border-radius:10px;">${user.perfil}</span></td>
+            
+            <td class="text-center">
+                <div class="btn-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
+                    <button class="btn btn-sm btn-white border-end" onclick='editarUsuario(${JSON.stringify(user)})'>
+                        <i class="bi bi-pencil-square text-primary"></i>
+                    </button>
+                    <button class="btn btn-sm btn-white" onclick="eliminarUsuario(${user.id_usuario})">
+                        <i class="bi bi-trash3 text-danger"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+});
     } catch (error) {
-        console.error("Error cargando usuarios:", error);
-        cuerpoTabla.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">Error de conexión con el servidor.</td></tr>';
+        cuerpoTabla.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Error de conexión.</td></tr>';
     }
 }
-
 
 // Inicializar carga al abrir la página o al refrescar el DOM
 document.addEventListener("DOMContentLoaded", cargarUsuarios);

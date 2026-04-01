@@ -133,16 +133,16 @@ include 'config/db_local.php';
         <div class="table-container">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="tablaSolicitudes" style="font-size: 0.85rem;">
-                    <thead>
-                        <tr class="text-muted x-small fw-bold text-uppercase">
-                            <th class="ps-4">Folio</th>
-                            <th>Evento / Solicitante</th>
-                            <th>Auditorio</th>
-                            <th>Fecha</th>
-                            <th class="text-center">Estatus</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
+                   <thead class="table-light">
+    <tr class="small text-muted text-uppercase">
+        <th class="ps-4">Usuario</th>
+        <th>Matrícula</th>
+        <th>Teléfono</th>
+        <th>Área / Carrera</th>
+        <th>Rol</th>
+        <th class="text-center">Acciones</th>
+    </tr>
+</thead>
                     <tbody id="contenedorSolicitudes">
                         <tr>
                             <td colspan="6" class="text-center py-5">
