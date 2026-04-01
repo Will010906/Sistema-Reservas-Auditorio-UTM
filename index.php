@@ -308,7 +308,7 @@
                     <div class="col-lg-8 mx-auto text-center">
                         <br><br>
                         <p class="large text-muted">¿Listo para comenzar?</p>
-                        <a class="btn btn-primary btn-xl text-uppercase" href="registro_externo.php">
+                        <a class="btn btn-primary btn-xl text-uppercase" href="registro.php">
                             <strong>Crear Cuenta de Visitante</strong>
                         </a>
                     </div>
@@ -337,9 +337,9 @@
                             </div>
                             <div class="form-group">
                                 <!-- Email address input-->
-                                <input class="form-control" id="email" name="email" type="email" placeholder="Tu Email *" data-sb-validations="required,email" />
-                                <div class="invalid-feedback" data-sb-feedback="email:required">Email requerido</div>
-                                <div class="invalid-feedback" data-sb-feedback="email:email">Email no valido</div>
+                                <input class="form-control" id="email" name="email" type="email" placeholder="Tu Gmail *" data-sb-validations="required,email" />
+                                <div class="invalid-feedback" data-sb-feedback="email:required">Gmail requerido</div>
+                                <div class="invalid-feedback" data-sb-feedback="email:email">Gmail no valido</div>
                             </div>
                             <div class="form-group mb-md-0">
                                 <!-- Phone number input-->

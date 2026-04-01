@@ -73,33 +73,49 @@ try {
             } else { throw new Exception(mysqli_error($conexion)); }
             break;
 
-        case 'PUT': 
+      case 'PUT': 
     if (!$data) throw new Exception("No hay datos para actualizar.");
 
-    // Aseguramos que el ID se reciba del campo 'id_editando' que manda el JS
-    $id_sol = intval($data['id_editando']);
-    $titulo = mysqli_real_escape_string($conexion, $data['titulo']);
-    $desc   = mysqli_real_escape_string($conexion, $data['descripcion']);
-    $otros  = mysqli_real_escape_string($conexion, $data['otros_servicios'] ?? '');
+    $id_sol     = intval($data['id_editando']);
+    $id_aud     = mysqli_real_escape_string($conexion, $data['id_auditorio']);
+    $titulo     = mysqli_real_escape_string($conexion, $data['titulo']);
+    $desc       = mysqli_real_escape_string($conexion, $data['descripcion']);
+    $fecha      = mysqli_real_escape_string($conexion, $data['fecha_evento']);
+    $h_ini      = mysqli_real_escape_string($conexion, $data['hora_inicio']);
+    $h_fin      = mysqli_real_escape_string($conexion, $data['hora_fin']);
+    $otros      = mysqli_real_escape_string($conexion, $data['otros_servicios'] ?? '');
     $asistentes = isset($data['num_asistentes']) ? intval($data['num_asistentes']) : 0;
 
-    // Corregimos el WHERE: Quitamos la restricción de fecha para que te deje editar abril
-  // En api/solicitudes/gestion_solicitudes.php
-$sql = "UPDATE solicitudes 
-                    SET titulo_event = '$titulo', descripcion = '$desc', otros_servicios = '$otros', num_asistentes = '$asistentes' 
-                    WHERE id_solicitud = $id_sol 
-                    AND id_usuario = '$id_user_token' 
-                    AND (estado LIKE 'PENDIENTE%' OR estado LIKE 'Pendiente%')";
+    // 1. Iniciamos la consulta base
+    $sql = "UPDATE solicitudes 
+            SET id_auditorio = '$id_aud', 
+                titulo_event = '$titulo', 
+                descripcion = '$desc', 
+                fecha_evento = '$fecha',
+                hora_inicio = '$h_ini',
+                hora_fin = '$h_fin',
+                otros_servicios = '$otros', 
+                num_asistentes = '$asistentes' 
+            WHERE id_solicitud = $id_sol";
+
+    // 2. APLICAMOS LA LÓGICA DE PERMISOS
+    // Si NO es administrador ni subdirector, aplicamos las restricciones de "dueño"
+    if ($perfil_user !== 'administrador' && $perfil_user !== 'subdirector') {
+        $sql .= " AND id_usuario = '$id_user_token' 
+                  AND (estado LIKE 'PENDIENTE%' OR estado LIKE 'Pendiente%')";
+    }
 
     if (mysqli_query($conexion, $sql)) {
-        if (mysqli_affected_rows($conexion) > 0) {
-            echo json_encode(["success" => true, "message" => "Cambios guardados."]);
+        // Verificamos si realmente se hizo un cambio o si el ID no existía para ese usuario
+        if (mysqli_affected_rows($conexion) === 0) {
+            // No lanzamos error porque a veces le dan "Aceptar" sin cambiar nada, 
+            // pero es bueno saberlo para debug.
+            echo json_encode(["success" => true, "message" => "Proceso terminado (sin cambios detectados)."]);
         } else {
-            // Si llega aquí, es porque el ID no existe o el estado cambió en la DB
-            throw new Exception("No se realizaron cambios. Verifica que la solicitud siga PENDIENTE.");
+            echo json_encode(["success" => true, "message" => "¡Reasignación guardada con éxito!"]);
         }
     } else { 
-        throw new Exception(mysqli_error($conexion)); 
+        throw new Exception("Error en la base de datos: " . mysqli_error($conexion)); 
     }
     break;
 

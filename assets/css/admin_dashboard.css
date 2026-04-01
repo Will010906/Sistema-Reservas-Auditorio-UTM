@@ -1,0 +1,173 @@
+/* =========================================
+   VARIABLES Y CONFIGURACIÓN BASE
+   ========================================= */
+:root {
+    --sira-purple-dark: #2D1B33;
+    --sira-purple-primary: #5B3D66;
+    --sira-bg: #EBEFF2;
+    --grad-urgent: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%);
+    --grad-pending: linear-gradient(135deg, #FFD93D 0%, #F9A825 100%);
+    --grad-ontime: linear-gradient(135deg, #6BCB77 0%, #46A351 100%);
+    --grad-accepted: linear-gradient(135deg, #42A5F5 0%, #1E88E5 100%);
+    --grad-rejected: linear-gradient(135deg, #B0BEC5 0%, #78909C 100%);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--sira-bg);
+    margin: 0;
+    color: #2D2D2D;
+}
+
+/* =========================================
+   ESTRUCTURA Y LAYOUT
+   ========================================= */
+.main-content {
+    margin-left: 310px;
+    padding: 30px 40px;
+    width: calc(100% - 310px);
+    min-width: 0;
+}
+
+/* =========================================
+   TARJETAS ESTADÍSTICAS (DASHBOARD)
+   ========================================= */
+.card-sira {
+    border: none;
+    border-radius: 20px;
+    padding: 12px 15px;
+    position: relative;
+    overflow: hidden;
+    transition: 0.3s;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04);
+    height: 95px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-sira .count {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1;
+    z-index: 2;
+    color: white;
+}
+
+.card-sira h6 {
+    font-size: 0.55rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    z-index: 2;
+    margin-bottom: 2px;
+    color: white;
+}
+
+.watermark {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    font-size: 3.2rem;
+    opacity: 0.15;
+    transform: rotate(-10deg);
+    color: white;
+}
+
+.bg-urg { background: var(--grad-urgent); }
+.bg-pen { background: var(--grad-pending); }
+.bg-pen h6, .bg-pen .count, .bg-pen .watermark { color: #2D1B33; }
+.bg-ont { background: var(--grad-ontime); }
+.bg-acc { background: var(--grad-accepted); }
+.bg-rej { background: var(--grad-rejected); }
+
+/* =========================================
+   CONTENEDOR DE TABLA (ALINEACIÓN SUPERIOR)
+   ========================================= */
+.table-container {
+    background: white;
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+    min-height: 400px; 
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important; /* Fuerza el pegado arriba */
+    overflow: hidden;
+}
+
+.table-responsive {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sira-purple-primary) #f8f9fa;
+}
+
+#tablaSolicitudes {
+    width: 100% !important;
+    margin-top: 0 !important;
+    border-collapse: collapse;
+}
+
+/* =========================================
+   BADGES Y BOTONES
+   ========================================= */
+.badge-status {
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    min-width: 105px;
+    text-align: center;
+    display: inline-block;
+}
+
+.st-urgente { background: var(--grad-urgent) !important; color: white !important; }
+.st-aceptada { background: var(--grad-accepted); color: white !important; }
+.st-rechazada { background: var(--grad-rejected); color: white !important; }
+.st-demorada { background: var(--grad-pending) !important; color: #2D1B33 !important; }
+.st-atiempo { background: var(--grad-ontime) !important; color: white !important; }
+
+.user-header-profile {
+    background: white;
+    padding: 6px 16px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.btn-gestionar-sira {
+    background-color: transparent !important;
+    border: 1.2px solid var(--sira-purple-primary) !important;
+    color: var(--sira-purple-primary) !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    padding: 6px 16px !important;
+    border-radius: 50px !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-gestionar-sira:hover {
+    background-color: var(--sira-purple-primary) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(91, 61, 102, 0.2) !important;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 80px;
+        width: calc(100% - 80px);
+        padding: 15px;
+    }
+    
+    .table-responsive {
+        border: 0;
+    }
+}

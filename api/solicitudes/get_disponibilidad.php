@@ -11,7 +11,7 @@ if (!isset($conexion)) {
     exit;
 }
 
-// 2. Validación de Token JWT (Requisito TSU)
+// 2. Validación de Token JWT
 $headers = apache_request_headers();
 $auth = $headers['Authorization'] ?? $headers['authorization'] ?? null;
 
@@ -21,18 +21,25 @@ if (!$auth) {
     exit;
 }
 
-// 3. Captura de parámetros
+// 3. Captura de parámetros (Añadimos id_excluir)
 $id_auditorio = isset($_GET['id']) ? mysqli_real_escape_string($conexion, $_GET['id']) : null;
-$fecha = isset($_GET['fecha']) ? mysqli_real_escape_string($conexion, $_GET['fecha']) : null;
+$fecha        = isset($_GET['fecha']) ? mysqli_real_escape_string($conexion, $_GET['fecha']) : null;
+$id_excluir   = isset($_GET['id_excluir']) ? mysqli_real_escape_string($conexion, $_GET['id_excluir']) : null;
 
 $ocupados = [];
 
 if ($id_auditorio && $fecha) {
-    // Consulta optimizada
+    // --- CONSULTA OPTIMIZADA CON EXCLUSIÓN ---
+    // Si estamos editando, ignoramos la solicitud actual para que sus horas aparezcan LIBRES
     $sql = "SELECT hora_inicio, hora_fin FROM solicitudes 
             WHERE id_auditorio = '$id_auditorio' 
             AND fecha_evento = '$fecha' 
             AND estado != 'RECHAZADA'";
+            
+    if ($id_excluir) {
+        $sql .= " AND id_solicitud != '$id_excluir'";
+    }
+    // -----------------------------------------
             
     $res = mysqli_query($conexion, $sql);
     
@@ -49,6 +56,6 @@ if ($id_auditorio && $fecha) {
     }
     echo json_encode($ocupados);
 } else {
-    echo json_encode([]); // Devolvemos array vacío si no hay datos
+    echo json_encode([]); 
 }
 exit;

@@ -19,199 +19,8 @@ include 'config/db_local.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <script src="assets/js/auth_check.js"></script>
-
-    <style>
-        :root {
-            --sira-purple-dark: #2D1B33;
-            --sira-purple-primary: #5B3D66;
-            --sira-bg: #EBEFF2;
-            --grad-urgent: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%);
-            --grad-pending: linear-gradient(135deg, #FFD93D 0%, #F9A825 100%);
-            --grad-ontime: linear-gradient(135deg, #6BCB77 0%, #46A351 100%);
-            --grad-accepted: linear-gradient(135deg, #42A5F5 0%, #1E88E5 100%);
-            --grad-rejected: linear-gradient(135deg, #B0BEC5 0%, #78909C 100%);
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--sira-bg);
-            margin: 0;
-            color: #2D2D2D;
-        }
-
-        .activity-bar {
-            background-color: var(--sira-purple-dark);
-            width: 80px;
-            min-height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 1001;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 25px;
-            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .side-bar {
-            background-color: #FDFBFF;
-            width: 230px;
-            min-height: 100vh;
-            position: fixed;
-            left: 80px;
-            top: 0;
-            border-right: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 30px 15px;
-            z-index: 1000;
-        }
-
-        .main-content {
-            margin-left: 310px;
-            padding: 30px 40px;
-            width: calc(100% - 310px);
-        }
-
-        .card-sira {
-            border: none;
-            border-radius: 20px;
-            padding: 12px 15px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.04);
-            height: 95px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .card-sira .count {
-            font-size: 1.8rem;
-            font-weight: 800;
-            line-height: 1;
-            z-index: 2;
-            color: white;
-        }
-
-        .card-sira h6 {
-            font-size: 0.55rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            z-index: 2;
-            margin-bottom: 2px;
-            color: white;
-        }
-
-        .watermark {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            font-size: 3.2rem;
-            opacity: 0.15;
-            transform: rotate(-10deg);
-            color: white;
-        }
-
-        .bg-urg {
-            background: var(--grad-urgent);
-        }
-
-        .bg-pen {
-            background: var(--grad-pending);
-        }
-
-        .bg-pen h6,
-        .bg-pen .count,
-        .bg-pen .watermark {
-            color: #2D1B33;
-        }
-
-        .bg-ont {
-            background: var(--grad-ontime);
-        }
-
-        .bg-acc {
-            background: var(--grad-accepted);
-        }
-
-        .bg-rej {
-            background: var(--grad-rejected);
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
-        }
-
-        .badge-status {
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            min-width: 105px;
-            text-align: center;
-            display: inline-block;
-        }
-
-        .st-urgente {
-            background: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%) !important;
-            color: white !important;
-        }
-
-        .st-aceptada {
-            background: var(--grad-accepted);
-            color: white !important;
-        }
-
-        .st-rechazada {
-            background: var(--grad-rejected);
-            color: white !important;
-        }
-
-        .st-demorada {
-            background: linear-gradient(135deg, #FFD93D 0%, #F9A825 100%) !important;
-            color: #2D1B33 !important;
-        }
-
-        .st-atiempo {
-            background: linear-gradient(135deg, #6BCB77 0%, #46A351 100%) !important;
-            color: white !important;
-        }
-
-        .user-header-profile {
-            background: white;
-            padding: 6px 16px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Botón Gestionar con Identidad UTM */
-        .btn-gestionar-sira {
-            background-color: transparent !important;
-            border: 1.2px solid var(--sira-purple-primary) !important;
-            color: var(--sira-purple-primary) !important;
-            font-size: 0.75rem !important;
-            font-weight: 700 !important;
-            padding: 6px 16px !important;
-            border-radius: 50px !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .btn-gestionar-sira:hover {
-            background-color: var(--sira-purple-primary) !important;
-            color: white !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(91, 61, 102, 0.2) !important;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/admin_dashboard.css?v=1.1">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
 </head>
 
 <body>
@@ -347,12 +156,17 @@ include 'config/db_local.php';
         </div>
     </div>
 
-    <?php include 'includes/modal_detalle.php'; ?>
+   <?php include 'includes/modal_detalle.php'; ?>
+    <?php include 'includes/modal_reservacion.php'; ?> 
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script src="assets/js/usuario_reservas.js"></script>
+    
     <script src="assets/js/admin_interactivo.js"></script>
+    
     <link rel="stylesheet" href="assets/css/style.css">
 </body>
 

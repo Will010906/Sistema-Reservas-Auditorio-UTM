@@ -38,7 +38,33 @@ if (!token) {
         --sira-purple-light: #F4EFFF;
         --utm-gris-bg: #f8f9fa;
     }
+.badge-sira-status {
+    background-color: #5B3D66 !important; /* El morado UTM */
+    color: white !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    padding: 5px 10px;
+    border-radius: 8px;
+}
 
+.capacidad-info {
+    font-size: 0.85rem;
+    color: #5B3D66; /* Morado UTM */
+    font-weight: 700;
+}   
+
+    .capacidad-info i {
+        margin-right: 5px;
+    }
+
+    /* Ajuste para que el nombre y estatus queden en la misma línea */
+    .card-title-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
     /* Tarjetas de Auditorio */
     .auditorio-card {
         border-radius: 20px;

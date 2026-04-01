@@ -83,40 +83,60 @@ async function cargarAuditorios() {
     const data = await response.json();
     contenedor.innerHTML = "";
 
-    data.forEach((aud) => {
+   data.forEach((aud) => {
       const esDisponible = parseInt(aud.disponibilidad) === 1;
 
+      // CAMBIO 1: Badge Morada UTM para "Activo" y Naranja para "Mantenimiento"
       const statusBadge = esDisponible
-        ? '<span class="badge bg-success shadow-sm">Activo</span>'
-        : '<span class="badge bg-warning text-dark shadow-sm">Mantenimiento</span>';
+        ? '<span class="badge badge-sira-status shadow-sm">Activo</span>'
+        : '<span class="badge bg-warning text-dark shadow-sm" style="font-size: 0.65rem;">Mantenimiento</span>';
 
       const btnStatusClass = esDisponible ? "btn-outline-guinda" : "btn-guinda";
       const btnStatusText = esDisponible ? "Mantenimiento" : "Activar Espacio";
 
-      // --- LÓGICA PARA BLOQUES DE EQUIPAMIENTO MINIMALISTAS ---
-      const listaEquipamiento = aud.equipamiento_fijo ? aud.equipamiento_fijo.split(",") : [];
+      // LÓGICA PARA EQUIPAMIENTO
+   const listaEquipamiento = aud.equipamiento_fijo ? aud.equipamiento_fijo.split(",") : [];
       let htmlEquipamiento = "";
 
       if (listaEquipamiento.length > 0 && listaEquipamiento[0].trim() !== "") {
+        // Creamos un contenedor de lista para que sea más intuitivo
+        htmlEquipamiento = '<div class="mt-2">';
         listaEquipamiento.forEach((item) => {
-          // Usamos la nueva clase 'badge-minimal'
-          htmlEquipamiento += `<span class="badge-minimal me-1 mb-1">${item.trim()}</span>`;
+          // Opción con icono de check para que el administrador identifique qué hay disponible
+          htmlEquipamiento += `
+            <div class="d-flex align-items-center mb-1">
+                <i class="bi bi-check2-square text-primary me-2" style="font-size: 0.8rem;"></i>
+                <span class="text-dark" style="font-size: 0.75rem;">${item.trim()}</span>
+            </div>`;
         });
+        htmlEquipamiento += '</div>';
       } else {
-        htmlEquipamiento = '<span class="text-muted" style="font-size: 0.65rem;">Sin equipamiento</span>';
+        htmlEquipamiento = `
+            <div class="d-flex align-items-center mt-2">
+                <i class="bi bi-info-circle text-muted me-2"></i>
+                <span class="text-muted" style="font-size: 0.7rem;">Sin equipamiento registrado</span>
+            </div>`;
       }
 
+      // CAMBIO 2: Inserción de Capacidad Máxima y Estructura Mejorada
       contenedor.innerHTML += `
         <div class="col-md-4 mb-4">
             <div class="card auditorio-card h-100 border-0 shadow-sm" style="border-radius: 20px;">
                 <img src="assets/img/auditorios/${aud.id_auditorio}.jpg" class="card-img-top" 
-                     onerror="this.src='assets/img/placeholder.jpg'" style="height: 180px; object-fit: cover; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                     onerror="this.src='assets/img/placeholder.jpg'" 
+                     style="height: 180px; object-fit: cover; border-top-left-radius: 20px; border-top-right-radius: 20px;">
                 <div class="card-body d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <h5 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem;">${aud.nombre_espacio}</h5>
                         ${statusBadge}
                     </div>
-                    <p class="text-muted mb-3" style="font-size: 0.8rem;"><i class="bi bi-geo-alt"></i> ${aud.ubicacion}</p>
+                    
+                    <div class="mb-3">
+                        <p class="text-muted mb-1" style="font-size: 0.8rem;"><i class="bi bi-geo-alt"></i> ${aud.ubicacion}</p>
+                        <div class="capacidad-info" style="font-size: 0.85rem; color: var(--sira-purple-primary); font-weight: 700;">
+                            <i class="bi bi-people-fill"></i> ${aud.capacidad_maxima} <span style="font-weight: 500; font-size: 0.75rem;">Capacidad</span>
+                        </div>
+                    </div>
                     
                     <div class="mb-4 flex-grow-1">
                         <label class="d-block text-muted fw-bold mb-1" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.5px;">Equipamiento Fijo</label>

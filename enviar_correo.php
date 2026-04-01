@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Diseñamos el cuerpo del correo con un poco de estilo
         $cuerpo = "<h1>Nuevo mensaje de contacto</h1>";
         $cuerpo .= "<p><strong>Nombre:</strong> " . $_POST['nombre'] . "</p>";
-        $cuerpo .= "<p><strong>Email:</strong> " . $_POST['email'] . "</p>";
+        $cuerpo .= "<p><strong>Gmail:</strong> " . $_POST['email'] . "</p>";
         $cuerpo .= "<p><strong>Teléfono:</strong> " . $_POST['phone'] . "</p>";
         $cuerpo .= "<p><strong>Mensaje:</strong><br>" . nl2br($_POST['message']) . "</p>";
 

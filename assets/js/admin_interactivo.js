@@ -7,17 +7,16 @@
 
 let idSeleccionado = null;
 let bsModal = null;
+let idSolicitudActualAdmin = null; // Variable global para reasignación
 
 /**
- * GESTIÓN DE DETALLES
- * Obtiene datos del servidor usando el estándar Bearer Token
- */
-/**
- * GESTIÓN DE DETALLES - SIRA UTM
- * Actualizado: Soporte para Bitácora de Cierre y Equipamiento Especial
+ * GESTIÓN DE DETALLES - Abre el modal de información
  */
 async function gestionar(id) {
     idSeleccionado = id;
+    
+    // Guardamos el ID para la posible reasignación
+    idSolicitudActualAdmin = id; 
 
     if (!bsModal) {
         const modalElement = document.getElementById("bsModalDetalle");
@@ -36,86 +35,72 @@ async function gestionar(id) {
         if (response.status === 401) return manejarErrorAutenticacion();
         const data = await response.json();
 
-        // 1. Llenado de textos básicos
-       document.getElementById("detFolio").innerText = "Folio: " + (data.folio || 'N/A');
-document.getElementById("detTituloEv").innerText = data.titulo_event;
+        // 1. LLENADO DEL BOTÓN DE WHATSAPP (Solución al error)
+        const btnWhatsApp = document.getElementById("btnWhatsApp");
+        if (btnWhatsApp && data.telefono) {
+            // Limpiamos el número (solo dejamos dígitos)
+            const telLimpio = data.telefono.replace(/\D/g, '');
+            // Creamos el mensaje predeterminado
+            const msj = encodeURIComponent(`Hola ${data.nombre_usuario}, te contacto del sistema SIRA UTM sobre tu reservación con folio ${data.folio}...`);
+            // Asignamos el link (Asumiendo lada +52 de México)
+            btnWhatsApp.href = `https://wa.me/52${telLimpio}?text=${msj}`;
+            btnWhatsApp.style.display = 'flex'; // Aseguramos que se vea
+        } else if (btnWhatsApp) {
+            btnWhatsApp.style.display = 'none'; // Si no hay teléfono, lo ocultamos
+        }
 
-// --- CAMBIO AQUÍ: Agregamos el ROL al lado del nombre ---
-const nombre = data.nombre_usuario || data.nombre || 'Sin nombre';
-const rol = data.perfil ? `(${data.perfil.toUpperCase()})` : ''; 
-document.getElementById("detUsuarioNombre").innerText = `${nombre} ${rol}`;
-
-document.getElementById("detAuditorio").innerText = data.nombre_espacio;
-
-// --- CAMBIO AQUÍ: Aseguramos que pinte el número de la DB ---
-document.getElementById("detAsistentes").innerText = `👥 ${data.num_asistentes || 0} asistentes aprox.`;
-
-document.getElementById("detFechaEvento").innerText = data.fecha_evento_limpia || data.fecha_evento;
-document.getElementById("detHorario").innerText = `${data.hora_inicio} a ${data.hora_fin}`;
-document.getElementById("detDescription").innerText = data.descripcion;
-
-        // 2. EQUIPAMIENTO ESPECIAL (EXTRAS)
-      // 2. EQUIPAMIENTO ESPECIAL (EXTRAS)
-// En lugar de buscar 'equipos_solicitados', buscamos 'otros_servicios'
-// En admin_interactivo.js
-// admin_interactivo.js - Dentro de gestionar(id)
-// admin_interactivo.js
-// 2. EQUIPAMIENTO ESPECIAL (EXTRAS)
-const contenedorEquipos = document.getElementById("detEquipamiento");
-
-// Usamos 'extras_texto' (que viene del alias en tu PHP) o 'otros_servicios'
-const extras = data.extras_texto || data.otros_servicios || '';
-
-if (contenedorEquipos) {
-    if (extras && extras.trim() !== "" && extras.toLowerCase() !== 'sin requerimientos extras') {
-        // Convertimos el texto "Laptop, Sonido" en Badges elegantes
-        const listaExtras = extras.split(', ');
-        contenedorEquipos.innerHTML = listaExtras.map(e => 
-            `<span class="badge bg-purple-soft text-purple border-purple-light me-1 shadow-sm" 
-                   style="background-color: #f3e5f5; color: #5B3D66; border: 1px solid #d1c4e9; padding: 5px 10px;">
-                ${e}
-            </span>`
-        ).join('');
-    } else {
-        // Si no hay datos, mostramos el mensaje por defecto
-        contenedorEquipos.innerHTML = '<span class="text-muted small italic">Sin requerimientos extras.</span>';
-    }
-}
-
-        // 3. BITÁCORA DE CIERRE (COHERENCIA CON USUARIO)
-        // Si el docente ya reportó el cierre, el admin debe verlo aquí.
-      const seccionBitacora = document.getElementById("seccionBitacoraAdmin");
-
-if (seccionBitacora) {
-    // Si la solicitud es 'PENDIENTE', forzamos que se vea para poder Aceptar/Rechazar
-    // O si ya tiene incidentes reportados, también la mostramos
-    if (data.estado === 'Pendiente' || data.incidentes_cierre) {
-        seccionBitacora.style.display = "block";
+        // 2. Llenado de textos básicos
+        document.getElementById("detMatricula").innerText = data.matricula || 'N/A';
+        document.getElementById("detCorreo").innerText = data.correo || 'N/A';
+        document.getElementById("detFolio").innerText = "Folio: " + (data.folio || 'N/A');
+        document.getElementById("detTituloEv").innerText = data.titulo_event;
         
-        // Si no hay incidentes aún, limpiamos el texto para que no se vea el "---"
-        document.getElementById("detBitacoraTexto").innerText = data.incidentes_cierre 
-            ? `"${data.incidentes_cierre}"` 
-            : "Esperando reporte de cierre del solicitante.";
-    } else {
-        // Si ya está aceptada y no hay incidentes, la ocultamos para no estorbar
-        seccionBitacora.style.display = "none";
-    }
-}
+        const nombre = data.nombre_usuario || data.nombre || 'Sin nombre';
+        const rol = data.perfil ? `(${data.perfil.toUpperCase()})` : ''; 
+        document.getElementById("detUsuarioNombre").innerText = `${nombre} ${rol}`;
 
-        // 4. WhatsApp Dinámico
-        const btnWA = document.getElementById("btnWhatsApp");
-        if (data.telefono) {
-            btnWA.href = `https://wa.me/52${data.telefono.replace(/\D/g, "")}`;
-            btnWA.style.display = "inline-block";
-        } else {
-            btnWA.style.display = "none";
+        const carreraElem = document.getElementById("detCarrera");
+        if (carreraElem) {
+            carreraElem.innerText = data.carrera || 'Carrera no especificada';
+        }
+        
+        document.getElementById("detAuditorio").innerText = data.nombre_espacio;
+        document.getElementById("detAsistentes").innerText = `👥 ${data.num_asistentes || 0} asistentes aprox.`;
+        document.getElementById("detFechaEvento").innerText = data.fecha_evento_limpia || data.fecha_evento;
+        document.getElementById("detHorario").innerText = `${data.hora_inicio} a ${data.hora_fin}`;
+        document.getElementById("detDescription").innerText = data.descripcion;
+
+        // 3. EQUIPAMIENTO (EXTRAS)
+        const contenedorEquipos = document.getElementById("detEquipamiento");
+        const extras = data.extras_texto || data.otros_servicios || '';
+
+        if (contenedorEquipos) {
+            contenedorEquipos.innerHTML = ""; 
+
+            if (extras && extras.trim() !== "" && extras.toLowerCase() !== 'sin requerimientos extras') {
+                const listaExtras = extras.split(',').map(item => item.trim());
+                const listaUnica = [...new Set(listaExtras)];
+
+                contenedorEquipos.innerHTML = listaUnica.map(e => 
+                    `<span class="badge bg-light text-dark border me-1 shadow-sm" style="padding: 5px 10px;">${e}</span>`
+                ).join('');
+            } else {
+                contenedorEquipos.innerHTML = '<span class="text-muted small italic">Sin requerimientos extras.</span>';
+            }
+        }
+
+        // 4. Bitácora y Botones de Acción
+        const seccionBitacora = document.getElementById("seccionBitacoraAdmin");
+        if (seccionBitacora) {
+            seccionBitacora.style.display = (data.estado === 'Pendiente' || data.incidentes_cierre) ? "block" : "none";
+            document.getElementById("detBitacoraTexto").innerText = data.incidentes_cierre ? `"${data.incidentes_cierre}"` : "Esperando reporte de cierre del solicitante.";
         }
 
         bsModal.show();
 
     } catch (error) {
-        console.error("Error de conexión:", error);
-        Swal.fire('Error', 'No se pudo obtener la información de la base de datos.', 'error');
+        console.error("Error:", error);
+        Swal.fire('Error', 'No se pudo obtener la información.', 'error');
     }
 }
 
@@ -411,3 +396,164 @@ async function eliminarSolicitudDesdeModal() {
         }
     }
 }
+
+// Variable global para rastrear qué solicitud estamos viendo en el panel admin
+let idSolicitudEnGestion = null;
+
+window.abrirReasignacion = async function(id) {
+    idSolicitudEnGestion = id; // Guardamos el ID para no perderlo
+    
+    try {
+        // 1. Consultamos los datos actuales de esa solicitud
+        const res = await fetch(`api/solicitudes/get_detalle.php?id=${id}`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}` }
+        });
+        const data = await res.json();
+
+        if(data.error) return Swal.fire('Error', data.error, 'error');
+
+        // 2. Seteamos el ID en el modal de reservación (el input oculto que ya tienes)
+        $('#id_editando').val(id);
+        
+        // 3. Llenamos los campos del formulario para que el admin no tenga que reescribirlos
+        $('input[name="titulo"]').val(data.titulo_event);
+        $('textarea[name="descripcion"]').val(data.descripcion);
+        $('input[name="num_asistentes"]').val(data.num_asistentes);
+        $('input[name="otros_servicios"]').val(data.otros_servicios);
+
+        // 4. IMPORTANTE: Mandamos al admin al PASO 1 (Seleccionar Auditorio)
+        // para que pueda elegir un salón diferente si hay choque de horarios
+        $('#modalNuevaSolicitud .modal-title').text('Reasignar Solicitud: ' + data.folio);
+        $('#display_nombre_auditorio').text('Selecciona el nuevo espacio');
+        
+        // Escondemos los pasos de calendario y formulario, mostramos el catálogo
+        $('#paso_calendario, #paso_formulario').hide();
+        $('#paso_catalogo').fadeIn();
+
+        // 5. Cerramos el modal de detalles y abrimos el de reservación
+        const modalDetalle = bootstrap.Modal.getInstance(document.getElementById('bsModalDetalle'));
+        if(modalDetalle) modalDetalle.hide();
+
+        const modalReserva = new bootstrap.Modal(document.getElementById('modalNuevaSolicitud'));
+        modalReserva.show();
+
+    } catch (e) {
+        console.error("Error al preparar reasignación:", e);
+        Swal.fire('Error', 'No se pudo conectar con la solicitud.', 'error');
+    }
+};
+
+
+// Variable global para que persista el ID de la solicitud abierta
+
+
+// Esta función debe ejecutarse cuando el admin abre el modal de detalle
+// Asegúrate de que tu función que llena el modal asigne el ID aquí
+window.asignarIdActual = function(id) {
+    idSolicitudActualAdmin = id;
+};
+
+window.prepararReasignacion = function() {
+    if (!idSolicitudActualAdmin) {
+        return Swal.fire('Atención', 'No se pudo identificar la solicitud.', 'warning');
+    }
+
+    // 1. Identificamos el modal que está abierto (Detalle)
+    const modalElement = document.getElementById('bsModalDetalle');
+    const modalDetalle = bootstrap.Modal.getInstance(modalElement);
+
+    if (modalDetalle) {
+        // 2. Cerramos el modal de forma inmediata
+        modalDetalle.hide();
+
+        // 3. LIMPIEZA AGRESIVA DE INTERFAZ (Para quitar lo opaco y desbloquear clics)
+        // Eliminamos todos los fondos oscuros que Bootstrap haya dejado
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
+        // Quitamos la clase que bloquea el scroll y los clics en el body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = 'auto';
+        document.body.style.paddingRight = '0';
+
+        // 4. Pequeña pausa para que el navegador se entere de que ya no hay modal
+        setTimeout(() => {
+            console.log("Interfaz desbloqueada. Abriendo catálogo de reasignación...");
+            abrirReasignacion(idSolicitudActualAdmin);
+        }, 200); 
+    } else {
+        abrirReasignacion(idSolicitudActualAdmin);
+    }
+};
+
+window.abrirReasignacion = async function(id) {
+    try {
+        const res = await fetch(`api/solicitudes/get_detalle.php?id=${id}`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}` }
+        });
+        const data = await res.json();
+
+        if(data.error) return Swal.fire('Error', data.error, 'error');
+
+        // 1. LLENADO DE DATOS ORIGINALES
+        $('input[name="titulo"]').val(data.titulo_event);
+        $('textarea[name="descripcion"]').val(data.descripcion);
+        $('input[name="num_asistentes"]').val(data.num_asistentes);
+        $('input[name="otros_servicios"]').val(data.otros_servicios);
+        
+        // Seteamos el ID de la solicitud que estamos editando (CRUCIAL para el UPDATE)
+        $('#id_editando').val(id);
+
+        // 2. LÓGICA DE CHECKBOXES (EXTRAS)
+        const extrasDB = data.otros_servicios || '';
+        // Limpiamos todos primero
+        $('#modalNuevaSolicitud input[type="checkbox"]').prop('checked', false);
+
+        if (extrasDB) {
+            // Convertimos la cadena "Proyector, Extensiones" en un array minúsculo
+            const listaExtras = extrasDB.split(',').map(item => item.trim().toLowerCase());
+            
+            $('#modalNuevaSolicitud input[type="checkbox"]').each(function() {
+                const valorCheck = $(this).val().toLowerCase();
+                if (listaExtras.includes(valorCheck)) {
+                    $(this).prop('checked', true);
+                }
+            });
+        }
+
+        // 3. CONFIGURACIÓN VISUAL Y BLOQUEO
+        $('#modalNuevaSolicitud .modal-title').text('Reasignar Folio: ' + data.folio);
+        
+        // Bloqueamos campos para que el Admin solo cambie lugar/fecha si así lo deseas
+        $('input[name="titulo"], textarea[name="descripcion"]').attr('readonly', true);
+
+        // Forzamos ir al catálogo para elegir el NUEVO auditorio
+        $('#paso_calendario, #paso_formulario').hide();
+        $('#paso_catalogo').show();
+
+        // 4. APERTURA CON EXTRACCIÓN (Para evitar pantalla opaca)
+        const modalElement = document.getElementById('modalNuevaSolicitud');
+        document.body.appendChild(modalElement); 
+        
+        modalElement.style.setProperty('display', 'block', 'important');
+        modalElement.style.setProperty('z-index', '10850', 'important'); // Z-index alto para Admin
+        modalElement.style.setProperty('position', 'fixed', 'important');
+        modalElement.style.setProperty('top', '50%', 'important');
+        modalElement.style.setProperty('left', '50%', 'important');
+        modalElement.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
+
+        const myModal = new bootstrap.Modal(modalElement);
+        myModal.show();
+        
+        console.log("Datos de reasignación cargados con éxito.");
+
+    } catch (e) {
+        console.error("Error al cargar datos para reasignar:", e);
+        Swal.fire('Error', 'No se pudo sincronizar la información.', 'error');
+    }
+};
+
+$(document).on('click', '#modalNuevaSolicitud .btn-close', function() {
+    $('#modalNuevaSolicitud').hide();
+    $('.modal-backdrop').remove();
+    $('body').removeClass('modal-open').css('overflow', 'auto');
+});

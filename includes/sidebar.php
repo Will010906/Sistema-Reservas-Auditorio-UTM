@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let htmlIconos = '';
 
     if (perfil === 'administrador') {
-        // --- VISTA ADMIN ---
+        // --- VISTA ADMIN (Limpia) ---
         htmlIconos = `
             <a href="panel_admin.php" class="text-white"><i class="bi bi-grid-fill fs-4"></i></a>
             <a href="admin_auditorios.php" class="text-white opacity-50"><i class="bi bi-building fs-4"></i></a>
@@ -68,22 +68,41 @@ document.addEventListener("DOMContentLoaded", function() {
             <a href="panel_admin.php" class="nav-link-custom ${pagina==='panel_admin.php'?'active':''}"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <div class="nav-section-title">Gestión Sistema</div>
             <a href="admin_auditorios.php" class="nav-link-custom ${pagina==='admin_auditorios.php'?'active':''}"><i class="bi bi-building"></i> Auditorios</a>
-            <a href="admin_usuarios.php" class="nav-link-custom ${pagina==='admin_usuarios.php'?'active':''}"><i class="bi bi-people"></i> Usuarios</a>
-            <div class="nav-section-title">Reportes</div>
-            <a href="#" class="nav-link-custom"><i class="bi bi-file-earmark-pdf"></i> Reportes PDF</a>`;
+            <a href="admin_usuarios.php" class="nav-link-custom ${pagina==='admin_usuarios.php'?'active':''}"><i class="bi bi-people"></i> Usuarios</a>`;
     } else {
-        // --- VISTA ALUMNO / USUARIO ---
+        // --- VISTA ALUMNO (Limpia) ---
         htmlIconos = `<a href="panel_usuario.php" class="text-white"><i class="bi bi-grid-fill fs-4"></i></a>`;
         
         htmlMenu += `
-            <a href="panel_usuario.php" class="nav-link-custom ${pagina==='panel_usuario.php'?'active':''}"><i class="bi bi-journal-text"></i> Mis Reservas</a>
-            <div class="nav-section-title">Ayuda</div>
-            <a href="#" class="nav-link-custom"><i class="bi bi-book"></i> Manual</a>`;
+            <a href="panel_usuario.php" class="nav-link-custom ${pagina==='panel_usuario.php'?'active':''}"><i class="bi bi-journal-text"></i> Mis Reservas</a>`;
     }
 
-    htmlMenu += `<a href="#" class="nav-link-custom"><i class="bi bi-question-circle"></i> Soporte</a>`;
+    // --- SECCIÓN REQUERIDA POR LA MAESTRA ---
+    htmlMenu += `
+        <div class="nav-section-title">Sesión</div>
+        <a href="javascript:void(0);" onclick="confirmarSalida()" class="nav-link-custom nav-link-exit">
+            <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
+        </a>`;
     
     menu.innerHTML = htmlMenu;
     iconos.innerHTML = htmlIconos;
 });
+
+// Función de salida limpia
+function confirmarSalida() {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#5B3D66',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('sira_session_token');
+            window.location.href = 'login.php';
+        }
+    });
+}
 </script>
