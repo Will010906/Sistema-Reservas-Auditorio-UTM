@@ -14,7 +14,7 @@
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
         <!-- estilo de la pagina-->
-        <link href="assets/css/pagina.css?v=3.0" rel="stylesheet">
+        <link href="assets/css/pagina.css?v=4.0" rel="stylesheet">
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -139,7 +139,7 @@
                                 <img class="img-fluid" src="assets/img/catalogo/1A.jpeg" alt="..." />
                             </a>
                             <div class="catalogo-caption">
-                                <div class="catalogo-caption-heading">Auditorio A</div>
+                                <div class="catalogo-caption-heading">Auditorio A-2</div>
                                 <div class="catalogo-caption-subheading text-muted">
                                     Capacidad: 63 personas<br>
                                     Ubicación: Edificio A Planta Alta
@@ -157,7 +157,7 @@
                                 <img class="img-fluid" src="assets/img/catalogo/2-A.jpeg" alt="..." />
                             </a>
                             <div class="catalogo-caption">
-                                <div class="catalogo-caption-heading">Auditorio A-2</div>
+                                <div class="catalogo-caption-heading">Auditorio A</div>
                                 <div class="catalogo-caption-subheading text-muted">
                                     Capacidad: 65 personas<br>
                                     Ubicación: Edificio A Planta Baja
@@ -166,7 +166,7 @@
                         </div>
                     </div>
                 </section>
-        <!-- guia-->
+        <!-- Guia-->
         <section class="page-section" id="guia">
             <div class="container">
                 <div class="text-center">
@@ -175,7 +175,7 @@
                 </div>
                 <ul class="timeline">
                     <li>
-                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/about/1.jpg" alt="..." /></div>
+                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/inicio.jpeg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4>Paso 1:</h4>
@@ -185,7 +185,7 @@
                         </div>
                     </li>
                     <li class="timeline-inverted">
-                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/about/2.jpg" alt="..." /></div>
+                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/solicitud.jpeg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4>Paso 2:</h4>
@@ -195,7 +195,7 @@
                         </div>
                     </li>
                     <li>
-                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/about/3.jpg" alt="..." /></div>
+                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/revision.jpeg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4>Paso 3:</h4>
@@ -205,7 +205,7 @@
                         </div>
                     </li>
                     <li class="timeline-inverted">
-                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/about/4.jpg" alt="..." /></div>
+                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/UTM.jpeg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4>Paso 4:</h4>
@@ -277,7 +277,6 @@
                 </div>
             </div>
         </section>
-        
         <!-- Contacto-->
         <section class="page-section" id="contacto">
             <div class="container">
