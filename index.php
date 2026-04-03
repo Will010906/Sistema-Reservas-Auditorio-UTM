@@ -14,7 +14,7 @@
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
         <!-- estilo de la pagina-->
-        <link href="assets/css/pagina.css?v=2.0" rel="stylesheet">
+        <link href="assets/css/pagina.css?v=3.0" rel="stylesheet">
     </head>
     <body id="page-top">
         <!-- Navigation-->
@@ -84,7 +84,7 @@
         </div>
     </div>
 </section>
-        <!-- catalogo Grid-->
+        <!-- Catalogo Auditorios-->
         <section class="page-section bg-light" id="catalogo">
             <div class="container">
                 <div class="text-center">
@@ -93,117 +93,79 @@
                         En nuestro <strong>Catálogo de Espacios</strong> encontrarás auditorios con tecnología de punta y la capacidad exacta que tu proyecto requiere.</h3>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-sm-6 mb-4">
-                        <!-- catalogo item 1-->
+                    <div class="col-lg-6 col-sm-6 mb-4">
+                        <!-- catalogo Auditorio D-->
                         <div class="catalogo-item">
                             <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal1">
                                 <div class="catalogo-hover">
                                     <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
-                                <img class="img-fluid" src="assets/img/portfolio/11.jpg" alt="..." />
+                                <img class="img-fluid" src="assets/img/catalogo/1D.jpeg" alt="..." />
                             </a>
                             <div class="catalogo-caption">
-                                <div class="catalogo-caption-heading">Auditorio Principal</div>
+                                <div class="catalogo-caption-heading">Auditorio D</div>
                                 <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 150 personas<br>
-                                    Ubicación: Edificio A
+                                    Capacidad: 182 personas<br>
+                                    Ubicación: Edificio D
                             </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 mb-4">
+                    <div class="col-lg-6 col-sm-6 mb-4">
                         <!-- catalogo item 2-->
                         <div class="catalogo-item">
                             <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal2">
                                 <div class="catalogo-hover">
                                     <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
-                                <img class="img-fluid" src="assets/img/portfolio/22.jpg" alt="..." />
+                                <img class="img-fluid" src="assets/img/catalogo/2B.jpeg" alt="..." />
                             </a>
                             <div class="catalogo-caption">
                                 <div class="catalogo-caption-heading">Auditorio B</div>
                                 <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 100 personas<br>
+                                    Capacidad: 80 personas<br>
                                     Ubicación: Edificio B
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 mb-4">
+                    <div class="col-lg-6 col-sm-6 mb-4">
                         <!-- catalogo item 3-->
                         <div class="catalogo-item">
                             <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal3">
                                 <div class="catalogo-hover">
                                     <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
-                                <img class="img-fluid" src="assets/img/portfolio/33.jpg" alt="..." />
+                                <img class="img-fluid" src="assets/img/catalogo/1A.jpeg" alt="..." />
                             </a>
                             <div class="catalogo-caption">
                                 <div class="catalogo-caption-heading">Auditorio A</div>
                                 <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 75 personas<br>
-                                    Ubicación: Edificio A
+                                    Capacidad: 63 personas<br>
+                                    Ubicación: Edificio A Planta Alta
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 mb-4 mb-lg-0">
+                    <div class="col-lg-6 col-sm-6 mb-4 mb-lg-0">
                         <!-- catalogo item 4-->
                         <div class="catalogo-item">
                             <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal4">
                                 <div class="catalogo-hover">
                                     <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
-                                <img class="img-fluid" src="assets/img/portfolio/44.jpg" alt="..." />
-                            </a>
-                            <div class="catalogo-caption">
-                                <div class="catalogo-caption-heading">Auditorio C</div>
-                                <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 120 personas<br>
-                                    Ubicación: Edificio C
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-6 mb-4 mb-sm-0">
-                        <!-- catalogo item 5-->
-                        <div class="catalogo-item">
-                            <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal5">
-                                <div class="catalogo-hover">
-                                    <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
-                                </div>
-                                <img class="img-fluid" src="assets/img/portfolio/55.jpg" alt="..." />
+                                <img class="img-fluid" src="assets/img/catalogo/2-A.jpeg" alt="..." />
                             </a>
                             <div class="catalogo-caption">
                                 <div class="catalogo-caption-heading">Auditorio A-2</div>
                                 <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 50 personas<br>
-                                    Ubicación: Edificio A
+                                    Capacidad: 65 personas<br>
+                                    Ubicación: Edificio A Planta Baja
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6">
-                        <!-- catalogo item 6-->
-                        <div class="catalogo-item">
-                            <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal6">
-                                <div class="catalogo-hover">
-                                    <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
-                                </div>
-                                <img class="img-fluid" src="assets/img/portfolio/66.jpg" alt="..." />
-                            </a>
-                            <div class="catalogo-caption">
-                                <div class="catalogo-caption-heading">Auditorio D</div>
-                                <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 150 personas<br>
-                                    Ubicación: Edificio D
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                </section>
         <!-- guia-->
         <section class="page-section" id="guia">
             <div class="container">

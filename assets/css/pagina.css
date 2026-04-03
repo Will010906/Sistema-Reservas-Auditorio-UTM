@@ -10930,7 +10930,7 @@ header.masthead {
   text-align: center;
   color: #fff;
   /* El linear-gradient crea una capa morada sobre la foto */
-  background-image: linear-gradient(rgba(45, 27, 51, 0.7), rgba(45, 27, 51, 0.7)), url("../img/auditorio.jpg");
+  background-image: linear-gradient(rgba(45, 27, 51, 0.7), rgba(45, 27, 51, 0.7)), url("../img/catalogo/fondo.jpeg");
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-position: center center;
@@ -10970,9 +10970,10 @@ header.masthead .masthead-heading {
   }
 }
 #catalogo .catalogo-item {
-  max-width: 26rem;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 15px; /* Crea un margen alrededor de cada tarjeta */
+  border-radius: 8px; /* Opcional: redondea un poco las esquinas para que se vea más moderno */
+  overflow: hidden; /* Asegura que la imagen no se salga de las esquinas redondeadas */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05); /* Una sombra muy suave para dar profundidad */
 }
 #catalogo .catalogo-item .catalogo-link {
   position: relative;
