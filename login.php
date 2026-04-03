@@ -1,7 +1,7 @@
 <?php
 /**
  * VISTA DE LOGIN - SIRA UTM
- * Actualizado: Integración con Autenticación JWT y SweetAlert2.
+ * Actualizado: Diseño Pro, Toggle de Contraseña y Recuperación Integrada.
  */
 ?>
 <!DOCTYPE html>
@@ -16,7 +16,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Mantengo tus variables y estilos originales para no romper el diseño */
         :root {
             --sira-purple-deep: #5B3D66;
             --sira-purple-med: #845C93;
@@ -72,9 +71,8 @@
         }
 
         .logo-img {
-            max-width: 200px;
-            margin-bottom: 30px;
-            border-radius: 15px;
+            max-width: 180px;
+            margin-bottom: 25px;
         }
 
         .form-control {
@@ -102,9 +100,8 @@
             text-decoration: underline !important;
         }
 
-        .border-top-custom {
-            border-top: 1px solid rgba(91, 61, 102, 0.1) !important;
-        }
+        /* Estilo para el ojo de la contraseña */
+        .sira-password-toggle .btn:focus { box-shadow: none !important; }
     </style>
 </head>
 
@@ -115,7 +112,7 @@
             <div class="card-body p-0">
                 <img src="assets/img/logo_app_web_RA.png" alt="Logo SIRA UTM" class="logo-img img-fluid">
 
-                <div class="mb-5">
+                <div class="mb-4">
                     <h5 class="fw-bold mt-2" style="color: var(--sira-purple-deep); letter-spacing: -0.5px;">BIENVENIDO A SIRA</h5>
                     <p class="text-muted small">Gestión de Auditorios UTM</p>
                 </div>
@@ -134,22 +131,32 @@
                     </div>
 
                     <div class="mb-4 text-start">
-                        <label for="password" class="form-label form-label-custom">Contraseña</label>
-                        <div class="input-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="password" class="form-label form-label-custom mb-0">Contraseña</label>
+                            <a href="recuperar.php" class="custom-link fw-bold" style="font-size: 0.7rem;">¿LA OLVIDASTE?</a>
+                        </div>
+                        <div class="input-group position-relative sira-password-toggle">
                             <span class="input-group-text border-end-0"><i class="bi bi-lock-fill"></i></span>
                             <input type="password" name="password" id="password"
                                 class="form-control form-control-lg border-start-0 ps-0"
                                 autocomplete="current-password"
-                                placeholder="••••••••" required>
+                                placeholder="••••••••" required 
+                                style="padding-right: 45px;">
+                            
+                            <button type="button" id="togglePassword" 
+                                class="btn position-absolute top-50 translate-middle-y end-0 me-1 p-1 text-muted" 
+                                style="border: none; background: none; z-index: 10;">
+                                <i class="bi bi-eye-slash fs-5" id="iconoOjo"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <button type="submit" id="btnEntrar" class="btn btn-sira btn-lg w-100 fw-bold rounded-pill">
+                    <button type="submit" id="btnEntrar" class="btn btn-sira btn-lg w-100 fw-bold rounded-pill shadow-sm">
                         ACCEDER AL SISTEMA
                     </button>
                 </form>
 
-                <div class="mt-5 text-center border-top-custom pt-3">
+                <div class="mt-5 text-center pt-3 border-top" style="border-color: rgba(91, 61, 102, 0.1) !important;">
                     <p class="text-muted small mb-0">¿Eres nuevo en la plataforma? <br>
                         <a href="registro.php" class="fw-bold custom-link">Crea tu cuenta aquí</a>
                     </p>
@@ -158,7 +165,11 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="assets/js/contrasena_toggle.js"></script>
     <script src="assets/js/login.js"></script>
 </body>
 
