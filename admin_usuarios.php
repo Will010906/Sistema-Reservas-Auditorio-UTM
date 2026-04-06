@@ -79,6 +79,17 @@ if (!token) {
     border: 1px solid #badbcc;
     font-weight: 800;
 }
+
+/* Ajuste para que el ojo no herede bordes del input-group */
+.sira-password-toggle .btn {
+    border: none !important;
+    outline: none !important;
+}
+
+/* Evita que el input se deforme con el botón absoluto */
+#user_pass {
+    border-radius: 8px !important; /* Mantiene la estética de tus otros campos */
+}
     </style>
 </head>
 
@@ -169,9 +180,17 @@ if (!token) {
                         </div>
                         
                         <div class="mb-3" id="bloque_password">
-                            <label class="form-label small fw-bold text-muted">Contraseña Inicial</label>
-                            <input type="password" name="password" id="user_pass" class="form-control rounded-3" placeholder="Mínimo 8 caracteres">
-                        </div>
+    <label class="form-label small fw-bold text-muted">Contraseña Inicial</label>
+    <div class="input-group position-relative sira-password-toggle">
+        <input type="password" name="password" id="user_pass" class="form-control rounded-3" placeholder="Mínimo 8 caracteres" style="padding-right: 45px;">
+        
+        <button type="button" id="togglePassword" 
+            class="btn position-absolute top-50 translate-middle-y end-0 me-1 p-1 text-muted" 
+            style="border: none; background: none; z-index: 10;">
+            <i class="bi bi-eye-slash fs-5" id="iconoOjo"></i>
+        </button>
+    </div>
+</div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -210,9 +229,11 @@ if (!token) {
             </div>
         </div>
     </div>
-
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/contrasena_toggle.js"></script>
     <script src="assets/js/admin_usuarios.js"></script>
     <script src="assets/js/auth_check.js"></script>
+    
 </body>
 </html>
