@@ -13,6 +13,10 @@
  * multicriterio en el lado del cliente.
  */
 include("config/db_local.php");
+// SIRA - Bloqueo de caché a nivel servidor
+header("Cache-Control: no-cache, no-store, must-revalidate"); 
+header("Pragma: no-cache"); 
+header("Expires: 0");
 ?>
 
 <!DOCTYPE html>

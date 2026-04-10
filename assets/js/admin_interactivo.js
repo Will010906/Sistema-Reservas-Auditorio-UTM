@@ -177,33 +177,36 @@ const claseStatus = sol.prioridad_visual.replace(" ", "").toLowerCase();
 contenedor.innerHTML += `
     <tr class="solicitud-fila animate__animated animate__fadeIn">
         <td class="ps-4">
-            <div class="fw-bold" style="color: #5B3D66;">${sol.nombre_usuario || 'Usuario UTM'}</div>
-            <div class="text-muted x-small">Folio: #${sol.folio}</div>
+            <div class="fw-bold" style="color: #5B3D66; font-size: 0.95rem;">#${sol.folio}</div>
         </td>
 
         <td>
-            <div class="fw-bold text-dark">${sol.matricula || 'S/M'}</div>
-            <div class="text-muted x-small">${sol.titulo_event}</div>
+            <div class="fw-bold text-dark" style="font-size: 0.9rem; line-height: 1.2;">
+                ${sol.titulo_event || 'Sin Título'}
+            </div>
+            <div class="text-muted x-small">
+                Por: ${sol.nombre_usuario || 'Usuario UTM'}
+            </div>
         </td>
 
         <td class="text-center">
-            <span class="badge rounded-pill bg-light text-secondary border px-3">
-                <i class="bi bi-telephone me-1"></i> ${sol.telefono || 'N/A'}
+            <span class="badge rounded-pill bg-light text-secondary border px-3" style="font-size: 0.75rem;">
+                ${sol.nombre_auditorio || 'Pendiente'}
             </span>
         </td>
 
-        <td class="text-center text-muted fw-medium">
-            ${sol.carrera_area || 'General'}
+        <td class="text-center text-muted fw-medium" style="font-size: 0.85rem;">
+            ${sol.fecha_evento || '---'}
         </td>
 
         <td class="text-center">
-            <span class="badge-status st-${claseStatus} shadow-sm">
+            <span class="badge-status st-${claseStatus} shadow-sm" style="width: 110px; display: inline-block; font-size: 0.75rem;">
                 ${sol.prioridad_visual.toUpperCase()}
             </span>
         </td>
 
         <td class="text-center">
-            <button class="btn btn-gestionar-sira btn-sm shadow-sm" onclick="gestionar(${sol.id_solicitud})">
+            <button class="btn btn-outline-secondary btn-sm shadow-sm" onclick="gestionar(${sol.id_solicitud})" style="border-radius: 20px; font-size: 0.75rem;">
                 <i class="bi bi-folder2-open me-1"></i> Gestionar
             </button>
         </td>

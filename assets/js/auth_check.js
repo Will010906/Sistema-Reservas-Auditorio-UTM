@@ -52,30 +52,37 @@
          * Decodifica el Payload (Base64) para verificar la vigencia temporal.
          */
         try {
-            const payload = JSON.parse(atob(sessionToken.split('.')[1]));
-            const ahora = Math.floor(Date.now() / 1000);
+           // ... dentro del try del subsistema de integridad JWT ...
+const payload = JSON.parse(atob(sessionToken.split('.')[1]));
+const perfil = payload.perfil.toLowerCase();
+const path = window.location.pathname;
 
-            // Verificación de expiración (Timestamp UNIX)
-            if (payload.exp < ahora) {
-                throw new Error("Token expirado");
-            }
+/**
+ * REGLAS DE ACCESO INSTITUCIONAL (RBAC)
+ * Si el usuario intenta estar en un panel que no coincide con su perfil, 
+ * lo redirigimos a donde sí tiene permiso.
+ */
+if (!path.includes('login.php') && !path.includes('index.php')) {
 
-            /**
-             * REDIRECCIÓN BASADA EN ROLES (RBAC)
-             * Previene que un usuario autenticado regrese a la pantalla de login.
-             */
-            if (esPaginaLogin) {
-                const perfil = payload.perfil.toLowerCase();
-                let destino = 'panel_usuario.php';
+    // 1. Bloqueo para entrar al Panel de Administrador
+    if (path.includes('panel_admin.php') && perfil !== 'administrador') {
+        let destino = (perfil === 'subdirector') ? 'panel_subdirector.php' : 'panel_usuario.php';
+        window.location.replace(destino + '?error=unauthorized');
+    }
 
-                if (perfil === 'administrador') {
-                    destino = 'panel_admin.php';
-                } else if (perfil === 'subdirector') {
-                    destino = 'panel_subdirector.php';
-                }
-                
-                window.location.href = destino;
-            }
+    // 2. Bloqueo para entrar al Panel de Subdirector
+    if (path.includes('panel_subdirector.php') && perfil !== 'subdirector') {
+        let destino = (perfil === 'administrador') ? 'panel_admin.php' : 'panel_usuario.php';
+        window.location.replace(destino + '?error=unauthorized');
+    }
+
+    // 3. Bloqueo para usuarios estándar intentando saltar rangos
+    if (path.includes('panel_usuario.php') && (perfil === 'administrador' || perfil === 'subdirector')) {
+        // Opcional: Si el admin entra a panel_usuario, mandarlo a su panel pro
+        let destino = (perfil === 'administrador') ? 'panel_admin.php' : 'panel_subdirector.php';
+        window.location.replace(destino);
+    }
+}
 
         } catch (e) {
             console.warn("Seguridad SIRA: Sesión inválida o expirada.", e.message);
