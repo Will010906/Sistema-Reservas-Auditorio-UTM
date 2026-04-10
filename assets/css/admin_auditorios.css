@@ -1,0 +1,132 @@
+
+    :root {
+        /* Colores sincronizados con tu sidebar.php */
+        --sira-purple-dark: #2D1B33;
+        --sira-purple-primary: #5B3D66;
+        --sira-purple-light: #F4EFFF;
+        --utm-gris-bg: #f8f9fa;
+    }
+.badge-sira-status {
+    background-color: #5B3D66 !important; /* El morado UTM */
+    color: white !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+
+.capacidad-info {
+    font-size: 0.85rem;
+    color: #5B3D66; /* Morado UTM */
+    font-weight: 700;
+}   
+
+    .capacidad-info i {
+        margin-right: 5px;
+    }
+
+    /* Ajuste para que el nombre y estatus queden en la misma línea */
+    .card-title-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    /* Tarjetas de Auditorio */
+    .auditorio-card {
+        border-radius: 20px;
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .auditorio-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(45, 27, 51, 0.1) !important;
+    }
+
+    /* Botón Principal (Nuevo Auditorio) y Guardar */
+    .btn-primary, .btn-guinda {
+        background-color: var(--sira-purple-primary) !important;
+        border-color: var(--sira-purple-primary) !important;
+        color: white !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover, .btn-guinda:hover {
+        background-color: var(--sira-purple-dark) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Botón Mantenimiento (Outline) */
+    .btn-outline-guinda {
+        color: var(--sira-purple-primary) !important;
+        border: 2px solid var(--sira-purple-primary) !important;
+        background-color: transparent !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem;
+    }
+
+    .btn-outline-guinda:hover {
+        background-color: var(--sira-purple-primary) !important;
+        color: white !important;
+    }
+
+    /* BLOQUE DE EQUIPAMIENTO MINIMALISTA */
+    .badge-minimal {
+        background-color: var(--utm-gris-bg);
+        color: var(--sira-purple-primary);
+        border: 1px solid #e9ecef;
+        padding: 2px 8px; /* Tamaño reducido */
+        border-radius: 4px;
+        font-size: 0.65rem; /* Fuente más pequeña */
+        font-weight: 600;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    /* Ajustes de texto sutiles */
+    .text-muted {
+        font-size: 0.8rem !important;
+    }
+
+    /**
+ * SISTEMA DE POSICIONAMIENTO SIRA
+ * Corrige el solapamiento del menú con las tarjetas
+ */
+
+/* 1. Ajuste del Contenedor de las Tarjetas */
+.main-content {
+    margin-left: 310px; /* Desplazamiento exacto para respetar el Sidebar */
+    padding: 40px;      /* Espacio interno para que no pegue a los bordes */
+    width: calc(100% - 310px); /* Ajusta el ancho para evitar scroll horizontal */
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+/* 2. Asegurar que el Sidebar no flote sobre el contenido */
+.side-bar {
+    z-index: 1040; /* Prioridad de capa para el menú */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.03); /* Sombra sutil para dar profundidad */
+}
+
+/* 3. Corrección del Grid de Auditorios */
+#contenedorAuditorios {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: 0;
+    margin-left: 0;
+}
+
+/* Responsividad: Si la pantalla es pequeña (Tablet) */
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 80px; /* Solo dejamos el espacio de la barra de iconos */
+        width: calc(100% - 80px);
+    }
+    .side-bar {
+        transform: translateX(-100%); /* Ocultamos la barra de texto */
+        transition: 0.3s;
+    }
+}

@@ -75,6 +75,50 @@
     scroll-behavior: smooth;
   }
 }
+#mainNav .container {
+    max-width: 95% !important; /* Expande logo a la izq y menú a la der */
+}
+#mainNav .nav-link {
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+#mainNav .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 50%;
+    background-color: var(--color-terciario); /* Color lila de tu paleta */
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+#mainNav .nav-link:hover::after {
+    width: 100%; /* La línea se expande al pasar el mouse */
+}
+
+#mainNav .nav-link:hover {
+    color: var(--color-lila) !important;
+}
+
+#catalogo .catalogo-item .catalogo-link .catalogo-hover {
+    background: none !important;
+    display: none !important; 
+}
+section#contacto .form-control {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    font-family: 'Inter', sans-serif;
+}
+
+section#contacto .form-control:focus {
+    border-color: #A684B3 !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
 
 body {
   margin: 0;

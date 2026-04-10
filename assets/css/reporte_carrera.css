@@ -1,0 +1,112 @@
+/**
+ * SIRA - UNIVERSIDAD TECNOLÓGICA DE MORELIA
+ * Hoja de estilos para Reportes Ejecutivos PDF
+ * @author Wilmer (UTM)
+ */
+
+/* Configuraciones de página para impresión PDF */
+@page { 
+    margin: 100px 50px; 
+}
+
+body { 
+    font-family: 'Helvetica', 'Arial', sans-serif; 
+    color: #333; 
+    font-size: 11px; 
+    line-height: 1.5;
+}
+
+/* --- Elementos Fijos (Header y Footer) --- */
+header { 
+    position: fixed; 
+    top: -70px; 
+    left: 0; 
+    right: 0; 
+    height: 80px; 
+    border-bottom: 2px solid #5B3D66; 
+}
+
+footer { 
+    position: fixed; 
+    bottom: -60px; 
+    left: 0; 
+    right: 0; 
+    height: 30px; 
+    font-size: 9px; 
+    text-align: center; 
+    color: #888; 
+    border-top: 1px solid #eee;
+    padding-top: 5px;
+}
+
+/* --- Identidad Visual --- */
+.logo { 
+    height: 55px; 
+    float: left; 
+}
+
+.info-header { 
+    float: right; 
+    text-align: right; 
+    margin-top: 5px; 
+}
+
+.title { 
+    text-align: center; 
+    font-size: 16px; 
+    font-weight: bold; 
+    color: #5B3D66; 
+    margin-top: 20px; 
+    clear: both; 
+    text-transform: uppercase;
+}
+
+/* --- Bloque de Resumen --- */
+.summary-box { 
+    background: #f4f0f7; 
+    padding: 15px; 
+    border-radius: 10px; 
+    margin-top: 20px; 
+    border: 1px solid #d4c2d9; 
+}
+
+.summary-box table { 
+    width: 100%; 
+    border: none; 
+}
+
+/* --- Tabla de Datos --- */
+table.data-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 25px; 
+}
+
+table.data-table th { 
+    background-color: #5B3D66; 
+    color: white; 
+    padding: 6px 4px; 
+    text-transform: uppercase; 
+    font-size: 9px; 
+    letter-spacing: 0.5px;
+}
+
+table.data-table td { 
+    padding: 6px; 
+    border-bottom: 1px solid #eee; 
+    text-align: center; 
+}
+
+/* Fila cebra para mejorar la lectura de datos */
+table.data-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.col-matricula {
+    width: 80px;
+}
+
+/* --- Semáforo de Estatus --- */
+.badge-aceptada { color: #2e7d32; font-weight: bold; }
+.badge-rechazada { color: #d32f2f; font-weight: bold; }
+.badge-pendiente { color: #f9a825; font-weight: bold; }

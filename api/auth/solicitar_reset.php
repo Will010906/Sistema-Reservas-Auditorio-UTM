@@ -1,11 +1,32 @@
 <?php
-// 1. Configuración de cabeceras (Solo debe haber una salida JSON)
+/**
+ * SIRA - SISTEMA INTEGRAL DE RESERVA DE AUDITORIOS
+ * * CONTROLADOR: SOLICITUD DE RECUPERACIÓN DE CONTRASEÑA
+ * * @package     Controladores_API
+ * @subpackage  Seguridad_Correo
+ * @version     1.1.0
+ * @copyright   2026 Universidad Tecnológica de Morelia
+ * * DESCRIPCIÓN TÉCNICA:
+ * Este servicio gestiona el inicio del flujo de recuperación de cuenta (Forgot Password).
+ * Realiza una validación de identidad, genera un identificador único temporal (Token)
+ * con expiración programada y despacha un correo electrónico institucional mediante
+ * el protocolo SMTP utilizando la librería PHPMailer.
+ * * SEGURIDAD:
+ * 1. Tokens Criptográficos: Generados con random_bytes para alta entropía.
+ * 2. Sentencias Preparadas: Protección contra Inyección SQL en consultas de usuario.
+ * 3. Bypass SSL Seguro: Configurado para compatibilidad con entornos de desarrollo locales (XAMPP).
+ */
+
+// Establecer cabecera para respuesta estrictamente en formato JSON
 header('Content-Type: application/json');
 
-// 2. Importar conexión y PHPMailer
-include("../../config/db_local.php");
-include("../../config/mail_config.php");
+/**
+ * IMPORTACIÓN DE RECURSOS Y LIBRERÍAS
+ */
+include("../../config/db_local.php");     // Conexión a la Base de Datos
+include("../../config/mail_config.php"); // Constantes de configuración SMTP
 
+// Carga de clases de PHPMailer (Manual, siguiendo estructura de archivos local)
 require '../../PHPMailer/src/Exception.php';
 require '../../PHPMailer/src/PHPMailer.php';
 require '../../PHPMailer/src/SMTP.php';
@@ -13,17 +34,22 @@ require '../../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// 3. Obtener datos del frontend
+/**
+ * 1. RECEPCIÓN DE DATOS DEL CLIENTE
+ */
 $data = json_decode(file_get_contents("php://input"), true);
 $correo = $data['correo'] ?? '';
 
 if (empty($correo)) {
-    echo json_encode(["success" => false, "error" => "Por favor, ingresa tu correo electrónico."]);
+    echo json_encode(["success" => false, "error" => "Por favor, ingresa tu correo institucional."]);
     exit();
 }
 
 try {
-    // 4. Verificar existencia del usuario
+    /**
+     * 2. VERIFICACIÓN DE IDENTIDAD INSTITUCIONAL
+     * Consulta la existencia del correo para prevenir el envío a cuentas inexistentes.
+     */
     $stmt = $conexion->prepare("SELECT nombre FROM usuarios WHERE correo_electronico = ?");
     $stmt->bind_param("s", $correo);
     $stmt->execute();
@@ -33,19 +59,29 @@ try {
         $usuario = $resultado->fetch_assoc();
         $nombre = $usuario['nombre'];
 
-        // 5. Generar Token y Expiración (1 hora)
+        /**
+         * 3. GENERACIÓN DE TOKEN DE SEGURIDAD
+         * @var string $token  Cadena hexadecimal de 40 caracteres (seguridad criptográfica).
+         * @var string $expira Marca de tiempo válida por 60 minutos.
+         */
         $token = bin2hex(random_bytes(20));
         $expira = date("Y-m-d H:i:s", strtotime('+1 hour'));
 
-        // 6. Actualizar Base de Datos con el Token
+        /**
+         * 4. PERSISTENCIA DEL TOKEN
+         * Almacena el token de recuperación vinculado a la cuenta del solicitante.
+         */
         $update = $conexion->prepare("UPDATE usuarios SET reset_token = ?, token_expira = ? WHERE correo_electronico = ?");
         $update->bind_param("sss", $token, $expira, $correo);
 
         if ($update->execute()) {
-            // 7. Configuración de Envío de Correo
+            
+            /**
+             * 5. CONFIGURACIÓN DEL MOTOR DE CORREO (SMTP)
+             */
             $mail = new PHPMailer(true);
 
-            // Configuración SMTP para Gmail/Outlook institucional
+            // Parámetros del Servidor SMTP
             $mail->isSMTP();
             $mail->Host       = SMTP_HOST;
             $mail->SMTPAuth   = true;
@@ -55,7 +91,11 @@ try {
             $mail->Port       = SMTP_PORT;
             $mail->CharSet    = 'UTF-8';
 
-            // Bypass para certificados SSL en XAMPP local
+            /**
+             * CONFIGURACIÓN SSL PARA ENTORNOS LOCALES
+             * Desactiva la verificación de pares para evitar fallos por falta de 
+             * certificados CA en entornos de desarrollo local (XAMPP/WAMP).
+             */
             $mail->SMTPOptions = array(
                 'ssl' => array(
                     'verify_peer' => false,
@@ -64,13 +104,17 @@ try {
                 )
             );
 
-            // Remitente y Destinatario
-           $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
+            // Definición de Intervinientes (Remitente y Destinatario)
+            $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
             $mail->addAddress($correo, $nombre);
 
-            // Contenido del Email
+            /**
+             * 6. CONSTRUCCIÓN DEL MENSAJE (MAQUETACIÓN HTML)
+             */
             $mail->isHTML(true);
             $mail->Subject = 'Restablecer Contraseña - SIRA UTM';
+            
+            // Definición de URL de acción (Ruta relativa al servidor local/remoto)
             $url = "http://localhost/RAUTM/restablecer.php?token=" . $token;
 
             $mail->Body = "
@@ -79,26 +123,43 @@ try {
                         <h2 style='color: #5B3D66;'>SIRA UTM</h2>
                     </div>
                     <p style='color: #333; font-size: 16px;'>Hola, <strong>$nombre</strong>,</p>
-                    <p style='color: #555;'>Recibimos una solicitud para restablecer tu contraseña. Si no fuiste tú, puedes ignorar este mensaje.</p>
+                    <p style='color: #555;'>Recibimos una solicitud para restablecer tu contraseña de acceso al sistema SIRA. Si no realizaste esta acción, ignora este mensaje.</p>
                     <div style='text-align: center; margin: 30px 0;'>
                         <a href='$url' style='background-color: #5B3D66; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>RESTABLECER MI CONTRASEÑA</a>
                     </div>
-                    <p style='color: #888; font-size: 12px; text-align: center;'>Este enlace expirará en 60 minutos.</p>
+                    <p style='color: #888; font-size: 12px; text-align: center;'>Este enlace es de uso único y expirará en un periodo de 60 minutos.</p>
                 </div>";
 
-            // 8. Enviar y responder
+            /**
+             * 7. DESPACHO DEL EMAIL Y RESPUESTA FINAL
+             */
             if ($mail->send()) {
-                echo json_encode(["success" => true, "message" => "El enlace ha sido enviado con éxito a tu correo institucional."]);
+                echo json_encode([
+                    "success" => true, 
+                    "message" => "El enlace de seguridad ha sido enviado a tu correo institucional con éxito."
+                ]);
             }
         } else {
-            echo json_encode(["success" => false, "error" => "Error al generar la solicitud de seguridad."]);
+            throw new Exception("Fallo en la actualización de seguridad en la base de datos.");
         }
     } else {
-        echo json_encode(["success" => false, "error" => "El correo ingresado no coincide con ningún registro."]);
+        echo json_encode([
+            "success" => false, 
+            "error"   => "El correo electrónico ingresado no coincide con los registros institucionales de la UTM."
+        ]);
     }
 } catch (Exception $e) {
-    // Si falla PHPMailer, capturamos el error específico
-    echo json_encode(["success" => false, "error" => "Error al enviar el correo: " . $mail->ErrorInfo]);
+    /**
+     * GESTIÓN DE EXCEPCIONES DE CORREO
+     * Captura errores específicos de PHPMailer (ej. credenciales SMTP inválidas).
+     */
+    echo json_encode([
+        "success" => false, 
+        "error"   => "Error técnico al procesar el envío: " . ($mail->ErrorInfo ?? $e->getMessage())
+    ]);
 } finally {
+    /**
+     * LIMPIEZA DE CONEXIÓN
+     */
     $conexion->close();
 }

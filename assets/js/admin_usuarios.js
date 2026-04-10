@@ -1,42 +1,65 @@
 /**
- * GESTIÓN DE USUARIOS - NIVEL TSU
- * Implementa: Async/Await, Seguridad JWT y Respuesta JSON
+ * SIRA - SISTEMA INTEGRAL DE RESERVA DE AUDITORIOS
+ * * MÓDULO: GESTIÓN DE USUARIOS Y CONTROL DE ACCESO (ADMIN)
+ * * @package     Frontend_Logic
+ * @subpackage  User_Management
+ * @version     2.5.0
+ * @copyright   2026 Universidad Tecnológica de Morelia
+ * * DESCRIPCIÓN TÉCNICA:
+ * Orquestador de operaciones CRUD (Create, Read, Update, Delete) para la entidad 'Usuarios'.
+ * Implementa un modelo de comunicación asíncrona mediante Fetch API, autenticación 
+ * persistente vía JWT (JSON Web Token) y renderizado reactivo del DOM.
  */
 
 /* global Swal, bootstrap */
 
-// --- BÚSQUEDA EN TIEMPO REAL (15% Filtros Útiles) ---
+/**
+ * 1. SUBSISTEMA DE BÚSQUEDA Y FILTRADO
+ * Implementa búsqueda predictiva en tiempo real sobre el set de datos cargado.
+ */
 document.getElementById('buscadorUsuarios')?.addEventListener('keyup', function() {
     let valor = this.value.toLowerCase();
     let filas = document.querySelectorAll('#tablaUsuarios tbody tr');
+    
     filas.forEach(fila => {
-        // Verifica si el texto de la fila contiene lo buscado
+        // Evaluación de coincidencia de texto en todas las celdas de la fila
         const coincide = fila.innerText.toLowerCase().includes(valor);
         fila.style.setProperty('display', coincide ? '' : 'none', 'important');
     });
 });
 
-// --- FUNCIONES DE INTERFAZ (Síncronas) ---
+/**
+ * 2. CONTROLADORES DE INTERFAZ (UI HANDLERS)
+ * Gestionan el estado de los modales y el mapeo de datos al formulario.
+ */
+
+/**
+ * Configura el formulario para la creación de una nueva identidad.
+ */
 function prepararNuevoUsuario() {
     const form = document.getElementById('formUsuario');
     if (!form) return;
     
     document.getElementById('tituloModalUsuario').innerText = 'Registrar Nuevo Usuario';
-    // CORRECCIÓN: Ruta unificada
     form.action = 'api/admin/gestion_usuarios.php'; 
     form.reset();
 
+    // Reset visual de bloques de datos obligatorios
     if (document.getElementById('bloque_matricula')) document.getElementById('bloque_matricula').style.display = 'block';
     if (document.getElementById('bloque_password')) document.getElementById('bloque_password').style.display = 'block';
 
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUsuario')).show();
 }
 
+/**
+ * Mapea los metadatos de un usuario existente al formulario de edición.
+ * @param {Object} user - Entidad usuario recuperada de la base de datos.
+ */
 function editarUsuario(user) {
     document.getElementById('tituloModalUsuario').innerText = 'Editar Usuario';
-    // CORRECCIÓN: Ruta unificada para que el submit sepa a dónde ir
     document.getElementById('formUsuario').action = 'api/admin/gestion_usuarios.php';
 
+    // Inyección de valores en los campos del DOM
     document.getElementById('user_id').value = user.id_usuario || '';
     document.getElementById('user_nombre').value = user.nombre || '';
     document.getElementById('user_correo').value = user.correo_electronico || '';
@@ -45,21 +68,27 @@ function editarUsuario(user) {
     document.getElementById('user_carrera').value = user.carrera_area || '';
     document.getElementById('user_perfil').value = user.perfil || '';
 
+    // Lógica de visualización: En edición no se expone la contraseña por seguridad
     if (document.getElementById('bloque_matricula')) document.getElementById('bloque_matricula').style.display = 'block';
     if (document.getElementById('bloque_password')) document.getElementById('bloque_password').style.display = 'none';
 
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUsuario')).show();
 }
 
-// --- FUNCIONES DE COMUNICACIÓN (40% CRUD + 30% JWT) ---
+/**
+ * 3. SUBSISTEMA DE COMUNICACIÓN ASÍNCRONA (CRUD + JWT)
+ * Orquesta las peticiones HTTP hacia la API unificada.
+ */
 
 /**
- * ELIMINACIÓN ASÍNCRONA
+ * Ejecuta la eliminación lógica/física de un usuario mediante método DELETE.
+ * @async
+ * @param {number} id - Identificador único del usuario.
  */
 async function eliminarUsuario(id) {
     const result = await Swal.fire({
-        title: '¿Eliminar usuario?',
-        text: "Esta acción es permanente y no se puede deshacer.",
+        title: '¿Confirmar eliminación?',
+        text: "Esta acción revocará permanentemente el acceso del usuario al sistema.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -70,7 +99,6 @@ async function eliminarUsuario(id) {
 
     if (result.isConfirmed) {
         try {
-            // USAMOS 'token' que es el nombre que definiste en tu bloqueo de seguridad
             const tokenSeguridad = localStorage.getItem('token'); 
 
             const response = await fetch('api/admin/gestion_usuarios.php', {
@@ -79,7 +107,6 @@ async function eliminarUsuario(id) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${tokenSeguridad}`
                 },
-                // ENVIAMOS exactamente id_usuario como lo espera el PHP
                 body: JSON.stringify({ id_usuario: parseInt(id) }) 
             });
 
@@ -93,42 +120,42 @@ async function eliminarUsuario(id) {
                 Swal.fire('Error', data.error, 'error');
             }
         } catch (error) {
-            console.error("Error en el catch:", error);
-            Swal.fire('Error', 'No se pudo conectar con el backend o el servidor falló.', 'error');
+            Swal.fire('Fallo de Red', 'No se pudo sincronizar con el servidor institucional.', 'error');
         }
     }
 }
 
 /**
- * FUNCIÓN PARA MANEJAR EL GUARDADO (NUEVO/EDITAR) VÍA FETCH
+ * MANEJADOR DE TRANSACCIONES (POST/PUT)
+ * Intercepta el evento submit para procesar el registro o actualización vía JSON.
  */
 document.getElementById('formUsuario')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     
-// Dentro del evento 'submit' de tu formUsuario
-const formData = new FormData(this);
-const idInput = document.getElementById('user_id').value;
+    const formData = new FormData(this);
+    const idInput = document.getElementById('user_id').value;
 
-// Construimos el objeto asegurando que no haya valores nulos extraños
-const datos = {
-    id_usuario: idInput ? idInput.toString() : null, // Convertimos a string para el PHP
-    nombre: formData.get('nombre').trim(),
-    matricula: formData.get('matricula').trim(),
-    telefono: formData.get('telefono').trim(),
-    correo_electronico: formData.get('correo_electronico').trim(),
-    carrera_area: formData.get('carrera_area'),
-    perfil: formData.get('perfil'),
-    password: formData.get('password') || "" // Enviamos cadena vacía si no hay cambio
-};
+    // Construcción del DTO (Data Transfer Object)
+    const datos = {
+        id_usuario: idInput ? idInput.toString() : null,
+        nombre: formData.get('nombre').trim(),
+        matricula: formData.get('matricula').trim(),
+        telefono: formData.get('telefono').trim(),
+        correo_electronico: formData.get('correo_electronico').trim(),
+        carrera_area: formData.get('carrera_area'),
+        perfil: formData.get('perfil'),
+        password: formData.get('password') || "" 
+    };
 
-const metodo = datos.id_usuario ? 'PUT' : 'POST';
+    // Determinación dinámica del verbo HTTP basado en la presencia de ID
+    const metodo = datos.id_usuario ? 'PUT' : 'POST';
 
     try {
         const response = await fetch('api/admin/gestion_usuarios.php', {
             method: metodo,
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}` // Usa 'token'
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify(datos)
         });
@@ -139,37 +166,17 @@ const metodo = datos.id_usuario ? 'PUT' : 'POST';
         if (data.success) {
             Swal.fire('¡Éxito!', data.message, 'success').then(() => location.reload());
         } else {
-            Swal.fire('Error', data.error, 'error');
+            Swal.fire('Validación', data.error, 'error');
         }
     } catch (error) {
-        Swal.fire('Error', 'Error al procesar la solicitud.', 'error');
+        Swal.fire('Error', 'Fallo crítico al procesar la solicitud.', 'error');
     }
 });
 
-function manejarSesionExpirada() {
-    // CORRECCIÓN: Usamos el nombre 'token' para ser consistentes con el resto del JS
-    localStorage.removeItem('token'); 
-    Swal.fire({
-        title: 'Sesión Expirada',
-        text: 'Por seguridad, inicia sesión nuevamente.',
-        icon: 'error',
-        confirmButtonColor: '#5B3D66'
-    }).then(() => window.location.href = 'login.php');
-}
 /**
- * CARGA DINÁMICA DE USUARIOS - SIRA UTM
- */
-/**
- * CARGA DINÁMICA DE USUARIOS
- * Elimina el spinner y renderiza la tabla con datos reales.
- */
-/**
- * CARGA DINÁMICA DE USUARIOS - SIRA UTM
- * Obtiene los datos del backend y genera las filas de la tabla.
- */
-/**
- * CARGA DINÁMICA DE USUARIOS - SIRA UTM
- * Obtiene los datos del backend y genera las filas de la tabla.
+ * 4. SUBSISTEMA DE RENDERIZADO DINÁMICO
+ * Consume la API mediante GET y reconstruye la tabla de usuarios.
+ * @async
  */
 async function cargarUsuarios() {
     const cuerpoTabla = document.getElementById("listaUsuariosBody");
@@ -187,55 +194,67 @@ async function cargarUsuarios() {
         cuerpoTabla.innerHTML = ""; 
 
         if (data.length === 0) {
-            cuerpoTabla.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No se encontraron usuarios.</td></tr>';
+            cuerpoTabla.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No existen registros en la base de datos.</td></tr>';
             return;
         }
 
-     data.forEach(user => {
-    const iniciales = user.nombre ? user.nombre.split(' ').map(n => n[0]).join('').substring(0, 2) : '??';
-    
-    // Asignamos una clase única por rol para el color de fondo personalizado
-    const roleClass = {
-        'administrador': 'sira-badge-admin',
-        'subdirector': 'sira-badge-sub',
-        'docente': 'sira-badge-doc',
-        'alumno': 'sira-badge-alu'
-    }[user.perfil.toLowerCase()] || 'bg-light text-dark';
+        data.forEach(user => {
+            // Generación de Iniciales para Avatar mediante manipulación de strings
+            const iniciales = user.nombre ? user.nombre.split(' ').map(n => n[0]).join('').substring(0, 2) : '??';
+            
+            // Mapeo de Identidad Visual por Rol
+            const roleClass = {
+                'administrador': 'sira-badge-admin',
+                'subdirector': 'sira-badge-sub',
+                'docente': 'sira-badge-doc',
+                'alumno': 'sira-badge-alu'
+            }[user.perfil.toLowerCase()] || 'bg-light text-dark';
 
-    cuerpoTabla.innerHTML += `
-        <tr>
-            <td class="ps-4">
-                <div class="d-flex align-items-center">
-                    <div class="avatar-circle-sm me-3">${iniciales}</div>
-                    <div>
-                        <div class="fw-bold text-dark" style="font-size: 0.9rem;">${user.nombre}</div>
-                        <div class="text-muted x-small">${user.correo_electronico}</div>
-                    </div>
-                </div>
-            </td>
-            <td><code class="fw-bold text-primary" style="font-size:0.75rem;">${user.matricula || 'N/A'}</code></td>
-            <td><span class="text-muted small">${user.telefono || '---'}</span></td>
-            <td><span class="small text-muted">${user.carrera_area}</span></td>
-            
-            <td><span class="badge ${roleClass} text-uppercase px-3 py-1" style="font-size: 0.6rem; border-radius:10px;">${user.perfil}</span></td>
-            
-            <td class="text-center">
-                <div class="btn-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
-                    <button class="btn btn-sm btn-white border-end" onclick='editarUsuario(${JSON.stringify(user)})'>
-                        <i class="bi bi-pencil-square text-primary"></i>
-                    </button>
-                    <button class="btn btn-sm btn-white" onclick="eliminarUsuario(${user.id_usuario})">
-                        <i class="bi bi-trash3 text-danger"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>`;
-});
+            // Inyección de fragmento HTML enriquecido
+            cuerpoTabla.innerHTML += `
+                <tr>
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle-sm me-3">${iniciales}</div>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size: 0.9rem;">${user.nombre}</div>
+                                <div class="text-muted x-small">${user.correo_electronico}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code class="fw-bold text-primary" style="font-size:0.75rem;">${user.matricula || 'N/A'}</code></td>
+                    <td><span class="text-muted small">${user.telefono || '---'}</span></td>
+                    <td><span class="small text-muted">${user.carrera_area}</span></td>
+                    <td><span class="badge ${roleClass} text-uppercase px-3 py-1" style="font-size: 0.6rem; border-radius:10px;">${user.perfil}</span></td>
+                    <td class="text-center">
+                        <div class="btn-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
+                            <button class="btn btn-sm btn-white border-end" onclick='editarUsuario(${JSON.stringify(user)})'>
+                                <i class="bi bi-pencil-square text-primary"></i>
+                            </button>
+                            <button class="btn btn-sm btn-white" onclick="eliminarUsuario(${user.id_usuario})">
+                                <i class="bi bi-trash3 text-danger"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
     } catch (error) {
-        cuerpoTabla.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Error de conexión.</td></tr>';
+        cuerpoTabla.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Error de conexión con el servicio de datos.</td></tr>';
     }
 }
 
-// Inicializar carga al abrir la página o al refrescar el DOM
-document.addEventListener("DOMContentLoaded", cargarUsuarios);
+/**
+ * 5. SEGURIDAD Y CONTROL DE SESIÓN
+ */
+function manejarSesionExpirada() {
+    localStorage.removeItem('token'); 
+    Swal.fire({
+        title: 'Sesión Expirada',
+        text: 'Por motivos de seguridad institutional, su sesión ha finalizado. Por favor, reingrese sus credenciales.',
+        icon: 'error',
+        confirmButtonColor: '#5B3D66'
+    }).then(() => window.location.href = 'login.php');
+}
 
+// Inicialización de la carga de datos al completar el ciclo de vida del DOM
+document.addEventListener("DOMContentLoaded", cargarUsuarios);

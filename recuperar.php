@@ -27,7 +27,7 @@
                 ENVIAR ENLACE
             </button>
             <div class="mt-4">
-                <a href="index.php" class="small text-muted text-decoration-none">← Volver al login</a>
+                <a href="login.php" class="small text-muted text-decoration-none">← Volver al login</a>
             </div>
         </form>
     </div>

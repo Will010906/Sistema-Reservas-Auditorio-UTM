@@ -1,0 +1,1 @@
+<link rel="icon" type="image/png" href="assets/img/logo_app_web_RA.png">

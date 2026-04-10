@@ -1,8 +1,15 @@
 <?php
 
 /**
- * PANEL DE ADMINISTRACIÓN - SIRA UTM 
- * Ajustado para coincidir con los IDs de admin_interactivo.js
+ * SIRA - DASHBOARD ADMINISTRATIVO 
+ * * MÓDULO: NÚCLEO DE GESTIÓN Y ANALÍTICA
+ * * @package     Frontend_Admin
+ * @subpackage  Dashboard_Controller
+ * @version     4.2.0
+ * @copyright   2026 Universidad Tecnológica de Morelia
+ * * DESCRIPCIÓN:
+ * Centraliza las herramientas de dictamen, monitoreo de indicadores de urgencia
+ * y auditoría de reservaciones de auditorios.
  */
 include 'config/db_local.php';
 ?>
@@ -53,20 +60,20 @@ include 'config/db_local.php';
                 </div>
             </div>
             <div class="col">
-        <div class="card-sira bg-pen">
-            <h6>Demoradas</h6>
-            <div class="count" id="countDemoradas">0</div> 
-            <i class="bi bi-clock-history watermark"></i>
-        </div>
-    </div>
+                <div class="card-sira bg-pen">
+                    <h6>Demoradas</h6>
+                    <div class="count" id="countDemoradas">0</div>
+                    <i class="bi bi-clock-history watermark"></i>
+                </div>
+            </div>
 
-    <div class="col">
-        <div class="card-sira bg-ont">
-            <h6>A Tiempo</h6>
-            <div class="count" id="countAtiempo">0</div>
-            <i class="bi bi-check2-circle watermark"></i>
-        </div>
-    </div>
+            <div class="col">
+                <div class="card-sira bg-ont">
+                    <h6>A Tiempo</h6>
+                    <div class="count" id="countAtiempo">0</div>
+                    <i class="bi bi-check2-circle watermark"></i>
+                </div>
+            </div>
             <div class="col">
                 <div class="card-sira bg-acc">
                     <h6>Aceptadas</h6>
@@ -134,15 +141,20 @@ include 'config/db_local.php';
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="tablaSolicitudes" style="font-size: 0.85rem;">
                    <thead class="table-light">
-    <tr class="small text-muted text-uppercase">
-        <th class="ps-4">Usuario</th>
-        <th>Matrícula</th>
-        <th>Teléfono</th>
-        <th>Área / Carrera</th>
-        <th>Rol</th>
-        <th class="text-center">Acciones</th>
-    </tr>
-</thead>
+                <tr class="small text-muted text-uppercase">
+                    <th class="ps-4">Folio</th> 
+                    
+                    <th>Evento</th> 
+                    
+                    <th class="text-center">Auditorio</th> 
+                    
+                    <th class="text-center">Fecha</th> 
+                    
+                    <th class="text-center">Estado</th> 
+                    
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
                     <tbody id="contenedorSolicitudes">
                         <tr>
                             <td colspan="6" class="text-center py-5">
@@ -156,17 +168,17 @@ include 'config/db_local.php';
         </div>
     </div>
 
-   <?php include 'includes/modal_detalle.php'; ?>
-    <?php include 'includes/modal_reservacion.php'; ?> 
+    <?php include 'includes/modal_detalle.php'; ?>
+    <?php include 'includes/modal_reservacion.php'; ?>
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
     <script src="assets/js/usuario_reservas.js"></script>
-    
+
     <script src="assets/js/admin_interactivo.js"></script>
-    
+
     <link rel="stylesheet" href="assets/css/style.css">
 </body>
 

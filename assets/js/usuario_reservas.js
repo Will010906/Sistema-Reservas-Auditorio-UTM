@@ -36,62 +36,74 @@ $(document).ready(function () {
     cargarMisReservaciones();
 
     // --- 3. FILTRADO POR CHECKBOXES (DATATABLES) ---
-    $(document).on('change', '.check-filtro', function () {
-        const table = $('#tablaMisReservas').DataTable();
-        let seleccionados = [];
-        
-        $('.check-filtro:checked').each(function () { 
-            seleccionados.push($(this).val()); 
-        });
-        
-        // Creamos una expresión regular para filtrar múltiples estatus
-        const regex = seleccionados.length > 0 ? '^(' + seleccionados.join('|') + ')$' : '';
-        table.column(4).search(regex, true, false).draw();
-    });
+ 
 });
 
 /**
  * 1. CARGA DE TABLA
+ */
+/**
+ * SINCRONIZACIÓN DE HISTORIAL ACADÉMICO
+ * @async
+ * @description Recupera el listado de solicitudes del usuario autenticado 
+ * y reconstruye la interfaz de seguimiento (Grid y KPIs).
  */
 async function cargarMisReservaciones() {
     const contenedor = document.getElementById("contenedorMisReservas");
     if (!contenedor) return;
 
     try {
+        // Ejecución de la consulta al endpoint de trámites personales
         const response = await fetch('api/solicitudes/get_mis_reservas.php', {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}` }
         });
+
+        // Verificación de integridad de la sesión en el cliente
         if (response.status === 401) return window.manejarSesionExpirada();
+        
         const data = await response.json();
         
-        if ($.fn.DataTable.isDataTable('#tablaMisReservas')) $('#tablaMisReservas').DataTable().destroy();
-        contenedor.innerHTML = ""; 
+        // Control de concurrencia: Destrucción de instancia previa de DataTable
+        if ($.fn.DataTable.isDataTable('#tablaMisReservas')) {
+            $('#tablaMisReservas').DataTable().destroy();
+        }
+        
+        contenedor.innerHTML = ""; // Limpieza del Skeleton Loading
 
         if (data.success && data.solicitudes.length > 0) {
             data.solicitudes.forEach(sol => {
+                // LÓGICA DE NEGOCIO: Determinación de mutabilidad del trámite
                 const esEditable = sol.estado.toUpperCase() === 'PENDIENTE';
+                
                 contenedor.innerHTML += `
-                    <tr>
+                    <tr class="solicitud-fila animate__animated animate__fadeIn">
                         <td class="ps-4 fw-bold" style="color: #5B3D66;">#${sol.folio}</td>
                         <td>
                             <div class="fw-bold">${sol.titulo_event}</div>
                             <div class="text-muted x-small">${sol.nombre_espacio}</div>
                         </td>
-                        <td><span class="badge rounded-pill bg-light text-dark border px-3">${sol.nombre_espacio}</span></td>
+                        <td>
+                            <span class="badge rounded-pill bg-light text-dark border px-3">
+                                ${sol.nombre_espacio}
+                            </span>
+                        </td>
                         <td class="fw-bold text-muted">${sol.fecha_evento}</td>
                         <td class="text-center">
-                            <span class="badge-status st-${sol.estado.toLowerCase()} shadow-sm">${sol.estado}</span>
+                            <span class="badge-status st-${sol.estado.toLowerCase()} shadow-sm">
+                                ${sol.estado}
+                            </span>
                         </td>
                         <td class="text-center">
                             <div class="btn-group">
-                                <button class="btn btn-sm btn-light border" onclick="window.verDetalleUsuario(${sol.id_solicitud})" title="Ver Detalle">
+                                <button class="btn btn-sm btn-light border" onclick="window.verDetalleUsuario(${sol.id_solicitud})">
                                     <i class="bi bi-eye-fill text-primary"></i>
                                 </button>
+                                
                                 ${esEditable ? `
-                                    <button class="btn btn-sm btn-light border" onclick="window.editarMiSolicitud(${sol.id_solicitud})" title="Editar">
+                                    <button class="btn btn-sm btn-light border" onclick="window.editarMiSolicitud(${sol.id_solicitud})">
                                         <i class="bi bi-pencil-square text-warning"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-light border" onclick="window.cancelarMiSolicitud(${sol.id_solicitud})" title="Cancelar">
+                                    <button class="btn btn-sm btn-light border" onclick="window.cancelarMiSolicitud(${sol.id_solicitud})">
                                         <i class="bi bi-trash3 text-danger"></i>
                                     </button>` : ''}
                             </div>
@@ -99,19 +111,28 @@ async function cargarMisReservaciones() {
                     </tr>`;
             });
             
+            // RE-INICIALIZACIÓN DEL DATA GRID PROFESIONAL
             $('#tablaMisReservas').DataTable({
-                retrieve: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
-                dom: 'rtip', pageLength: 10, order: [[0, "desc"]],
-                columnDefs: [{ targets: [5], orderable: false }]
+                retrieve: true,
+                language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
+                dom: 'rtip', // Solo tabla, información y paginación
+                pageLength: 10,
+                order: [[0, "desc"]], // Prioridad a folios recientes
+                columnDefs: [{ targets: [5], orderable: false }] // Bloqueo de orden en acciones
             });
 
+            /** * ACTUALIZACIÓN DE INDICADORES (KPIs)
+             * Sincronización de contadores tras el renderizado exitoso.
+             */
             if (data.stats) {
                 document.getElementById("countPendientes").innerText = data.stats.pendientes || 0;
                 document.getElementById("countAprobadas").innerText = data.stats.aprobadas || 0;
                 document.getElementById("countRechazadas").innerText = data.stats.rechazadas || 0;
             }
         }
-    } catch (error) { console.error("Error al cargar reservaciones", error); }
+    } catch (error) { 
+        console.error("Falla crítica en la sincronización de reservaciones:", error); 
+    }
 }
 
 /**
@@ -251,27 +272,18 @@ function generarGridHorarios(ocupados) {
 $(document).on('submit', '#formNuevaReservacion', async function(e) {
     e.preventDefault(); 
     
-    // 1. Obtenemos el ID del input oculto
     const idEditando = $('#id_editando').val();
-    console.log("ID detectado:", idEditando || "Ninguno (Es nueva reservación)");
-
-    // 2. VALIDACIÓN INTELIGENTE:
-    // Solo exigimos ID si el título del modal indica una modificación
-    const esEdicion = $('#modalNuevaSolicitud .modal-title').text().includes('Modificar');
+    const esEdicion = $('#modalNuevaSolicitud .modal-title').text().includes('Modificar') || 
+                      $('#modalNuevaSolicitud .modal-title').text().includes('Reasignar');
     
     if (esEdicion && !idEditando) {
         return Swal.fire('Error', 'No se detectó el ID de la reservación para editar.', 'error');
     }
 
-    // 3. Definimos el método según la existencia del ID
     const metodo = idEditando ? 'PUT' : 'POST';
-
-    // 4. Recolectamos extras de los checkboxes (Laptop/Grabación)
     const checks = Array.from(document.querySelectorAll('input[name="extras[]"]:checked')).map(el => el.value);
-    // Recolectamos el texto manual del input "otros_servicios"
     const textoExtra = $('input[name="otros_servicios"]').val().trim();
     
-    // Unificamos ambos en una sola cadena para la base de datos
     let totalServicios = [...checks];
     if (textoExtra) totalServicios.push(textoExtra);
     const serviciosFinales = totalServicios.join(', ') || 'Sin requerimientos extras';
@@ -285,7 +297,7 @@ $(document).on('submit', '#formNuevaReservacion', async function(e) {
         hora_fin:     $('#input_hora_fin').val(),
         titulo:       $('input[name="titulo"]').val(),
         descripcion:  $('textarea[name="descripcion"]').val(),
-        otros_servicios: serviciosFinales // Enviamos la cadena unificada
+        otros_servicios: serviciosFinales 
     };
 
     try {
@@ -299,13 +311,36 @@ $(document).on('submit', '#formNuevaReservacion', async function(e) {
         });
 
         const result = await res.json();
+
         if (result.success) {
-            Swal.fire({ title: '¡Éxito!', text: result.message || 'Operación completada.', icon: 'success' }).then(() => {
-                bootstrap.Modal.getInstance(document.getElementById('modalNuevaSolicitud')).hide();
+            /**
+             * SOLUCIÓN AL ERROR VISUAL:
+             * 1. Cerramos el modal primero para liberar el z-index.
+             */
+            const modalElem = document.getElementById('modalNuevaSolicitud');
+            const instance = bootstrap.Modal.getInstance(modalElem);
+            if (instance) instance.hide();
+
+            /**
+             * 2. Limpieza agresiva del DOM para que el SweetAlert sea visible.
+             */
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '0';
+
+            /**
+             * 3. Ahora el recuadrito de éxito saldrá al frente sin problemas.
+             */
+            Swal.fire({ 
+                title: '¡Éxito!', 
+                text: result.message || 'Operación completada.', 
+                icon: 'success',
+                confirmButtonColor: '#5B3D66'
+            }).then(() => {
                 location.reload(); 
             });
         } else {
-            // Si el servidor dice "No se realizaron cambios", es por el estado o falta de cambios reales
             Swal.fire('Atención', result.error, 'warning');
         }
     } catch (error) {
@@ -666,27 +701,34 @@ window.manejarSesionExpirada = function() {
 /**
  * LÓGICA DE FILTRADO DINÁMICO POR CHECKBOXES
  */
+// --- MOTOR DE FILTRADO TÁCTICO SIRA (ESCANEO TOTAL) ---
+// --- MOTOR DE FILTRADO TÁCTICO SIRA (ESCANEO TOTAL) ---
 $(document).on('change', '.check-filtro', function () {
     const table = $('#tablaMisReservas').DataTable();
-    let seleccionados = [];
+    
+    // 1. Limpiamos cualquier rastro de filtros anteriores
+    $.fn.dataTable.ext.search = [];
 
-    // 1. Capturamos los valores (Pendiente, Aceptada, Rechazada)
-    $('.check-filtro:checked').each(function () {
-        seleccionados.push($(this).val());
-    });
+    // 2. Capturamos lo que el usuario marcó (Normalizado: MAYÚSCULAS y sin 'S')
+    const seleccionados = $('.check-filtro:checked').map(function() {
+        return $(this).val().toUpperCase().replace(/S$/, '').trim();
+    }).get();
 
+    console.log("Filtros UTM activos:", seleccionados);
+
+    // 3. Si hay algo seleccionado, aplicamos el escáner de fila
     if (seleccionados.length > 0) {
-        // Creamos la regex: (Pendiente|Aceptada|Rechazada)
-        // Usamos búsqueda inteligente para que ignore los <span> del badge
-        const regex = seleccionados.join('|');
-        
-        table.column(4) // Columna ESTATUS
-             .search(regex, true, false) 
-             .draw();
-    } else {
-        // Si no hay nada marcado, limpiamos la columna
-        table.column(4).search('').draw();
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            // Unimos todo el texto de la fila (Folio, Título, Auditorio, Estatus)
+            const textoCompletoFila = data.join(" ").toUpperCase();
+            
+            // Si alguna palabra seleccionada está en el texto de la fila, se muestra.
+            return seleccionados.some(s => textoCompletoFila.includes(s));
+        });
     }
+
+    // 4. Redibujamos la tabla
+    table.draw();
 });
 
 // Ejemplo de cómo cargar los datos al saltar al formulario
@@ -699,18 +741,25 @@ window.prepararFormularioFinal = function(datosAuditorio) {
     document.getElementById('equipamiento_incluido_txt').innerText = datosAuditorio.equipamiento_fijo || 'Sin equipamiento fijo registrado.';
 };
 /**
- * LIMPIAR FILTROS (Botón Negro)
+ * RESTAURACIÓN DE VISTA ORIGINAL SIRA
+ * @description Desactiva filtros activos y reinicia el motor de búsqueda de DataTables.
  */
 window.limpiarFiltros = function() {
-    // 1. Desmarcar checkboxes
+    // 1. Desmarcar físicamente todos los checkboxes de la interfaz
     $('.check-filtro').prop('checked', false);
     
-    // 2. Resetear DataTables
+    // 2. LIMPIEZA DE MOTOR: Vaciamos el array de búsqueda personalizada
+    // Esto es vital para que la tabla "vuelva a mirar" todos los registros.
+    $.fn.dataTable.ext.search = [];
+    
+    // 3. RESET DE DATATABLES: Limpiamos búsquedas internas y redibujamos
     const table = $('#tablaMisReservas').DataTable();
     table.search('').columns().search('').draw();
     
-    // 3. Opcional: Recargar los contadores de las cards
+    // 4. OPCIONAL: Sincronizamos KPIs por si hubo cambios en el servidor
     cargarMisReservaciones();
+
+    console.log("Sinergia restaurada: Filtros eliminados.");
 };
 
 window.guardarCierre = async function(id) {
@@ -769,44 +818,39 @@ window.limpiarSeleccionHorario = function() {
     $('.fc-day').removeClass('bg-primary bg-opacity-10');
 };
 
+/**
+ * RESETEO INTEGRAL DE LA CAPA DE TEMPORALIDAD
+ * Limpia los ruidos visuales para evitar colisiones con el Dashboard.
+ */
 function resetearInterfazHorarios() {
-    // 1. Limpiar variables lógicas
+    // 1. Reiniciar estados lógicos
     horaInicioSeleccionada = null;
 
-    // 2. Limpiar inputs visuales
-    const fechaDisplay = document.getElementById('fecha_display');
-    const inputFecha = document.getElementById('input_fecha_evento');
-    const inputInicio = document.getElementById('input_hora_inicio');
-    const inputFin = document.getElementById('input_hora_fin');
-    const grid = document.getElementById('grid_horarios');
+    // 2. Limpiar inputs del formulario
+    const campos = ['fecha_display', 'input_fecha_evento', 'input_hora_inicio', 'input_hora_fin'];
+    campos.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
 
+    // 3. Ocultar y vaciar la grid de horas
+    const grid = document.getElementById('grid_horarios');
     if (grid) {
-        // Forzamos a que se oculte de nuevo
         grid.style.setProperty('display', 'none', 'important');
         grid.innerHTML = ""; 
     }
-    
 
-    if(fechaDisplay) fechaDisplay.value = "";
-    if(inputFecha) inputFecha.value = "";
-    if(inputInicio) inputInicio.value = "";
-    if(inputFin) inputFin.value = "";
+    /** * CORRECCIÓN DE SINERGIA:
+     * Apuntamos EXCLUSIVAMENTE al ID del modal para no secuestrar la tarjeta naranja.
+     */
+    const txtResumen = document.getElementById('modal_ayuda_calendario'); // ID BLINDADO
+    if (txtResumen) {
+        txtResumen.innerText = "Selecciona un día para ver bloques";
+    }
 
-    // 3. Resetear textos y botón
-    const txtResumen = document.getElementById('fecha_seleccionada_txt');
     const btnConfirmar = document.getElementById('btnConfirmarHorario');
-    const labelHorario = document.querySelector('.bi-clock-history')?.parentElement;
+    if (btnConfirmar) btnConfirmar.disabled = true;
 
-    if(labelHorario) labelHorario.innerHTML = '<i class="bi bi-clock-history me-1"></i> Selecciona un día para ver bloques';
-    
-    if(txtResumen) txtResumen.innerText = "Selecciona un día para ver bloques";
-    if(btnConfirmar) btnConfirmar.disabled = true;
-
-    // 4. Quitar el color morado de los botones
-    document.querySelectorAll('.btn-horario').forEach(btn => {
-        btn.classList.remove('activo');
-    });
-
-    // 5. Limpiar selección visual en el calendario (FullCalendar)
+    // 4. Limpiar rastro visual en el calendario
     $('.fc-day').removeClass('bg-primary bg-opacity-10');
 }

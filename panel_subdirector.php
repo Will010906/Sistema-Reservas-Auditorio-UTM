@@ -1,4 +1,12 @@
 <?php
+/**
+ * SIRA - SUPERVISIÓN ACADÉMICA (SUBDIRECTORES)
+ * * MÓDULO: NÚCLEO DE MÉTRICAS Y AUDITORÍA DE CARRERA
+ * * @package     Frontend_Admin
+ * @subpackage  Subdirector_Dashboard
+ * @version     1.5.0
+ * @copyright   2026 Universidad Tecnológica de Morelia
+ */
 include("config/db_local.php");
 ?>
 <!DOCTYPE html>
@@ -14,63 +22,14 @@ include("config/db_local.php");
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
+    <link rel="stylesheet" href="assets/css/panel_subdirector.css?v=1.2">
     <script>
         const tokenSira = localStorage.getItem('sira_session_token');
         if (!tokenSira) { window.location.href = 'login.php?error=expired'; }
         const payload = JSON.parse(atob(tokenSira.split('.')[1]));
     </script>
 
-    <style>
-        :root { 
-            --sira-purple: #5B3D66; 
-            --sira-purple-dark: #3a2741;
-            --sira-bg: #f8f9fa;
-        }
-
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--sira-bg); color: var(--sira-purple-dark); }
-        .fw-800 { font-weight: 800; }
-        .navbar-sira { background-color: white; border-bottom: 1px solid #eee; padding: 0.8rem 2rem; }
-
-        /* KPI Cards y Layout */
-        .card-kpi { border: none; border-radius: 24px; transition: all 0.3s ease; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border-left: 6px solid transparent; min-height: 120px; display: flex; align-items: center; padding: 1.5rem !important; }
-        .border-sira-primary { border-left-color: var(--sira-purple); }
-        .border-sira-warning { border-left-color: #ffc107; }
-        .border-sira-success { border-left-color: #2e7d32; }
-
-        /* CORRECCIÓN: Visibilidad de textos */
-        .badge-subdirector {
-            background-color: #f4f0f7;
-            color: var(--sira-purple) !important; /* Forzamos color para que no se pierda */
-            font-size: 0.6rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            padding: 5px 10px;
-            border-radius: 6px;
-        }
-
-        /* CORRECCIÓN: Folios legibles */
-        .folio-sira {
-    background-color: #f4f0f7; /* Un moradito muy claro de fondo */
-    color: #5B3D66 !important;  /* El morado oscuro oficial para el texto */
-    border: 1px solid rgba(91, 61, 102, 0.2);
-    font-weight: 800;
-    padding: 6px 12px;
-    border-radius: 8px;
-    display: inline-block;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
-
-        .icon-box { width: 60px; height: 60px; min-width: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: #f4f0f7; color: var(--sira-purple); }
-        .kpi-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #888; letter-spacing: 1px; }
-        .kpi-value { font-size: 2.2rem; font-weight: 800; line-height: 1; }
-
-        .card-table { border-radius: 24px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.03); background: white; }
-        .table thead th { background-color: #fcfcfc; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; font-weight: 800; color: #999; padding: 1.2rem 1rem; border-bottom: 2px solid #f4f0f7; }
-        
-        .badge-status { padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 0.65rem; }
-    </style>
+    
 </head>
 <body>
 
@@ -83,7 +42,7 @@ include("config/db_local.php");
         <div class="d-flex align-items-center">
     <div class="text-end me-3 d-none d-md-block">
         <div class="fw-800 mb-0 small" id="nombreSubdirector" style="color: var(--sira-purple-dark);">--</div>
-        <div class="badge-subdirector">MODO SUBDIRECTOR</div>
+        <div class="badge-subdirector" style="text-align: center;">SUBDIRECTOR</div>
     </div>
     
     <div class="user-avatar" id="avatarLetra" style="width: 40px; height: 40px; background: var(--sira-purple); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: default;">

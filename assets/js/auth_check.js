@@ -1,73 +1,98 @@
 /**
- * GUARDIÁN DE SESIÓN - SIRA UTM (Nivel TSU)
- * Implementa: Verificación de JWT, Expiración y Seguridad en Rutas.
+ * SIRA - SISTEMA INTEGRAL DE RESERVA DE AUDITORIOS
+ * * MÓDULO: GUARDIÁN DE SESIÓN Y MIDDLEWARE DE SEGURIDAD
+ * * @package     Frontend_Security
+ * @subpackage  Auth_Control
+ * @version     2.6.0
+ * @copyright   2026 Universidad Tecnológica de Morelia
+ * * DESCRIPCIÓN TÉCNICA:
+ * Implementa una Capa de Seguridad Persistente que intercepta la carga de cada 
+ * documento para validar la autenticidad de la sesión. Utiliza el estándar JWT 
+ * para el control de expiración y perfilamiento de rutas.
+ * * CAPACIDADES:
+ * 1. Inyección de Token: Captura y limpieza de tokens vía URL.
+ * 2. RBAC (Role-Based Access Control): Redirección inteligente por perfil.
+ * 3. Cache Invalidation: Prevención de retroceso en el historial tras el logout.
+ * 4. UX: Gestión de alertas institucionales mediante SweetAlert2.
  */
 
 /* global Swal */
 
+/**
+ * 1. SUBSISTEMA DE VALIDACIÓN DE ENTRADA (AUTO-EJECUTABLE)
+ * Analiza el contexto de la URL y el estado del almacenamiento local.
+ */
 (async function() {
     const params = new URLSearchParams(window.location.search);
     const tokenUrl = params.get('token');
     const path = window.location.pathname;
 
-    // 1. CAPTURA: Si el token viene de la redirección inicial de PHP
+    /**
+     * CAPTURA Y SANITIZACIÓN DE TOKEN
+     * Si el servidor PHP inyecta el token en la redirección inicial, se persiste
+     * y se limpia la barra de direcciones para mitigar riesgos de 'Shoulder Surfing'.
+     */
     if (tokenUrl) {
         localStorage.setItem('sira_session_token', tokenUrl);
-        // Limpiamos la URL para que el token no sea visible (Seguridad)
         const cleanUrl = window.location.origin + path;
         window.history.replaceState({}, document.title, cleanUrl);
     }
 
     const sessionToken = localStorage.getItem('sira_session_token');
-
-    // 2. PROTECCIÓN DE RUTAS: ¿Quién tiene permitido entrar?
     const esPaginaLogin = path.includes('index.php') || path.includes('login.php');
 
+    // Escenario A: Intento de acceso sin credenciales
     if (!sessionToken) {
         if (!esPaginaLogin) {
-            // Si no hay token y no está en login, expulsión inmediata
             window.location.href = 'login.php?error=no_auth';
         }
     } else {
-        // 3. VALIDACIÓN TSU: ¿El token sigue siendo válido y no ha expirado? 
+        /**
+         * 2. SUBSISTEMA DE INTEGRIDAD JWT
+         * Decodifica el Payload (Base64) para verificar la vigencia temporal.
+         */
         try {
-            // Decodificamos el Payload del JWT (Base64) para ver la expiración y perfil
             const payload = JSON.parse(atob(sessionToken.split('.')[1]));
             const ahora = Math.floor(Date.now() / 1000);
 
+            // Verificación de expiración (Timestamp UNIX)
             if (payload.exp < ahora) {
-                throw new Error("Token expirado"); // El token ya cumplió su tiempo
+                throw new Error("Token expirado");
             }
 
-            // MEJORA: Redirección inteligente si intenta entrar al Login ya estando logueado
-           if (esPaginaLogin) {
-            const perfil = payload.perfil.toLowerCase();
-            let destino = 'panel_usuario.php'; // Por defecto
+            /**
+             * REDIRECCIÓN BASADA EN ROLES (RBAC)
+             * Previene que un usuario autenticado regrese a la pantalla de login.
+             */
+            if (esPaginaLogin) {
+                const perfil = payload.perfil.toLowerCase();
+                let destino = 'panel_usuario.php';
 
-            if (perfil === 'administrador') {
-                destino = 'panel_admin.php';
-            } else if (perfil === 'subdirector') {
-                destino = 'panel_subdirector.php';
+                if (perfil === 'administrador') {
+                    destino = 'panel_admin.php';
+                } else if (perfil === 'subdirector') {
+                    destino = 'panel_subdirector.php';
+                }
+                
+                window.location.href = destino;
             }
-            
-            window.location.href = destino;
-        }
 
         } catch (e) {
-            console.warn("Sesión inválida o expirada:", e.message);
-            ejecutarSalida('expirada'); // Limpieza por seguridad
+            console.warn("Seguridad SIRA: Sesión inválida o expirada.", e.message);
+            ejecutarSalida('expirada'); 
         }
     }
 })();
 
 /**
- * CIERRE DE SESIÓN SEGURO (UX Mejorada)
+ * 3. GESTIÓN DE CIERRE DE SESIÓN SEGURO
+ * Realiza una limpieza dual (Cliente/Servidor) para garantizar el fin de sesión.
+ * @async
  */
-// --- FUNCIÓN GLOBAL DE SALIDA (Añadir al final de admin_usuarios.js) ---
 async function confirmarSalida() {
     const result = await Swal.fire({
-        title: '¿Cerrar sesión?',
-        text: "Se eliminará tu acceso actual del navegador.",
+        title: '¿Finalizar sesión?',
+        text: "Se eliminarán los privilegios de acceso del navegador actual.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#5B3D66',
@@ -79,18 +104,16 @@ async function confirmarSalida() {
 
     if (result.isConfirmed) {
         try {
-            // 1. Avisamos al servidor que cierre la sesión (PHP)
+            // Notificación al servidor para invalidación de PHPSESSID si existiera
             await fetch('logout.php'); 
 
-            // 2. Limpiamos los tokens locales del navegador
+            // Purga de almacenamiento local
             localStorage.removeItem('token');
             localStorage.removeItem('sira_session_token');
 
-            // 3. Redirigimos manualmente al login/index
             window.location.href = 'login.php?status=logout'; 
             
         } catch (error) {
-            // Si algo falla, igual limpiamos el local y salimos
             localStorage.clear();
             window.location.href = 'login.php';
         }
@@ -98,43 +121,41 @@ async function confirmarSalida() {
 }
 
 /**
- * LIMPIEZA TOTAL (Frontend + Backend)
+ * LIMPIEZA TÉCNICA DE EMERGENCIA
+ * @param {string} motivo - Contexto del cierre (expirada/error).
  */
-// En auth_check.js, busca la función ejecutarSalida
 function ejecutarSalida(motivo = '') {
     localStorage.removeItem('sira_session_token');
-    localStorage.removeItem('token'); // Borramos ambos por si acaso
+    localStorage.removeItem('token'); 
     
-    // Si tu login es index.php, déjalo así. Si es login.php, cámbialo:
     let urlRedireccion = 'login.php'; 
     if (motivo === 'expirada') urlRedireccion += '?error=expired';
     
     window.location.href = urlRedireccion;
 }
+
 /**
- * PROTECCIÓN DE HISTORIAL - SIRA UTM
- * Evita que el usuario regrese a la sesión tras cerrar sesión.
+ * 4. PROTECCIÓN DEL HISTORIAL Y CACHÉ (NAVEGACIÓN SEGURA)
+ * Evita que se recupere la información del DOM mediante el botón 'Atrás'.
  */
 (function() {
-    // 1. Reemplazamos el estado actual para que el "atrás" sea el mismo Login
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
     }
 
-    // 2. Detectamos si la página se carga desde el "caché" (flecha atrás)
+    // Invalida la persistencia en caché del navegador tras el logout
     window.onpageshow = function(event) {
         if (event.persisted) {
-            // Si el navegador intenta mostrar una copia guardada, forzamos recarga
             window.location.reload();
         }
     };
 
-    // 3. Opcional: Alerta de bienvenida si viene de un logout
+    // Alerta informativa tras redirección por cierre exitoso
     const params = new URLSearchParams(window.location.search);
     if (params.get('status') === 'logout') {
         Swal.fire({
             title: '¡Sesión Finalizada!',
-            text: 'Has salido del sistema con éxito.',
+            text: 'Has salido del ecosistema SIRA con éxito.',
             icon: 'success',
             confirmButtonColor: '#5B3D66'
         });

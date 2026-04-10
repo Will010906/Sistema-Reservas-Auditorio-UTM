@@ -1,26 +1,65 @@
 <?php
+/**
+ * SIRA - SISTEMA INTEGRAL DE RESERVA DE AUDITORIOS
+ * * API CONTROLADOR: REGISTRO DE SOLICITUDES DE RESERVACIÓN
+ * * @package     Controladores_API
+ * @subpackage  Gestion_Solicitudes
+ * @version     1.0.5
+ * @copyright   2026 Universidad Tecnológica de Morelia
+ * * DESCRIPCIÓN TÉCNICA:
+ * Este endpoint procesa el almacenamiento persistente de nuevas solicitudes.
+ * Implementa una capa de seguridad que extrae la identidad del solicitante
+ * directamente del Token Bearer, evitando la suplantación de identidad (Spoofing).
+ * * FUNCIONALIDADES:
+ * 1. Autenticación: Decodificación de Base64 para obtener el ID de usuario.
+ * 2. Generación: Creación de folios institucionales únicos basados en tiempo.
+ * 3. Seguridad: Saneamiento de cadenas para mitigar ataques de Inyección SQL.
+ */
+
+/**
+ * CONFIGURACIÓN DE SALIDA
+ */
 header('Content-Type: application/json');
+
+/**
+ * IMPORTACIÓN DE RECURSOS
+ */
 require_once "../../config/db_local.php";
 
-// 1. Extraer ID del usuario desde el Token JWT
+/**
+ * 1. EXTRACCIÓN DE IDENTIDAD (JWT PAYLOAD)
+ * Recupera el ID del usuario desde la cabecera de autorización para garantizar 
+ * que la solicitud se vincule al dueño real de la sesión.
+ */
 $headers = apache_request_headers();
 $auth = $headers['Authorization'] ?? $headers['authorization'] ?? '';
 if (!preg_match('/Bearer\s(\S+)/', $auth, $matches)) {
-    echo json_encode(['success' => false, 'error' => 'Token no detectado']);
+    echo json_encode(['success' => false, 'error' => 'Token de seguridad no detectado.']);
     exit;
 }
 
+// Decodificación de la segunda parte del token (Payload)
 $payload = json_decode(base64_decode(explode('.', $matches[1])[1]), true);
 $id_usuario_real = $payload['id']; 
 
-// 2. Recibir datos del modal vía JSON
+/**
+ * 2. RECEPCIÓN Y PROCESAMIENTO DE DATOS
+ * Captura el flujo de entrada (Input Stream) para procesar el objeto JSON del modal.
+ */
 $data = json_decode(file_get_contents('php://input'), true);
 
 if ($data) {
-    // Generación de Folio dinámico
+    /**
+     * GENERACIÓN DE FOLIO INSTITUCIONAL
+     * Estructura: UTM - [AÑO/MES/DÍA] - [ALEATORIO]
+     * @var string $folio Identificador único de la reservación.
+     */
     $folio = "UTM-" . date('Ymd') . "-" . rand(100, 999);
     
-    // Saneamiento de datos (Evitar Inyección SQL)
+    /**
+     * SANEAMIENTO DE DATOS (DATA SANITIZATION)
+     * Preparación de variables para interacción segura con el motor MySQL.
+     */
     $id_aud  = mysqli_real_escape_string($conexion, $data['id_auditorio']);
     $tit     = mysqli_real_escape_string($conexion, $data['titulo']);
     $desc    = mysqli_real_escape_string($conexion, $data['descripcion']);
@@ -30,13 +69,16 @@ if ($data) {
     $otros   = mysqli_real_escape_string($conexion, $data['otros_servicios'] ?? '');
     
     /**
-     * AJUSTE SEGÚN TU DER
-     * Agregamos prioridad por defecto y num_asistentes (puedes capturarlos luego en el modal)
+     * ATRIBUTOS POR DEFECTO (LÓGICA DE NEGOCIO SIRA)
+     * Define valores base para prioridad y capacidad según el DER institucional.
      */
     $prioridad = 'Con tiempo'; 
-    $asistentes = 10; // Valor temporal, idealmente viene del modal
+    $asistentes = 10; 
 
-    // 3. Inserción Completa
+    /**
+     * 3. PERSISTENCIA DE LA INFORMACIÓN
+     * Ejecuta la sentencia INSERT en la tabla 'solicitudes' con estado inicial 'Pendiente'.
+     */
     $sql = "INSERT INTO solicitudes (
                 folio, id_usuario, id_auditorio, titulo_event, 
                 descripcion, otros_servicios, fecha_evento, 
@@ -48,10 +90,14 @@ if ($data) {
             )";
 
     if (mysqli_query($conexion, $sql)) {
+        // Respuesta exitosa al cliente
         echo json_encode(['success' => true, 'folio' => $folio]);
     } else {
-        // Si falla, te dirá exactamente qué columna falta o está mal
-        echo json_encode(['success' => false, 'error' => mysqli_error($conexion)]);
+        // Reporte de error técnico en caso de fallo en el motor DB
+        echo json_encode(['success' => false, 'error' => "Fallo en base de datos: " . mysqli_error($conexion)]);
     }
 }
+/**
+ * CIERRE DE EJECUCIÓN
+ */
 exit;

@@ -1,0 +1,90 @@
+       body { background-color: #f8f9fa; }
+        .avatar-circle-sm {
+            width: 35px; height: 35px;
+            background-color: #5B3D66; color: white;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; font-size: 0.85rem; font-weight: bold;
+            text-transform: uppercase;
+        }
+        .table-card { border: none; border-radius: 15px; overflow: hidden; background: #fff; }
+        .x-small { font-size: 0.75rem; }
+        .bg-primary-subtle { background-color: #e0d4e5 !important; }
+        .text-primary { color: #5B3D66 !important; }
+
+        .btn-utm {
+    background-color: #5B3D66 !important; /* El color de tu sidebar */
+    border-color: #5B3D66 !important;
+    color: white !important;
+}
+
+.btn-utm:hover {
+    background-color: #4a3254 !important; /* Un tono más oscuro para el hover */
+    border-color: #4a3254 !important;
+}
+/* Colores de Roles SIRA Premium */
+.sira-badge-admin { 
+    background-color: #f8d7da !important; 
+    color: #842029 !important; 
+    border: 1px solid #f5c2c7;
+    font-weight: 800;
+}
+
+.sira-badge-sub { 
+    background-color: #fff3cd !important; 
+    color: #856404 !important; 
+    border: 1px solid #ffeeba;
+    font-weight: 800;
+}
+
+.sira-badge-doc { 
+    background-color: #cfe2ff !important; 
+    color: #084298 !important; 
+    border: 1px solid #b6d4fe;
+    font-weight: 800;
+}
+
+.sira-badge-alu { 
+    background-color: #d1e7dd !important; 
+    color: #0f5132 !important; 
+    border: 1px solid #badbcc;
+    font-weight: 800;
+}
+
+/* Ajuste para que el ojo no herede bordes del input-group */
+.sira-password-toggle .btn {
+    border: none !important;
+    outline: none !important;
+}
+
+/* Evita que el input se deforme con el botón absoluto */
+#user_pass {
+    border-radius: 8px !important; /* Mantiene la estética de tus otros campos */
+}
+
+/**
+         * CORRECCIÓN DE LAYOUT SIRA
+         * Previene que el sidebar solape la tabla de usuarios.
+         */
+        .main-content {
+            margin-left: 310px; /* Offset: ActivityBar(80px) + Sidebar(230px) */
+            padding: 40px;
+            width: calc(100% - 310px);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* Estilos para los Badges de Roles Académicos */
+        .role-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .role-alumno { background-color: #e8f5e9; color: #2e7d32; }
+        .role-subdirector { background-color: #fff3e0; color: #ef6c00; }
+        .role-admin { background-color: #ffebee; color: #c62828; }
+
+        @media (max-width: 992px) {
+            .main-content { margin-left: 80px; width: calc(100% - 80px); }
+        }

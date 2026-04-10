@@ -1,7 +1,11 @@
 <?php
 /**
- * VISTA: MIS RESERVACIONES - SIRA UTM
- * Actualizado: Carga dinámica vía API y validación de Token.
+ * SIRA - SISTEMA INTEGRAL DE RESERVA DE AUDITORIOS
+ * * MÓDULO: MIS RESERVACIONES (VISTA ALUMNO/DOCENTE)
+ * * @package     Frontend_User
+ * @subpackage  Reservas_Dashboard
+ * @version     3.1.0
+ * @copyright   2026 Universidad Tecnológica de Morelia
  */
 include("config/db_local.php");
 ?>

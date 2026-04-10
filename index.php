@@ -1,28 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>SIRA</title>
-        <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-        <!-- Font Awesome icons (free version)-->
+        <meta name="description" content="SIRA - Sistema Integral de Reserva de Auditorios UTM" />
+        <meta name="author" content="SIRA UTM" />
+        <title>SIRA - UTM</title>
+        <?php include 'includes/head.php'; ?>
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-        <!-- Google fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
-        <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
-        <!-- estilo de la pagina-->
+        
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+        
         <link href="assets/css/pagina.css?v=4.0" rel="stylesheet">
     </head>
     <body id="page-top">
-        <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
             <div class="container">
-                <!-- ESTO ES SI TENEMOS LOGO EN LETRAS QUE SE VEA BIEN 
-                <a class="navbar-brand" href="#page-top"><img src="assets/img/logos/logoSIRA.jpeg" alt="..." /></a>-->
-                <a class="navbar-brand" href="#page-top">SIRA-UTM</a>
+                <a class="navbar-brand d-flex align-items-center" href="#page-top">
+                    <img src="assets/img/logo_app_web_RA_SB.png" alt="SIRA Logo" style="height: 50px; width: auto; margin-right: 12px;">
+                    <span class="fw-bold" style="letter-spacing: 1px;">SIRA-UTM</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     Menu
                     <i class="fas fa-bars ms-1"></i>
@@ -32,7 +29,7 @@
                         <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
                         <li class="nav-item"><a class="nav-link" href="#catalogo">Catálogo</a></li>
                         <li class="nav-item"><a class="nav-link" href="#guia">Guía</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#registro">Registrate</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#registro">Regístrate</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
                         <li class="nav-item">
                             <a class="nav-link btn-login-nav" href="login.php">Iniciar Sesión</a>
@@ -41,7 +38,7 @@
                 </div>
             </div>
         </nav>
-        <!-- Masthead-->
+
         <header class="masthead">
             <div class="container">
                 <div class="masthead-subheading">¡BIENVENIDO A SIRA!</div>
@@ -49,133 +46,118 @@
                 <a class="btn btn-primary btn-xl text-uppercase" href="#servicios">Leer más</a>
             </div>
         </header>
-        <!-- Servicios-->
+
         <section class="page-section" id="servicios">
-    <div class="container">
-        <div class="text-center">
-            <h2 class="section-heading text-uppercase">Servicios</h2>
-            <h3 class="section-subheading text-muted">La plataforma integral para el control y reserva de auditorios en UTM.</h3>
-        </div>
-        <div class="row text-center">
-            <div class="col-md-4">
-                <span class="fa-stack fa-4x">
-                    <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                    <i class="fas fa-calendar-check fa-stack-1x fa-inverse"></i>
-                </span>
-                <h4 class="my-3">Reserva en Línea</h4>
-                <p class="text-muted">Consulta la disponibilidad en tiempo real y aparta tu fecha desde cualquier lugar.</p>
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-heading text-uppercase">Servicios</h2>
+                    <h3 class="section-subheading text-muted">La plataforma integral para el control y reserva de auditorios en UTM.</h3>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <span class="fa-stack fa-4x">
+                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                            <i class="fas fa-calendar-check fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <h4 class="my-3">Reserva en Línea</h4>
+                        <p class="text-muted">Consulta la disponibilidad en tiempo real y aparta tu fecha desde cualquier lugar.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="fa-stack fa-4x">
+                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                            <i class="fas fa-tasks fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <h4 class="my-3">Gestión de Eventos</h4>
+                        <p class="text-muted">Sube los detalles de tu evento (nombre, requerimientos técnicos).</p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="fa-stack fa-4x">
+                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                            <i class="fas fa-microchip fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <h4 class="my-3">Soporte Técnico</h4>
+                        <p class="text-muted">Solicita equipo adicional como proyectores, micrófonos o iluminación especial.</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4">
-                <span class="fa-stack fa-4x">
-                    <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                    <i class="fas fa-tasks fa-stack-1x fa-inverse"></i>
-                </span>
-                <h4 class="my-3">Gestión de Eventos</h4>
-                <p class="text-muted">Sube los detalles de tu evento (nombre, requerimientos técnicos).</p>
-            </div>
-            <div class="col-md-4">
-                <span class="fa-stack fa-4x">
-                    <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                    <i class="fas fa-microchip fa-stack-1x fa-inverse"></i>
-                </span>
-                <h4 class="my-3">Soporte Técnico</h4>
-                <p class="text-muted">Solicita equipo adicional como proyectores, micrófonos o iluminación especial.</p>
-            </div>
-        </div>
-    </div>
-</section>
-        <!-- Catalogo Auditorios-->
+        </section>
+
         <section class="page-section bg-light" id="catalogo">
             <div class="container">
                 <div class="text-center">
                     <h2 class="section-heading text-uppercase">Catálogo de Espacios</h2>
-                    <h3 class="section-subheading text-muted">Descubre el espacio perfecto para tu próximo foro, conferencia o taller.<br> 
-                        En nuestro <strong>Catálogo de Espacios</strong> encontrarás auditorios con tecnología de punta y la capacidad exacta que tu proyecto requiere.</h3>
+                    <h3 class="section-subheading text-muted">Descubre el espacio perfecto para tu próximo foro, conferencia o taller.</h3>
                 </div>
                 <div class="row">
                     <div class="col-lg-6 col-sm-6 mb-4">
-                        <!-- catalogo Auditorio D-->
                         <div class="catalogo-item">
                             <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal1">
                                 <div class="catalogo-hover">
                                     <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
-                                <img class="img-fluid" src="assets/img/catalogo/1D.jpeg" alt="..." />
+                                <img class="img-fluid" src="assets/img/catalogo/1D.jpeg" alt="Auditorio D" />
                             </a>
                             <div class="catalogo-caption">
                                 <div class="catalogo-caption-heading">Auditorio D</div>
-                                <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 182 personas<br>
-                                    Ubicación: Edificio D
-                            </div>
+                                <div class="catalogo-caption-subheading text-muted">Capacidad: 182 personas | Ubicación: Edificio D</div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6 col-sm-6 mb-4">
-                        <!-- catalogo item 2-->
                         <div class="catalogo-item">
                             <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal2">
                                 <div class="catalogo-hover">
                                     <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
-                                <img class="img-fluid" src="assets/img/catalogo/2B.jpeg" alt="..." />
+                                <img class="img-fluid" src="assets/img/catalogo/2B.jpeg" alt="Auditorio B" />
                             </a>
                             <div class="catalogo-caption">
                                 <div class="catalogo-caption-heading">Auditorio B</div>
-                                <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 80 personas<br>
-                                    Ubicación: Edificio B
-                                </div>
+                                <div class="catalogo-caption-subheading text-muted">Capacidad: 80 personas | Ubicación: Edificio B</div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6 col-sm-6 mb-4">
-                        <!-- catalogo item 3-->
                         <div class="catalogo-item">
                             <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal3">
                                 <div class="catalogo-hover">
                                     <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
-                                <img class="img-fluid" src="assets/img/catalogo/1A.jpeg" alt="..." />
+                                <img class="img-fluid" src="assets/img/catalogo/1A.jpeg" alt="Auditorio A-2" />
                             </a>
                             <div class="catalogo-caption">
                                 <div class="catalogo-caption-heading">Auditorio A-2</div>
-                                <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 63 personas<br>
-                                    Ubicación: Edificio A Planta Alta
-                                </div>
+                                <div class="catalogo-caption-subheading text-muted">Capacidad: 63 personas | Ubicación: Edificio A (PA)</div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-sm-6 mb-4 mb-lg-0">
-                        <!-- catalogo item 4-->
+                    <div class="col-lg-6 col-sm-6 mb-4">
                         <div class="catalogo-item">
                             <a class="catalogo-link" data-bs-toggle="modal" href="#catalogoModal4">
                                 <div class="catalogo-hover">
                                     <div class="catalogo-hover-content"><i class="fas fa-plus fa-3x"></i></div>
                                 </div>
-                                <img class="img-fluid" src="assets/img/catalogo/2-A.jpeg" alt="..." />
+                                <img class="img-fluid" src="assets/img/catalogo/2-A.jpeg" alt="Auditorio A" />
                             </a>
                             <div class="catalogo-caption">
                                 <div class="catalogo-caption-heading">Auditorio A</div>
-                                <div class="catalogo-caption-subheading text-muted">
-                                    Capacidad: 65 personas<br>
-                                    Ubicación: Edificio A Planta Baja
-                                </div>
+                                <div class="catalogo-caption-subheading text-muted">Capacidad: 65 personas | Ubicación: Edificio A (PB)</div>
                             </div>
                         </div>
                     </div>
-                </section>
-        <!-- Guia-->
+                </div>
+            </div>
+        </section>
+
         <section class="page-section" id="guia">
             <div class="container">
                 <div class="text-center">
                     <h2 class="section-heading text-uppercase">Guía de Reserva</h2>
-                    <h3 class="section-subheading text-muted">Conoce como funciona SIRA</h3>
+                    <h3 class="section-subheading text-muted">Conoce cómo funciona SIRA</h3>
                 </div>
                 <ul class="timeline">
                     <li>
-                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/inicio.jpeg" alt="..." /></div>
+                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/inicio.jpeg" alt="Paso 1" /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4>Paso 1:</h4>
@@ -185,27 +167,27 @@
                         </div>
                     </li>
                     <li class="timeline-inverted">
-                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/solicitud.jpeg" alt="..." /></div>
+                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/solicitud.jpeg" alt="Paso 2" /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4>Paso 2:</h4>
                                 <h4 class="subheading">Selección de Espacio</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Explora los auditorios disponibles y verifica la disponibilidad en el calendario en tiempo real.</p></div>
+                            <div class="timeline-body"><p class="text-muted">Explora los auditorios disponibles y verifica la disponibilidad en tiempo real.</p></div>
                         </div>
                     </li>
                     <li>
-                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/revision.jpeg" alt="..." /></div>
+                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/revision.jpeg" alt="Paso 3" /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4>Paso 3:</h4>
                                 <h4 class="subheading">Validación de Solicitud</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">El equipo administrativo revisará tu petición y recibirás una notificación de confirmación.</p></div>
+                            <div class="timeline-body"><p class="text-muted">El equipo administrativo revisará tu petición y recibirás una notificación.</p></div>
                         </div>
                     </li>
                     <li class="timeline-inverted">
-                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/UTM.jpeg" alt="..." /></div>
+                        <div class="timeline-image"><img class="rounded-circle img-fluid" src="assets/img/guia/UTM.jpeg" alt="Paso 4" /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4>Paso 4:</h4>
@@ -216,124 +198,90 @@
                     </li>
                     <li class="timeline-inverted">
                         <div class="timeline-image">
-                            <h4>
-                                ¡TU EVENTO
-                                <br />
-                                EMPIEZA
-                                <br />
-                                AQUÍ!
-                            </h4>
+                            <h4>¡TU EVENTO<br />EMPIEZA<br />AQUÍ!</h4>
                         </div>
                     </li>
                 </ul>
             </div>
         </section>
-        <!-- registro-->
-        <section class="page-section bg-light" id="registro">
-    <div class="container">
-        <div class="text-center">
-            <h2 class="section-heading text-uppercase">¿No formas parte de de la comunidad UTM?</h2>
-            <h3 class="section-subheading text-muted">Registra tu cuenta externa para solicitar acceso a nuestros espacios.</h3>
-        </div>
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="registro-member text-center">
-                    <span class="fa-stack fa-4x">
-                        <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                        <i class="fas fa-user-plus fa-stack-1x fa-inverse"></i> </span>
-                        <h4><strong>Crea tu Perfil</strong></h4>
-                        <p class="text-muted">Proporciona tus datos básicos <br> y de contacto.</p>
-                    </div>
-                </div>
 
-                <div class="col-lg-4">
-                    <div class="registro-member text-center">
-                        <span class="fa-stack fa-4x">
-                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                            <i class="fas fa-id-card fa-stack-1x fa-inverse"></i> </span>
+        <section class="page-section bg-light" id="registro">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-heading text-uppercase">¿No formas parte de la comunidad UTM?</h2>
+                    <h3 class="section-subheading text-muted">Registra tu cuenta externa para solicitar acceso a nuestros espacios.</h3>
+                </div>
+                <div class="row text-center">
+                    <div class="col-lg-4">
+                        <div class="registro-member">
+                            <span class="fa-stack fa-4x">
+                                <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                                <i class="fas fa-user-plus fa-stack-1x fa-inverse"></i> 
+                            </span>
+                            <h4><strong>Crea tu Perfil</strong></h4>
+                            <p class="text-muted">Proporciona tus datos básicos y de contacto.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="registro-member">
+                            <span class="fa-stack fa-4x">
+                                <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                                <i class="fas fa-id-card fa-stack-1x fa-inverse"></i> 
+                            </span>
                             <h4><strong>Verificación</strong></h4>
                             <p class="text-muted">Nuestro equipo validará tu identidad para permitirte realizar solicitudes.</p>
                         </div>
                     </div>
-
-                <div class="col-lg-4">
-                    <div class="registro-member text-center">
-                        <span class="fa-stack fa-4x">
-                            <i class="fas fa-circle fa-stack-2x text-primary"></i>
-                            <i class="fas fa-calendar-check fa-stack-1x fa-inverse"></i> </span>
+                    <div class="col-lg-4">
+                        <div class="registro-member">
+                            <span class="fa-stack fa-4x">
+                                <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                                <i class="fas fa-calendar-check fa-stack-1x fa-inverse"></i> 
+                            </span>
                             <h4><strong>Reserva</strong></h4>
-                            <p class="text-muted">Una vez aprobado, podrás gestionar tus eventos igual que un usuario institucional.</p>
+                            <p class="text-muted">Una vez aprobado, podrás gestionar tus eventos eficientemente.</p>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-8 mx-auto text-center">
-                        <br><br>
-                        <p class="large text-muted">¿Listo para comenzar?</p>
-                        <a class="btn btn-primary btn-xl text-uppercase" href="registro.php">
-                            <strong>Crear Cuenta de Visitante</strong>
-                        </a>
-                    </div>
+                <div class="text-center mt-5">
+                    <p class="large text-muted">¿Listo para comenzar?</p>
+                    <a class="btn btn-primary btn-xl text-uppercase" href="registro.php"><strong>Crear Cuenta de Visitante</strong></a>
                 </div>
             </div>
         </section>
-        <!-- Contacto-->
+
         <section class="page-section" id="contacto">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="section-heading text-uppercase">Contactanos</h2>
-                    <h3 class="section-subheading text-muted">
-                        <strong>Ubicación: </strong>Edificio A, Planta Baja.<br>
-                        <strong>Horarios: </strong>Lunes a Viernes de 9:00 AM a 3:00 PM
-                    </h3>
+                    <h2 class="section-heading text-uppercase">Contáctanos</h2>
+                    <h3 class="section-subheading text-white">Edificio A, Planta Baja | Lunes a Viernes de 9:00 AM a 3:00 PM</h3>
                 </div>
-                <!-- to get an API token!-->
-                    <form id="contactoForm" action="enviar_correo.php" method="POST">
+                <form id="contactoForm" action="enviar_correo.php" method="POST">
                     <div class="row align-items-stretch mb-5">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <!-- Name input-->
-                                <input class="form-control" id="nombre" name="nombre" type="text" placeholder="Tu Nombre *" data-sb-validations="required" />
-                                <div class="invalid-feedback" data-sb-feedback="name:required">Nombre requerido</div>
+                            <div class="form-group mb-3">
+                                <input class="form-control" id="nombre" name="nombre" type="text" placeholder="Tu Nombre *" required />
                             </div>
-                            <div class="form-group">
-                                <!-- Email address input-->
-                                <input class="form-control" id="email" name="email" type="email" placeholder="Tu Gmail *" data-sb-validations="required,email" />
-                                <div class="invalid-feedback" data-sb-feedback="email:required">Gmail requerido</div>
-                                <div class="invalid-feedback" data-sb-feedback="email:email">Gmail no valido</div>
+                            <div class="form-group mb-3">
+                                <input class="form-control" id="email" name="email" type="email" placeholder="Tu Correo *" required />
                             </div>
                             <div class="form-group mb-md-0">
-                                <!-- Phone number input-->
-                                <input class="form-control" id="phone" name="phone" type="tel" placeholder="Tu Número *" data-sb-validations="required" />
-                                <div class="invalid-feedback" data-sb-feedback="phone:required">Número requerido</div>
+                                <input class="form-control" id="phone" name="phone" type="tel" placeholder="Tu Teléfono *" required />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group form-group-textarea mb-md-0">
-                                <!-- Message input-->
-                                <textarea class="form-control" id="message" name="message" placeholder="Tus Dudas *" data-sb-validations="required"></textarea>
-                                <div class="invalid-feedback" data-sb-feedback="message:required">El mensaje es requerido</div>
+                                <textarea class="form-control" id="message" name="message" placeholder="Tus Dudas *" required style="min-height: 150px;"></textarea>
                             </div>
                         </div>
                     </div>
-                    <!-- has successfully submitted-->
-                    <div class="d-none" id="submitSuccessMessage">
-                        <div class="text-center text-white mb-3">
-                            <div class="fw-bolder">¡Envío de Formulario Exitoso!</div>
-                        </div>
-                    </div>
-                    <!-- an error submitting the form-->
-                    <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error de envío</div></div>
-                    <!-- Submit Button-->
                     <div class="text-center">
-                        <button class="btn btn-primary btn-xl text-uppercase" type="submit">
-                            Enviar Mensaje
-                        </button>
-                </div>
+                        <button class="btn btn-primary btn-xl text-uppercase" type="submit">Enviar Mensaje</button>
+                    </div>
                 </form>
             </div>
         </section>
-        <!-- Footer-->
+
         <footer class="footer py-4">
             <div class="container">
                 <div class="row align-items-center">
@@ -350,14 +298,15 @@
                 </div>
             </div>
         </footer>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Core theme JS-->
-        <script src="assets/js/pagina.js"></script>
+
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+
+<script src="assets/js/pagina.js"></script>
     </body>
 </html>

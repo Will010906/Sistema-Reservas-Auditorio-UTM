@@ -175,19 +175,33 @@ async function cargarDashboard() {
 const claseStatus = sol.prioridad_visual.replace(" ", "").toLowerCase(); 
 
 contenedor.innerHTML += `
-    <tr class="solicitud-fila">
-        <td class="ps-4 fw-bold" style="color: #5B3D66;">#${sol.folio}</td>
-        <td>
-            <div class="fw-bold">${sol.titulo_event}</div>
-            <div class="text-muted x-small">Por: ${sol.nombre_usuario || 'Docente UTM'}</div>
+    <tr class="solicitud-fila animate__animated animate__fadeIn">
+        <td class="ps-4">
+            <div class="fw-bold" style="color: #5B3D66;">${sol.nombre_usuario || 'Usuario UTM'}</div>
+            <div class="text-muted x-small">Folio: #${sol.folio}</div>
         </td>
-        <td><span class="badge rounded-pill bg-light text-dark border px-3">${sol.nombre_espacio || 'Auditorio'}</span></td>
-        <td class="fw-bold text-muted date-cell">${sol.fecha_evento}</td>
+
+        <td>
+            <div class="fw-bold text-dark">${sol.matricula || 'S/M'}</div>
+            <div class="text-muted x-small">${sol.titulo_event}</div>
+        </td>
+
+        <td class="text-center">
+            <span class="badge rounded-pill bg-light text-secondary border px-3">
+                <i class="bi bi-telephone me-1"></i> ${sol.telefono || 'N/A'}
+            </span>
+        </td>
+
+        <td class="text-center text-muted fw-medium">
+            ${sol.carrera_area || 'General'}
+        </td>
+
         <td class="text-center">
             <span class="badge-status st-${claseStatus} shadow-sm">
                 ${sol.prioridad_visual.toUpperCase()}
             </span>
         </td>
+
         <td class="text-center">
             <button class="btn btn-gestionar-sira btn-sm shadow-sm" onclick="gestionar(${sol.id_solicitud})">
                 <i class="bi bi-folder2-open me-1"></i> Gestionar

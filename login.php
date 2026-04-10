@@ -1,7 +1,15 @@
 <?php
 /**
- * VISTA DE LOGIN - SIRA UTM
- * Actualizado con: Spinner de carga, Efectos de Focus y Footer Institucional.
+ * SIRA - SISTEMA INTEGRAL DE RESERVA DE AUDITORIOS
+ * * MÓDULO: PORTAL DE AUTENTICACIÓN CENTRAL (LOGIN)
+ * * @package     Frontend_Security
+ * @subpackage  Authentication_View
+ * @version     3.5.0
+ * @copyright   2026 Universidad Tecnológica de Morelia
+ * * DESCRIPCIÓN TÉCNICA:
+ * Implementa la interfaz de acceso restringido mediante validación de credenciales.
+ * Gestiona estados asíncronos para el envío de datos al backend y proporciona
+ * una experiencia de usuario (UX) reactiva mediante feedback visual dinámico.
  */
 ?>
 <!DOCTYPE html>
@@ -11,148 +19,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRA - Login UTM</title>
+    <?php include 'includes/head.php'; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --sira-purple-deep: #5B3D66;
-            --sira-purple-med: #845C93;
-            --sira-bg-main: #EBEFF2;
-            --sira-card-white: #F4F7F9;
-            --sira-silver: #BDC3C7; 
-            --sira-black: #2D2D2D;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at center, #ffffff 0%, var(--sira-bg-main) 100%);
-            height: 100vh;
-            display: flex;
-            flex-direction: column; /* Para acomodar el footer abajo */
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            color: var(--sira-black);
-            overflow: hidden;
-        }
-
-        .btn-back-home {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: var(--sira-purple-deep);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            background: white;
-            padding: 8px 16px;
-            border-radius: 50px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border: 1px solid transparent;
-        }
-
-        .btn-back-home:hover {
-            color: var(--sira-purple-med);
-            transform: translateX(-5px);
-            border-color: var(--sira-silver); 
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-        }
-
-        .login-card {
-            background-color: #ffffff;
-            border-radius: 30px;
-            max-width: 480px;
-            width: 90%;
-            box-shadow: 0 25px 50px -12px rgba(91, 61, 102, 0.15);
-            border: none;
-            padding: 3.5rem !important;
-            border-top: 6px solid var(--sira-silver); 
-            animation: fadeInScale 0.6s ease-out;
-        }
-
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .form-label-custom {
-            font-weight: 700;
-            color: var(--sira-purple-deep);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-sira {
-            background-color: var(--sira-purple-deep);
-            color: white;
-            border: none;
-            padding: 14px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .btn-sira:hover:not(:disabled) {
-            background-color: var(--sira-purple-med);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(91, 61, 102, 0.2);
-        }
-
-        .btn-sira:disabled {
-            opacity: 0.8;
-            cursor: not-allowed;
-        }
-
-        .form-control {
-            background-color: var(--sira-card-white);
-            border: 2px solid transparent;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .form-control:focus {
-            background-color: #fff;
-            border-color: var(--sira-silver); 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transform: scale(1.02); /* Efecto de escala suave */
-        }
-
-        .input-group-text {
-            background-color: var(--sira-card-white);
-            border: 2px solid transparent;
-            color: var(--sira-purple-med);
-            border-radius: 12px 0 0 12px;
-            transition: all 0.3s ease;
-        }
-
-        .input-group:focus-within .input-group-text {
-            border-color: var(--sira-silver); 
-            background-color: #fff;
-        }
-
-        .custom-link {
-            color: var(--sira-purple-med);
-            font-size: 0.85rem;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .custom-link:hover { color: var(--sira-purple-deep); }
-
-        footer {
-            margin-top: 2rem;
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 0.8rem;
-            line-height: 1.5;
-        }
-    </style>
+        <link rel="stylesheet" href="assets/css/login.css">
 </head>
 
 <body>
