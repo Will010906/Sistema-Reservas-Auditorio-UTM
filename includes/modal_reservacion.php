@@ -22,7 +22,7 @@
                         <span class="badge rounded-pill me-3 shadow-sm" style="background-color: #5B3D66; padding: 10px 16px; font-size: 1rem;">1</span>
                         <h5 class="fw-800 text-uppercase mb-0" style="color: #5B3D66; font-weight: 800;">Selecciona el Auditorio o Espacio</h5>
                     </div>
-                    
+
                     <div class="row g-4 px-2">
                         <?php
                         // Consulta optimizada para auditorios disponibles
@@ -31,10 +31,10 @@
                             $ruta_foto = "assets/img/auditorios/" . $a['id_auditorio'] . ".jpg";
                         ?>
                             <div class="col-md-6 col-lg-4">
-                                <div class="card card-auditorio-pro h-100 border shadow-sm overflow-hidden" 
-                                     style="border-radius: 16px; cursor: pointer; transition: all 0.3s ease; border: 1px solid #eee;"
-                                     onclick="irAlCalendario(<?php echo $a['id_auditorio']; ?>, '<?php echo addslashes($a['nombre_espacio']); ?>', '<?php echo addslashes($a['equipamiento_fijo']); ?>')">
-                                    
+                                <div class="card card-auditorio-pro h-100 border shadow-sm overflow-hidden"
+                                    style="border-radius: 16px; cursor: pointer; transition: all 0.3s ease; border: 1px solid #eee;"
+                                    onclick="irAlCalendario(<?php echo $a['id_auditorio']; ?>, '<?php echo addslashes($a['nombre_espacio']); ?>', '<?php echo addslashes($a['equipamiento_fijo']); ?>')">
+
                                     <div class="position-relative" style="height: 160px; overflow: hidden;">
                                         <img src="<?php echo $ruta_foto; ?>" onerror="this.src='assets/img/placeholder.jpg'" style="width: 100%; height: 100%; object-fit: cover;">
                                         <div class="position-absolute bottom-0 start-0 m-3">
@@ -43,7 +43,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="card-body p-4 bg-white">
                                         <h6 class="fw-bold mb-1 text-dark" style="font-size: 1.1rem;"><?php echo $a['nombre_espacio']; ?></h6>
                                         <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-primary"></i> <?php echo $a['ubicacion']; ?></p>
@@ -51,8 +51,9 @@
                                             <?php
                                             $equipos = explode(',', $a['equipamiento_fijo']);
                                             foreach ($equipos as $e): if (trim($e) != "" && trim($e) != "bszsrbsr"): ?>
-                                                <span class="badge bg-light text-muted border fw-normal px-2 py-1" style="font-size: 0.6rem; border-radius: 4px;"><?php echo trim($e); ?></span>
-                                            <?php endif; endforeach; ?>
+                                                    <span class="badge bg-light text-muted border fw-normal px-2 py-1" style="font-size: 0.6rem; border-radius: 4px;"><?php echo trim($e); ?></span>
+                                            <?php endif;
+                                            endforeach; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -65,7 +66,7 @@
                     <button class="btn btn-sm text-primary fw-bold mb-4 p-0 d-flex align-items-center gap-2" onclick="regresarAlCatalogo()" style="font-size: 0.8rem; text-transform: uppercase;">
                         <i class="bi bi-arrow-left fs-5"></i> Volver al catálogo
                     </button>
-                    
+
                     <div class="row g-4">
                         <div class="col-lg-8">
                             <div id="calendar_interactivo" class="shadow-sm border rounded-4 bg-white p-4"></div>
@@ -121,20 +122,22 @@
                         <div class="row g-5">
                             <div class="col-lg-7 border-end pe-lg-5">
                                 <h6 class="fw-800 text-uppercase mb-4 pb-2 border-bottom" style="color: #5B3D66; font-weight: 800; font-size: 0.8rem;">Información del Evento</h6>
-                                
+
                                 <div class="mb-4">
                                     <label class="form-label label-sira-pro">Nombre del Evento</label>
                                     <input type="text" name="titulo" class="form-control input-sira-pro" placeholder="Escribe el nombre aquí..." required>
                                 </div>
 
                                 <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label label-sira-pro">Cantidad de Asistentes</label>
-                                        <div class="input-group input-group-sira-pro rounded-3 overflow-hidden border">
-                                            <span class="input-group-text border-0 bg-transparent ps-3"><i class="bi bi-people text-primary fs-5"></i></span>
-                                            <input type="number" name="num_asistentes" id="num_asistentes_input" class="form-control border-0 p-3" placeholder="Cantidad" min="1" required>
-                                        </div>
-                                    </div>
+                                   <div class="col-md-6">
+    <label class="form-label label-sira-pro">Cantidad de Asistentes (Máx: <span id="max_asistentes_label">0</span>)</label>
+    <div class="input-group input-group-sira-pro rounded-3 overflow-hidden border">
+        <span class="input-group-text border-0 bg-transparent ps-3"><i class="bi bi-people text-primary fs-5"></i></span>
+        <input type="number" name="num_asistentes" id="num_asistentes_input" 
+               class="form-control border-0 p-3" placeholder="Cantidad" 
+               min="1" required>
+    </div>
+</div>
                                     <div class="col-md-6">
                                         <label class="form-label label-sira-pro">Otros Requerimientos</label>
                                         <input type="text" name="otros_servicios" class="form-control input-sira-pro" placeholder="Ej. Cafetería, presídium...">
@@ -149,7 +152,7 @@
 
                             <div class="col-lg-5 ps-lg-4">
                                 <h6 class="fw-800 text-uppercase mb-4 pb-2 border-bottom" style="color: #5B3D66; font-weight: 800; font-size: 0.8rem;">Resumen Visual</h6>
-                                
+
                                 <div class="mb-4 text-center bg-light rounded-4 p-3 border shadow-inner">
                                     <img id="img_final_preview" src="assets/img/placeholder.jpg" class="rounded-3 shadow-sm mb-3 border" style="width: 100%; height: 130px; object-fit: cover;">
                                     <div class="d-flex align-items-center justify-content-center py-2 px-3 rounded-pill bg-white border mx-auto shadow-sm" style="width: fit-content;">
@@ -179,9 +182,12 @@
 
                         <div class="mt-5 d-flex justify-content-between align-items-center border-top pt-4">
                             <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none small" onclick="regresarAlCatalogo()">Cancelar Reservación</button>
-                            <button type="submit" class="btn btn-enviar-sira px-5 py-3 rounded-pill fw-bold shadow-lg d-flex align-items-center gap-2 fs-6">
-                                Enviar Solicitud SIRA <i class="bi bi-send-fill ms-1"></i>
-                            </button>
+   <button type="button" 
+        id="btnConfirmarGeneral" 
+        class="btn btn-enviar-sira px-5 py-3 rounded-pill fw-bold shadow-lg"
+        onclick="procesarSolicitudSIRA(event)">
+    Confirmar Reasignación<i class="bi bi-send-fill ms-1"></i>
+</button>
                         </div>
                     </form>
                 </div>
@@ -195,31 +201,56 @@
     :root {
         --sira-purple-primary: #5B3D66;
         --sira-purple-dark: #3a2741;
-        --sira-green-success: #2e7d32; 
+        --sira-green-success: #2e7d32;
     }
 
     /* 1. INTERACTIVIDAD DEL CALENDARIO */
-    .fc-daygrid-day:hover { background-color: rgba(91, 61, 102, 0.08) !important; cursor: pointer; transition: 0.2s ease; }
+    .fc-daygrid-day:hover {
+        background-color: rgba(91, 61, 102, 0.08) !important;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
 
     /* Estilos para el día seleccionado en Morado UTM */
-    .fc-day-selected, .fc-daygrid-day.bg-primary.bg-opacity-10 {
+    .fc-day-selected,
+    .fc-daygrid-day.bg-primary.bg-opacity-10 {
         background-color: rgba(91, 61, 102, 0.15) !important;
         border: 2px solid var(--sira-purple-primary) !important;
         z-index: 5;
     }
 
-    .fc-daygrid-day-number { color: var(--sira-purple-primary) !important; font-weight: 800 !important; text-decoration: none !important; }
-    .fc-toolbar-title { font-size: 1.1rem !important; font-weight: 800 !important; color: var(--sira-purple-dark); text-transform: uppercase; }
+    .fc-daygrid-day-number {
+        color: var(--sira-purple-primary) !important;
+        font-weight: 800 !important;
+        text-decoration: none !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.1rem !important;
+        font-weight: 800 !important;
+        color: var(--sira-purple-dark);
+        text-transform: uppercase;
+    }
 
     /* Botonera de navegación del Calendario */
-    .fc-prev-button.fc-button, .fc-next-button.fc-button {
+    .fc-prev-button.fc-button,
+    .fc-next-button.fc-button {
         background-color: var(--sira-purple-dark) !important;
         border-color: var(--sira-purple-dark) !important;
     }
-    .fc-prev-button.fc-button:hover, .fc-next-button.fc-button:hover { background-color: var(--sira-purple-primary) !important; }
+
+    .fc-prev-button.fc-button:hover,
+    .fc-next-button.fc-button:hover {
+        background-color: var(--sira-purple-primary) !important;
+    }
 
     /* 2. BOTONES DINÁMICOS */
-    #btnConfirmarHorario { background-color: var(--sira-purple-primary) !important; border: none !important; color: white !important; transition: 0.3s; }
+    #btnConfirmarHorario {
+        background-color: var(--sira-purple-primary) !important;
+        border: none !important;
+        color: white !important;
+        transition: 0.3s;
+    }
 
     #btnConfirmarHorario:disabled {
         background-color: #eee !important;
@@ -234,12 +265,23 @@
         border: none !important;
     }
 
-    .btn-enviar-sira:hover { transform: translateY(-3px); shadow: 0 8px 20px rgba(91, 61, 102, 0.3) !important; }
+    .btn-enviar-sira:hover {
+        transform: translateY(-3px);
+        shadow: 0 8px 20px rgba(91, 61, 102, 0.3) !important;
+    }
 
     /* 3. INPUTS Y ESTILOS UTM CLEAN */
-    .label-sira-pro { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #888; display: block; letter-spacing: 0.5px; }
+    .label-sira-pro {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #888;
+        display: block;
+        letter-spacing: 0.5px;
+    }
 
-    .input-sira-pro, .input-group-sira-pro {
+    .input-sira-pro,
+    .input-group-sira-pro {
         background-color: #f8f9fa !important;
         border: 1px solid #e0e0e0 !important;
         border-radius: 12px !important;
@@ -248,7 +290,8 @@
         transition: all 0.3s ease;
     }
 
-    .input-sira-pro:focus, .input-group-sira-pro:focus-within {
+    .input-sira-pro:focus,
+    .input-group-sira-pro:focus-within {
         background-color: #fff !important;
         border-color: var(--sira-purple-primary) !important;
         box-shadow: 0 0 0 4px rgba(91, 61, 102, 0.05) !important;
@@ -270,5 +313,8 @@
         transition: 0.2s;
     }
 
-    .btn-horario.activo { background-color: var(--sira-purple-primary) !important; color: white !important; }
+    .btn-horario.activo {
+        background-color: var(--sira-purple-primary) !important;
+        color: white !important;
+    }
 </style>

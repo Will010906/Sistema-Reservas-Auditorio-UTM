@@ -57,21 +57,13 @@ try {
      * 2. NÚCLEO DE CONSULTA (DATA EXTRACTION)
      * Recupera atributos detallados de las solicitudes ordenadas por fecha de registro.
      */
-    $query = "SELECT 
-                s.id_solicitud, 
-                s.folio, 
-                s.titulo_event, 
-                s.fecha_evento, 
-                s.hora_inicio, 
-                s.hora_fin,
-                s.estado, 
-                s.observaciones_admin, 
-                s.prioridad,
+   $query = "SELECT 
+                s.*, 
                 a.nombre_espacio 
               FROM solicitudes s 
-              JOIN auditorio a ON s.id_auditorio = a.id_auditorio 
+              LEFT JOIN auditorio a ON s.id_auditorio = a.id_auditorio 
               WHERE s.id_usuario = $id_usuario 
-              ORDER BY s.fecha_registro DESC";
+              ORDER BY s.id_solicitud DESC";
 
     $res = mysqli_query($conexion, $query);
     if (!$res) throw new Exception(mysqli_error($conexion));

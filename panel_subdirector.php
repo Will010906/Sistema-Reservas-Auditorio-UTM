@@ -67,9 +67,11 @@ header("Expires: 0");
             <p class="text-muted small fw-bold">ÁREA: <span class="text-sira text-uppercase" id="areaCarrera">--</span></p>
         </div>
         <div class="col-md-6 d-flex justify-content-md-end align-items-center gap-3">
-            <button class="btn btn-primary rounded-pill px-4 fw-800 shadow-sm border-0 py-2" style="background: var(--sira-purple);" onclick="abrirNuevaReservacion()">
-                <i class="bi bi-plus-circle-fill"></i> Nueva Reservación
-            </button>
+          <button class="btn btn-primary rounded-pill px-4 fw-800 shadow-sm border-0 py-2" 
+        style="background: var(--sira-purple);" 
+        onclick="abrirModalNuevaReservacion()"> 
+    <i class="bi bi-plus-circle-fill"></i> Nueva Reservación
+</button>
             <button id="btnPDFCarrera" class="btn btn-danger rounded-pill px-4 fw-800 shadow-sm border-0 py-2">
                 <i class="bi bi-file-earmark-pdf-fill"></i> Reporte
             </button>

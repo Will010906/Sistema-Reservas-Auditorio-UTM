@@ -43,11 +43,11 @@ try {
      * 2. CONSOLIDACIÓN DE DATOS (DATA MINING)
      * Ejecuta una triple unión para obtener detalles del solicitante y el espacio.
      */
-    $sql_lista = "SELECT s.*, u.nombre as nombre_usuario, a.nombre_espacio 
+   $sql_lista = "SELECT s.*, u.nombre as nombre_usuario, a.nombre_espacio 
                   FROM solicitudes s
-                  JOIN usuarios u ON s.id_usuario = u.id_usuario
-                  JOIN auditorio a ON s.id_auditorio = a.id_auditorio
-                  ORDER BY s.fecha_evento ASC";
+                  LEFT JOIN usuarios u ON s.id_usuario = u.id_usuario
+                  LEFT JOIN auditorio a ON s.id_auditorio = a.id_auditorio
+                  ORDER BY s.fecha_registro DESC";
                   
     $res_lista = mysqli_query($conexion, $sql_lista);
     $solicitudes = [];

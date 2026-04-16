@@ -53,31 +53,39 @@ async function cargarMisReservaciones() {
     if (!contenedor) return;
 
     try {
-        // Ejecución de la consulta al endpoint de trámites personales
         const response = await fetch('api/solicitudes/get_mis_reservas.php', {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}` }
         });
 
-        // Verificación de integridad de la sesión en el cliente
         if (response.status === 401) return window.manejarSesionExpirada();
         
         const data = await response.json();
         
-        // Control de concurrencia: Destrucción de instancia previa de DataTable
         if ($.fn.DataTable.isDataTable('#tablaMisReservas')) {
             $('#tablaMisReservas').DataTable().destroy();
         }
         
-        contenedor.innerHTML = ""; // Limpieza del Skeleton Loading
+        contenedor.innerHTML = ""; 
 
         if (data.success && data.solicitudes.length > 0) {
             data.solicitudes.forEach(sol => {
-                // LÓGICA DE NEGOCIO: Determinación de mutabilidad del trámite
-                const esEditable = sol.estado.toUpperCase() === 'PENDIENTE';
-                
+                // 1. DETECCIÓN DE REASIGNACIÓN (El corazón del aviso)
+                const fueReasignado = sol.notificacion_admin == 1;
+                const esEditable = sol.estado.toUpperCase() === 'PENDIENTE' && !fueReasignado;
+
+                // 2. CREACIÓN DEL BADGE ROJO PARPADEANTE
+                const alertaCambio = fueReasignado 
+                    ? `<span class="badge bg-danger animate__animated animate__flash animate__infinite ms-2" 
+                             style="font-size: 0.65rem; vertical-align: middle;">
+                          <i class="bi bi-bell-fill"></i> ¡REASIGNADO!
+                       </span>` 
+                    : '';
+
                 contenedor.innerHTML += `
                     <tr class="solicitud-fila animate__animated animate__fadeIn">
-                        <td class="ps-4 fw-bold" style="color: #5B3D66;">#${sol.folio}</td>
+                        <td class="ps-4 fw-bold" style="color: #5B3D66;">
+                            #${sol.folio} ${alertaCambio}
+                        </td>
                         <td>
                             <div class="fw-bold">${sol.titulo_event}</div>
                             <div class="text-muted x-small">${sol.nombre_espacio}</div>
@@ -95,6 +103,17 @@ async function cargarMisReservaciones() {
                         </td>
                         <td class="text-center">
                             <div class="btn-group">
+                                ${fueReasignado ? `
+    <div class="btn-group shadow-sm">
+       <button class="btn btn-sm btn-success fw-bold me-1" 
+        onclick="window.confirmarReasignacionConSwal(${sol.id_solicitud})">
+    <i class="bi bi-check-lg"></i> Aceptar
+</button>
+        <button class="btn btn-sm btn-danger fw-bold" onclick="window.rechazarReasignacion(${sol.id_solicitud})">
+            <i class="bi bi-x-lg"></i> Rechazar
+        </div>
+    </div>
+` : ''}
                                 <button class="btn btn-sm btn-light border" onclick="window.verDetalleUsuario(${sol.id_solicitud})">
                                     <i class="bi bi-eye-fill text-primary"></i>
                                 </button>
@@ -111,19 +130,15 @@ async function cargarMisReservaciones() {
                     </tr>`;
             });
             
-            // RE-INICIALIZACIÓN DEL DATA GRID PROFESIONAL
             $('#tablaMisReservas').DataTable({
                 retrieve: true,
                 language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
-                dom: 'rtip', // Solo tabla, información y paginación
+                dom: 'rtip',
                 pageLength: 10,
-                order: [[0, "desc"]], // Prioridad a folios recientes
-                columnDefs: [{ targets: [5], orderable: false }] // Bloqueo de orden en acciones
+                order: [[0, "desc"]],
+                columnDefs: [{ targets: [5], orderable: false }]
             });
 
-            /** * ACTUALIZACIÓN DE INDICADORES (KPIs)
-             * Sincronización de contadores tras el renderizado exitoso.
-             */
             if (data.stats) {
                 document.getElementById("countPendientes").innerText = data.stats.pendientes || 0;
                 document.getElementById("countAprobadas").innerText = data.stats.aprobadas || 0;
@@ -131,7 +146,7 @@ async function cargarMisReservaciones() {
             }
         }
     } catch (error) { 
-        console.error("Falla crítica en la sincronización de reservaciones:", error); 
+        console.error("Falla crítica en la sincronización:", error); 
     }
 }
 
@@ -173,17 +188,15 @@ window.obtenerDisponibilidadHoraria = async function(id, fecha) {
         console.error("Error al obtener disponibilidad:", e);
     }
 };
-
 function generarGridHorarios(ocupados) {
     const grid = document.getElementById('grid_horarios');
     const txtResumen = document.getElementById('fecha_seleccionada_txt'); 
     const msjError = document.getElementById('msj_error_rango');
     
-    // --- PASO 1: MOSTRAR EL CONTENEDOR ---
-    // En cuanto entramos aquí es porque ya hay una fecha, así que mostramos la grid
     grid.style.setProperty('display', 'flex', 'important'); 
+    grid.innerHTML = "";
+    if(msjError) $(msjError).hide();
 
-    // Formato de fecha descriptivo
     const fechaInput = document.getElementById('input_fecha_evento').value;
     if (fechaInput) {
         const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
@@ -193,21 +206,25 @@ function generarGridHorarios(ocupados) {
         if(inputDisplay) inputDisplay.value = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
     }
 
-    grid.innerHTML = "";
-    $(msjError).hide();
-
     for (let h = 7; h <= 20; h++) { 
         const hInicioRaw = `${h.toString().padStart(2, '0')}:00`;
         const hTexto = `${h > 12 ? h - 12 : h}:00 ${h >= 12 ? 'PM' : 'AM'}`;
+        
         const estaOcupado = ocupados.some(o => (hInicioRaw >= o.inicio && hInicioRaw < o.fin));
 
         const btn = document.createElement('button');
         btn.type = "button";
         btn.id = `btn-hora-${h}`; 
         btn.className = `btn btn-horario ${estaOcupado ? 'ocupado disabled' : ''}`;
-        btn.innerHTML = estaOcupado ? `<i class="bi bi-x-circle me-1"></i> ${hTexto}` : hTexto;
 
-        if (!estaOcupado) {
+        if (estaOcupado) {
+            btn.innerHTML = `<i class="bi bi-lock-fill"></i> ${hTexto}`;
+            btn.style.backgroundColor = "#ffe5e5"; 
+            btn.style.color = "#d9534f";
+            btn.style.border = "1px solid #f5c2c7";
+            btn.style.cursor = "not-allowed";
+        } else {
+            btn.innerHTML = hTexto;
             btn.onclick = () => {
                 const inputFin = document.getElementById('input_hora_fin');
                 const btnConfirmar = document.getElementById('btnConfirmarHorario');
@@ -231,7 +248,7 @@ function generarGridHorarios(ocupados) {
                         document.querySelectorAll('.btn-horario').forEach(b => b.classList.remove('activo'));
                         inputFin.value = "";
                         btnConfirmar.disabled = true;
-                        txtResumen.innerText = "Selección cancelada. Elige un nuevo inicio.";
+                        txtResumen.innerText = "Selección cancelada.";
                         return;
                     }
 
@@ -242,23 +259,24 @@ function generarGridHorarios(ocupados) {
                             if (bRango) bRango.classList.add('activo');
                         }
 
-                        const hInicioTexto = `${horaInicioSeleccionada > 12 ? horaInicioSeleccionada - 12 : horaInicioSeleccionada}:00 ${horaInicioSeleccionada >= 12 ? 'PM' : 'AM'}`;
-                        const hFinTexto = `${h > 12 ? h - 12 : h}:00 ${h >= 12 ? 'PM' : 'AM'}`;
+                        // --- 🟢 LÍNEA CLAVE: SUMAMOS 1 PARA LA HORA DE SALIDA REAL ---
+                        // --- 🟢 CORRECCIÓN DE VARIABLES (Línea 170+) ---
+const horaFinReal = h; 
+const hInicioNum = parseInt(document.getElementById('input_hora_inicio').value.split(':')[0]);
 
-                        inputFin.value = `${h.toString().padStart(2, '0')}:00`;
-                        btnConfirmar.disabled = false; 
-                        btnConfirmar.style.opacity = "1"; 
-                        
-                        txtResumen.innerHTML = `<i class="bi bi-clock-history me-1"></i> Horario: <b>${hInicioTexto}</b> a <b>${hFinTexto}</b>`;
-                        
-                        horaInicioSeleccionada = null; 
-                    } else {
-                        horaInicioSeleccionada = h;
-                        document.querySelectorAll('.btn-horario').forEach(b => b.classList.remove('activo'));
-                        btn.classList.add('activo');
-                        document.getElementById('input_hora_inicio').value = hInicioRaw;
-                        btnConfirmar.disabled = true;
-                        txtResumen.innerHTML = `Nuevo inicio: <b>${hTexto}</b>. Selecciona la salida.`;
+// Definimos hFinTexto correctamente para que no salga "not defined"
+const hFinTexto = `${horaFinReal > 12 ? horaFinReal - 12 : horaFinReal}:00 ${horaFinReal >= 12 ? 'PM' : 'AM'}`;
+const hInicioDisplay = `${hInicioNum > 12 ? hInicioNum - 12 : hInicioNum}:00 ${hInicioNum >= 12 ? 'PM' : 'AM'}`;
+
+// Guardamos en formato 24h para la base de datos
+document.getElementById('input_hora_fin').value = `${horaFinReal.toString().padStart(2, '0')}:00`;
+
+// 🟢 Aquí usamos hFinTexto que ya está definida arriba
+txtResumen.innerHTML = `<i class="bi bi-clock-history me-1"></i> Rango: <b>${hInicioDisplay}</b> a <b>${hFinTexto}</b>`;
+
+btnConfirmar.disabled = false; 
+btnConfirmar.style.opacity = "1"; 
+horaInicioSeleccionada = null;
                     }
                 }
             };
@@ -359,19 +377,18 @@ window.editarMiSolicitud = async function(id) {
 
     if(data.error) return Swal.fire('Error', data.error, 'error');
 
-    // --- LAS 3 LÍNEAS QUE ARREGLAN TU ERROR ---
-    auditorioSeleccionado = data.id_auditorio; // 1. Activamos la variable global
-    $('#input_id_auditorio').val(data.id_auditorio); // 2. Llenamos el input oculto
-    $('#display_nombre_auditorio').text(data.nombre_espacio); // 3. Quitamos el 'undefined' del header
-    // ------------------------------------------
+    // 1. CARGA DE IDENTIDAD (Evitamos undefined)
+    auditorioSeleccionado = data.id_auditorio; 
+    $('#input_id_auditorio').val(data.id_auditorio); 
+    $('#display_nombre_auditorio').text(data.nombre_espacio); 
 
-    // 1. Llenamos los inputs de la izquierda
+    // 2. LLENADO DE FORMULARIO (Datos persistentes)
     $('#modalNuevaSolicitud .modal-title').text('Modificar Reservación');
     $('input[name="titulo"]').val(data.titulo_event);
     $('textarea[name="descripcion"]').val(data.descripcion);
     $('input[name="num_asistentes"]').val(data.num_asistentes);
     
-    // 2. Tarjeta de la derecha (Sin undefined)
+    // Resumen lateral
     $('#display_nombre_final').text(data.nombre_espacio); 
     $('#capacidad_numero_txt').text(data.capacidad_maxima);
     
@@ -381,62 +398,58 @@ window.editarMiSolicitud = async function(id) {
         imgPreview.onerror = () => imgPreview.src = 'assets/img/placeholder.jpg';
     }
 
-    // 3. Lógica de "Incluye" (Iconos azules)
-    const divEquipamiento = document.getElementById('check_equipamiento_fijo');
-    if (divEquipamiento) {
-        const lista = data.equipamiento_fijo ? data.equipamiento_fijo.split(',') : [];
-        let htmlIcons = "";
-        lista.forEach(item => {
-            if(item.trim() !== "") {
-                htmlIcons += `<div class="d-flex align-items-center mb-1">
-                                <i class="bi bi-check2-circle text-primary me-2"></i>
-                                <span class="small">${item.trim()}</span>
-                              </div>`;
-            }
-        });
-        divEquipamiento.innerHTML = htmlIcons || '<span class="small text-muted">Mobiliario básico.</span>';
-    }
-
-    // 4. --- CORRECCIÓN CLAVE: Lógica de Extras y Texto Manual ---
-    // Limpiamos checks y el input de texto manual
+    // 3. LÓGICA DE EXTRAS (Checkboxes y manual)
     document.querySelectorAll('input[name="extras[]"]').forEach(cb => cb.checked = false);
     $('input[name="otros_servicios"]').val('');
 
     if (data.otros_servicios) {
         const serviciosPrevios = data.otros_servicios.split(', ');
-        // Lista de valores que SI son checkboxes (Ajusta según tus values del HTML)
         const valoresCheckboxes = ['Proyector', 'Extensiones', 'Mobiliario', 'Microfono', 'Cafetera', 'Manteles', 'Insumos'];
         let textosManuales = [];
 
         serviciosPrevios.forEach(item => {
             const itemLimpio = item.trim();
-            // Si es un checkbox, lo marcamos
             if (valoresCheckboxes.includes(itemLimpio)) {
                 const cb = Array.from(document.querySelectorAll('input[name="extras[]"]'))
                                 .find(c => c.value === itemLimpio);
                 if (cb) cb.checked = true;
-            } else {
-                // Si no es checkbox, lo guardamos para el input de texto
-                if(itemLimpio !== "") textosManuales.push(itemLimpio);
+            } else if(itemLimpio !== "") {
+                textosManuales.push(itemLimpio);
             }
         });
-        
-        // REINYECTAMOS EL TEXTO MANUAL (Lo que te faltaba)
         $('input[name="otros_servicios"]').val(textosManuales.join(', '));
     }
 
-    // 5. Gestión de ID
-    $('#input_id_auditorio').val(data.id_auditorio);
+    // 4. GESTIÓN DE ID (Modo Edición Activo)
     if($('#id_editando').length === 0) {
         $('#formNuevaReservacion').append(`<input type="hidden" id="id_editando" name="id_editando" value="${id}">`);
     } else {
         $('#id_editando').val(id);
     }
 
-    // 6. Navegación visual
-    $('#paso_catalogo, #paso_calendario').hide();
-    $('#paso_formulario').fadeIn();
+    // 5. 🟢 NAVEGACIÓN VISUAL: INICIO DESDE EL CATÁLOGO
+    // Ocultamos los pasos avanzados y mostramos el Paso 1
+    $('#paso_calendario, #paso_formulario').hide(); 
+    $('#paso_catalogo').fadeIn(); 
+    
+    // Cambiamos el estilo del botón para que diga "Confirmar Movimiento"
+    actualizarInterfazBotonSIRA(); 
+
+    // Mostramos el modal
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNuevaSolicitud')).show();
+
+    // 6. AVISO TOAST (Opcional para UX)
+    Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    }).fire({
+        icon: 'info',
+        title: 'Modo Edición',
+        text: 'Por favor, confirma o cambia el auditorio.'
+    });
 };
 
 window.verDetalleUsuario = async function(id) {
@@ -445,39 +458,67 @@ window.verDetalleUsuario = async function(id) {
     });
     const data = await res.json();
 
-    // Debug: mira esto en tu consola (F12) para ver qué llega exactamente
-    console.log("Datos de la solicitud:", data);
+    const hInicio = data.hora_inicio ? data.hora_inicio.substring(0, 5) : '--:--';
+    const hFin = data.hora_fin ? data.hora_fin.substring(0, 5) : '--:--';
+    const estado = data.estado ? data.estado.toUpperCase() : 'PENDIENTE';
 
-    const ahora = new Date();
-    const fechaFinEvento = new Date(`${data.fecha_evento}T${data.hora_fin}`);
-    const esPasado = ahora > fechaFinEvento;
-
-    // Convertimos a mayúsculas para que 'Aceptada' y 'ACEPTADA' sean iguales
-    const estado = data.estado ? data.estado.toUpperCase() : '';
-const textoNotas = data.notas_admin || data.observaciones_admin || 'En revisión.';
     let htmlContent = `
-        <div class="text-start p-2">
-        
-            <h5 class="fw-bold text-primary mb-3">${data.titulo_event}</h5>
-            <p class="small mb-1"><strong>Folio:</strong> ${data.folio}</p>
-            <p class="small"><strong>Estado:</strong> ${data.estado}</p>
-            <div class="bg-light p-3 rounded-4 mt-2 border-start border-4 border-info">
-                <label class="extra-small fw-bold text-uppercase d-block mb-1">Notas Administrativas:</label>
-                <span class="small italic">"${textoNotas}"</span>
-            </div>`;
-if (estado === 'ACEPTADA' && esPasado && !data.incidentes_cierre) {
-        htmlContent += `
-            <hr class="my-4">
-            <div class="mt-3 p-3 border border-danger rounded-4 bg-danger bg-opacity-10 shadow-sm">
-                <label class="small fw-bold text-danger d-block mb-2 text-uppercase">Reportar Cierre e Incidentes</label>
-                <textarea id="incidente_texto" class="form-control form-control-sm mb-2" rows="3" placeholder="¿Daños o problemas?"></textarea>
-                <button onclick="guardarCierre(${data.id_solicitud})" class="btn btn-danger btn-sm w-100 fw-bold">Finalizar Reservación</button>
-            </div>`;
-    } else if (data.incidentes_cierre) {
-        htmlContent += `<div class="alert alert-success mt-3 small"><strong>Cierre:</strong> ${data.incidentes_cierre}</div>`;
-    }
+        <div class="text-start px-1">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h5 class="fw-900 mb-1" style="color: #5B3D66; font-weight: 900; font-size: 1.4rem;">${data.titulo_event}</h5>
+                    <span class="text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">FOLIO: #${data.folio}</span>
+                </div>
+                <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-bold shadow-sm" style="font-size: 0.65rem;">
+                    <i class="bi bi-clock-history me-1"></i> ${estado}
+                </span>
+            </div>
 
-    Swal.fire({ html: htmlContent + '</div>', showConfirmButton: false, showCloseButton: true });
+            <div class="rounded-4 p-3 mb-4 shadow-sm border" style="background: linear-gradient(135deg, #ffffff 0%, #f9f6fa 100%); border-left: 6px solid #5B3D66 !important;">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.6rem; letter-spacing: 1px;">Espacio Asignado:</label>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-building-fill text-primary me-2 fs-5"></i>
+                            <span class="fw-bold text-dark" style="font-size: 1.1rem;">${data.nombre_espacio}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.6rem; letter-spacing: 1px;">Fecha del Evento:</label>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-calendar3 text-primary me-2"></i>
+                            <span class="fw-bold">${data.fecha_evento}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.6rem; letter-spacing: 1px;">Horario:</label>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock-fill text-primary me-2"></i>
+                            <span class="fw-bold">${hInicio} - ${hFin}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 rounded-4 bg-light border">
+                <label class="text-muted fw-bold text-uppercase d-block mb-2" style="font-size: 0.6rem; letter-spacing: 1px;">Notas Administrativas:</label>
+                <p class="mb-0 italic text-dark" style="font-size: 0.9rem; line-height: 1.5;">
+                    <i class="bi bi-quote fs-4 text-secondary opacity-25"></i>
+                    ${data.notas_admin || "Su solicitud está siendo procesada por la administración de la UTM."}
+                </p>
+            </div>
+        </div>`;
+
+    Swal.fire({
+        html: htmlContent,
+        showConfirmButton: false,
+        showCloseButton: true,
+        width: '500px',
+        customClass: {
+            container: 'sira-detail-modal',
+            popup: 'rounded-5'
+        }
+    });
 };
 
 window.guardarCierre = async function(id) {
@@ -501,6 +542,7 @@ window.guardarCierre = async function(id) {
  */
 window.abrirModalNuevaReservacion = function() {
     $('#id_editando').val('');
+    actualizarInterfazBotonSIRA();
     $('#formNuevaReservacion')[0].reset();
     limpiarSeleccionHorario(); // <--- Y esto aquí
     $('#modalNuevaSolicitud .modal-title').text('Nueva Reservación');
@@ -513,27 +555,23 @@ window.manejarSesionExpirada = function() { localStorage.removeItem('sira_sessio
 window.limpiarFiltros = function() { $('.check-filtro').prop('checked', false); cargarMisReservaciones(); };
 
 window.irAlCalendario = function(id, nombre) {
-    // 1. Limpieza de seguridad que ya teníamos
+    // 1. Limpiamos ruidos visuales previos
     resetearInterfazHorarios(); 
-
     auditorioSeleccionado = id;
     
-    // 2. ACTUALIZACIÓN: Escondemos el formulario y el catálogo
-    // para que solo se vea el calendario
+    // 2. 🟢 LA CLAVE: Vaciamos el contenedor del calendario
+    const calendarEl = document.getElementById('calendar_interactivo');
+    if (calendarEl) calendarEl.innerHTML = ""; 
+
+    // 3. Cambiamos de paso en el modal
     $('#paso_catalogo, #paso_formulario').hide(); 
-    
-    // 3. Mostramos el calendario
     $('#paso_calendario').fadeIn();
     
-    // 4. Actualizamos textos
-    const displayNombre = document.getElementById('display_nombre_auditorio');
-    
-    if(displayNombre) displayNombre.innerText = nombre;
-    
+    // 4. Actualizamos el ID en el input oculto
     const inputId = document.getElementById('input_id_auditorio');
     if(inputId) inputId.value = id;
-    
-    // 5. Renderizamos
+
+    // 5. Renderizamos el calendario "fresco"
     setTimeout(() => renderizarCalendarioInteractivo(id), 300);
 };
 
@@ -543,40 +581,52 @@ window.regresarAlCatalogo = function() {
 };
 
 window.irAlFormularioFinal = async function() {
-    // 1. INTENTO DE CAPTURA DOBLE
-    // Primero del input oculto, si falla, usamos la variable global
     let idAud = $('#input_id_auditorio').val() || auditorioSeleccionado;
     
-    console.log("ID de Auditorio detectado:", idAud); // Checa esto en F12
-
     if (!idAud || idAud === "0" || idAud === "") {
-        Swal.fire('Atención', 'No se detectó el auditorio. Por favor regresa al catálogo.', 'warning');
+        Swal.fire('Atención', 'No se detectó el auditorio.', 'warning');
         return;
     }
 
     try {
-        // 2. PETICIÓN AL SERVIDOR
         const res = await fetch(`api/solicitudes/get_detalle.php?id_auditorio=${idAud}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}` }
         });
         
         const auditorio = await res.json();
-        
-        // Si el PHP devuelve un error o viene vacío
-        if (!auditorio || auditorio.error) {
-             console.error("El PHP no encontró el auditorio");
-             return;
-        }
+        if (!auditorio || auditorio.error) return;
 
-        // 3. LLENADO DE DATOS (Con los nombres de tu DB)
         const nombreReal = auditorio.nombre_espacio || auditorio.nombre || 'Auditorio';
-        const capacidadReal = auditorio.capacidad_maxima || auditorio.capacidad || '0';
+        const capacidadReal = parseInt(auditorio.capacidad_maxima || auditorio.capacidad || '0');
 
         document.getElementById('display_nombre_auditorio').innerText = nombreReal;
         document.getElementById('display_nombre_final').innerText = nombreReal;
         
         const txtCapacidad = document.getElementById('capacidad_numero_txt');
         if (txtCapacidad) txtCapacidad.innerText = capacidadReal;
+
+        // --- 🟢 BLOQUE DE RESTRICCIÓN PARA REASIGNACIÓN (Punto 5 Mejorado) ---
+        const inputAsis = document.getElementById('num_asistentes_input');
+      if (inputAsis) {
+        // 🟢 Permitimos la edición
+        inputAsis.readOnly = false; 
+        
+        // 🟢 Actualizamos el límite físico
+        inputAsis.max = capacidadReal; 
+
+        // Si el valor actual de la reservación vieja supera al nuevo auditorio, 
+        // lo ajustamos automáticamente al máximo para evitar errores
+        if (parseInt(inputAsis.value) > capacidadReal) {
+            inputAsis.value = capacidadReal;
+            Swal.fire({
+                icon: 'info',
+                title: 'Ajuste de Asistentes',
+                text: `La capacidad se ajustó a ${capacidadReal} (límite del nuevo espacio).`,
+                confirmButtonColor: '#5B3D66'
+            });
+        }
+    }
+        // --------------------------------------------------------------------
 
         // 3. IMAGEN PREVIEW
         const imgElement = document.getElementById('img_final_preview');
@@ -588,8 +638,7 @@ window.irAlFormularioFinal = async function() {
         // 4. LÓGICA DE ICONOS PARA "INCLUYE"
         const divEquipamiento = document.getElementById('check_equipamiento_fijo');
         if (divEquipamiento) {
-            const textoRaw = auditorio.equipamiento_fijo || '';
-            const lista = textoRaw.split(',');
+            const lista = (auditorio.equipamiento_fijo || '').split(',');
             let htmlIconos = '<div class="mt-1">';
             if (lista.length > 0 && lista[0].trim() !== "") {
                 lista.forEach(item => {
@@ -606,25 +655,12 @@ window.irAlFormularioFinal = async function() {
             divEquipamiento.innerHTML = htmlIconos;
         }
 
-        // 5. VALIDACIÓN DE CAPACIDAD
-        const numAsistentes = parseInt($('#num_asistentes_input').val()) || 0;
-        const capMax = parseInt(capacidadReal);
-        if (txtCapacidad) {
-            if (numAsistentes > capMax) {
-                txtCapacidad.classList.add('text-danger');
-                txtCapacidad.classList.remove('text-dark');
-            } else {
-                txtCapacidad.classList.add('text-dark');
-                txtCapacidad.classList.remove('text-danger');
-            }
-        }
-
         // 6. CAMBIO DE VISTA
         $('#paso_calendario').hide();
         $('#paso_formulario').fadeIn();
         
     } catch (e) {
-        console.error("Error crítico en irAlFormularioFinal:", e);
+        console.error("Error crítico:", e);
         Swal.fire('Error', 'No se pudieron cargar los datos del auditorio.', 'error');
     }
 };
@@ -854,3 +890,242 @@ function resetearInterfazHorarios() {
     // 4. Limpiar rastro visual en el calendario
     $('.fc-day').removeClass('bg-primary bg-opacity-10');
 }
+
+window.confirmarCambioAdmin = async function(id) {
+    const res = await fetch('api/solicitudes/confirmar_notificacion.php', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}`
+        },
+        body: JSON.stringify({ id: id })
+    });
+    
+    const data = await res.json();
+    if(data.success) {
+        Swal.fire({
+            title: '¡Confirmado!',
+            text: 'Has aceptado los nuevos términos de tu reservación.',
+            icon: 'success',
+            confirmButtonColor: '#5B3D66'
+        }).then(() => {
+            cargarMisReservaciones(); // Recargamos la tabla para que desaparezca el badge rojo
+        });
+    }
+};
+
+window.rechazarReasignacion = async function(id) {
+    const confirmacion = await Swal.fire({
+        title: '¿Rechazar cambio?',
+        text: "Al rechazar, tu solicitud será cancelada permanentemente.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, cancelar solicitud',
+        cancelButtonText: 'Regresar'
+    });
+
+    if (confirmacion.isConfirmed) {
+        try {
+            const res = await fetch(`api/solicitudes/gestion_solicitudes.php?id=${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}` }
+            });
+            const data = await res.json();
+            if(data.success) {
+                Swal.fire('Cancelada', 'La solicitud ha sido eliminada.', 'success')
+                    .then(() => cargarMisReservaciones());
+            }
+        } catch (e) {
+            console.error("Error al rechazar:", e);
+        }
+    }
+};
+
+window.confirmarReasignacionConSwal = async function(id) {
+    // 1. Mostrar la confirmación visual (como en tu imagen)
+    const result = await Swal.fire({
+        title: '¿Confirmar Nuevos Términos?',
+        text: "Al aceptar, tu reservación quedará asegurada con el nuevo auditorio y horario.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2e7d32', // Un verde UTM
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, Aceptar Cambio',
+        cancelButtonText: 'Revisar'
+    });
+
+    // 2. Si el usuario acepta, procedemos al backend
+    if (result.isConfirmed) {
+        Swal.showLoading(); // Mostramos el cargador para que espere
+        
+        try {
+            // Reutilizamos la función que ya teníamos para llamar al PHP
+            const res = await fetch('api/solicitudes/confirmar_notificacion.php', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}`
+                },
+                body: JSON.stringify({ id: id })
+            });
+            
+            const data = await res.json();
+            if(data.success) {
+                // Alerta de éxito final
+                Swal.fire({
+                    title: '¡Sinergia Exitosa!',
+                    text: 'Tu reservación ha sido confirmada.',
+                    icon: 'success',
+                    confirmButtonColor: '#5B3D66'
+                }).then(() => {
+                    cargarMisReservaciones(); // Recargamos la tabla para que desaparezca el aviso
+                });
+            } else {
+                Swal.fire('Error', 'No se pudo confirmar la reservación.', 'error');
+            }
+        } catch (e) {
+            Swal.fire('Error de Conexión', 'Fallo al conectar con el servidor SIRA.', 'error');
+        }
+    }
+};
+
+
+async function enviarNuevaSolicitud() {
+    // 1. Extraemos los datos del formulario
+    const formulario = document.getElementById('formNuevaReservacion');
+    const fd = new FormData(formulario);
+    const objetoDatos = Object.fromEntries(fd.entries());
+
+    // --- 🟢 BLOQUE DE RESTRICCIONES DE SEGURIDAD ---
+    // Validamos manualmente antes del fetch para que no se creen folios vacíos
+    if (!objetoDatos.titulo || objetoDatos.titulo.trim() === "" || 
+        !objetoDatos.num_asistentes || objetoDatos.num_asistentes <= 0 ||
+        !objetoDatos.descripcion || objetoDatos.descripcion.trim() === "") {
+        
+        return Swal.fire({
+            icon: 'error',
+            title: 'Datos Incompletos',
+            text: 'Debes llenar el título, la cantidad de asistentes y la descripción.',
+            confirmButtonColor: '#5B3D66'
+        });
+    }
+
+    console.log("SIRA - Enviando datos validados:", objetoDatos);
+
+    try {
+        const response = await fetch('api/solicitudes/guardar_solicitud.php', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}` 
+            },
+            body: JSON.stringify(objetoDatos)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                title: '¡Reservación Creada!',
+                text: `Tu folio es: ${data.folio}`,
+                icon: 'success',
+                confirmButtonColor: '#5B3D66'
+            }).then(() => location.reload());
+        } else {
+            Swal.fire('Error', data.error, 'error');
+        }
+    } catch (error) {
+        console.error("Falla de red:", error);
+        Swal.fire('Error', 'No se pudo conectar con el servidor UTM.', 'error');
+    }
+}
+
+window.procesarSolicitudSIRA = function(event) {
+    if (event) event.preventDefault();
+
+    // 1. RECOGER DATOS
+    const hInicio = document.getElementById('input_hora_inicio').value;
+    const hFin = document.getElementById('input_hora_fin').value;
+    const fecha = document.getElementById('input_fecha_evento').value;
+
+    // 2. 🟢 BLOQUE DE SEGURIDAD PARA LAS HORAS (Evita el 00:00)
+    if (!fecha || !hInicio || !hFin || hInicio === "00:00" || hFin === "00:00") {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Horario Requerido',
+            text: 'Por favor, selecciona un día y un rango de horas en el calendario.',
+            confirmButtonColor: '#5B3D66'
+        });
+        return; // Detenemos el envío si no hay horas reales
+    }
+
+    // ... (Mantén aquí tus validaciones de título, asistentes y descripción)
+
+    const campoId = document.getElementById('id_editando');
+    const idEdicion = campoId ? campoId.value : "";
+    const esAdmin = window.location.href.includes('panel_admin');
+
+    if (idEdicion && idEdicion !== "0") {
+        if (esAdmin) {
+            confirmarReasignacionFinal(); 
+        } else {
+            // 🟢 Al usar trigger, el navegador enviará los datos actuales de los inputs
+            $('#formNuevaReservacion').trigger('submit');
+        }
+    } else {
+        enviarNuevaSolicitud(); 
+    }
+};
+
+window.actualizarInterfazBotonSIRA = function() {
+    const btn = document.getElementById('btnConfirmarGeneral');
+    const idEdicion = $('#id_editando').val();
+    
+    if (!btn) return;
+
+    if (idEdicion && idEdicion !== "0" && idEdicion !== "") {
+        // --- MODO EDICIÓN (Personalizado con JS) ---
+        btn.innerHTML = 'Confirmar Cambios <i class="bi bi-pencil-square ms-1"></i>';
+        
+        // Aplicamos el color directamente
+        btn.style.backgroundColor = "#8E6B9E"; // Morado claro para edición
+        btn.style.color = "#white";
+        btn.style.border = "none";
+        
+        // Removemos clases que puedan estorbar
+        btn.classList.remove('btn-warning', 'btn-enviar-sira', 'text-dark');
+    } else {
+        // --- MODO NUEVA SOLICITUD (Vuelve al original) ---
+        btn.innerHTML = 'Enviar Solicitud SIRA <i class="bi bi-send-fill ms-1"></i>';
+        
+        // Limpiamos los estilos directos para que use su clase de CSS normal
+        btn.style.backgroundColor = ""; 
+        btn.style.color = "";
+        btn.style.border = "";
+        
+        btn.classList.add('btn-enviar-sira');
+    }
+};
+
+// Agrega esto a tu archivo JS de reservaciones
+document.getElementById('num_asistentes_input').addEventListener('input', function() {
+    // Obtenemos la capacidad máxima actual desde el resumen visual
+    const capacidadMax = parseInt(document.getElementById('capacidad_numero_txt').innerText);
+    const valorIngresado = parseInt(this.value);
+
+    if (valorIngresado > capacidadMax) {
+        // Bloqueamos el exceso
+        this.value = capacidadMax;
+        
+        // Alerta visual para el usuario
+        Swal.fire({
+            icon: 'warning',
+            title: 'Capacidad Excedida',
+            text: `El auditorio seleccionado solo permite un máximo de ${capacidadMax} personas.`,
+            confirmButtonColor: '#5B3D66',
+            target: document.getElementById('modalNuevaSolicitud')
+        });
+    }
+});

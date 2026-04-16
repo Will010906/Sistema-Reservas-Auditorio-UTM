@@ -75,6 +75,23 @@
     scroll-behavior: smooth;
   }
 }
+
+.masthead {
+    /* 🟢 Capa de degradado: Oscurece más la parte superior e inferior para resaltar el centro */
+    background: linear-gradient(rgba(30, 15, 40, 0.8), rgba(30, 15, 40, 0.75)), 
+                url('../img/fondo_utm.jpg'); 
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Para que el título se vea más "fuerte" */
+.fw-black {
+    font-weight: 900 !important;
+}
 #mainNav .container {
     max-width: 95% !important; /* Expande logo a la izq y menú a la der */
 }

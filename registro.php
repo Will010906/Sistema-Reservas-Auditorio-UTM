@@ -1,7 +1,7 @@
 <?php
 /**
  * VISTA: REGISTRO DE USUARIOS - SIRA UTM
- * Actualizado: Diseño Pro y Toggle de Contraseña funcional.
+ * Actualizado: Diseño Pro, Aviso Docente y Estética Unificada.
  */
 ?>
 <!DOCTYPE html>
@@ -19,14 +19,15 @@
         :root { --sira-purple: #5B3D66; }
         body { background-color: #f8f9fa; }
         .card { border-radius: 20px; }
-        /* Estilo para el ojo de la contraseña */
         .sira-password-toggle .btn:focus { box-shadow: none !important; outline: none !important; }
         .sira-password-toggle .btn:hover { color: var(--sira-purple) !important; }
-        .form-control:focus { border-color: var(--sira-purple); box-shadow: 0 0 0 0.25rem rgba(91, 61, 102, 0.25); }
+        .form-control:focus, .form-select:focus { border-color: var(--sira-purple); box-shadow: 0 0 0 0.25rem rgba(91, 61, 102, 0.25); }
+        /* Estilo para la alerta institucional */
+        .alert-utm { background-color: rgba(91, 61, 102, 0.05); border-left: 4px solid var(--sira-purple); color: #444; }
     </style>
 </head>
 
-<body class="d-flex align-items-center vh-100">
+<body class="d-flex align-items-center py-5">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-5">
@@ -35,6 +36,16 @@
                         <img src="assets/img/logo_app_web_RA.png" style="max-width: 70px;" alt="UTM Logo">
                         <h4 class="fw-bold mt-3">Crea tu cuenta</h4>
                         <p class="text-muted small">Portal de Reservas UTM</p>
+                    </div>
+
+                    <div class="alert alert-utm shadow-sm mb-4">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-info-circle-fill me-2 mt-1" style="color: var(--sira-purple);"></i>
+                            <div style="font-size: 0.85rem; line-height: 1.4;">
+                                <strong>Registro exclusivo para estudiantes.</strong><br>
+                                Si es docente, por favor envíe un correo para su registro o acuda con el encargado administrativo para su alta.
+                            </div>
+                        </div>
                     </div>
 
                     <form id="registroForm" novalidate>
@@ -95,13 +106,18 @@
                             <div class="form-text" style="font-size: 0.7rem;">Mín. 8 caracteres, letras y números.</div>
                         </div>
 
-                        <button type="submit" id="btnRegistro" class="btn btn-primary w-100 rounded-pill fw-bold py-2 mt-2" style="background-color: #5B3D66; border: none;">
+                        <button type="submit" id="btnRegistro" class="btn btn-primary w-100 rounded-pill fw-bold py-2 mt-2" style="background-color: var(--sira-purple); border: none;">
                             REGISTRARME
                         </button>
 
-                        <div class="text-center mt-3">
-                            <a href="login.php" class="small text-decoration-none text-muted">¿Ya tienes cuenta? Inicia sesión</a>
-                        </div>
+                        <div class="text-center mt-4">
+    <p class="small text-muted mb-0">
+        ¿Ya tienes cuenta? 
+        <a href="login.php" class="fw-bold text-decoration-none" style="color: var(--sira-purple);">
+            Inicia sesión
+        </a>
+    </p>
+</div>
                     </form>
                 </div>
             </div>

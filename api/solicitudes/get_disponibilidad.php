@@ -51,29 +51,29 @@ if (!$auth) {
  * @var string $fecha Fecha del evento en formato ISO (YYYY-MM-DD).
  * @var int|null $id_excluir Identificador opcional para procesos de reasignación.
  */
-$id_auditorio = isset($_GET['id']) ? mysqli_real_escape_string($conexion, $_GET['id']) : null;
+$id_auditorio = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $fecha        = isset($_GET['fecha']) ? mysqli_real_escape_string($conexion, $_GET['fecha']) : null;
-$id_excluir   = isset($_GET['id_excluir']) ? mysqli_real_escape_string($conexion, $_GET['id_excluir']) : null;
+// Forzamos que sea un entero para evitar errores de comillas
+$id_excluir   = isset($_GET['id_excluir']) && $_GET['id_excluir'] !== "" ? (int)$_GET['id_excluir'] : 0;
 
 $ocupados = [];
 
-if ($id_auditorio && $fecha) {
+if ($id_auditorio > 0 && $fecha) {
     /**
      * CONSULTA DE TRASLAPE HORARIO (OVERLAP QUERY)
-     * Selecciona horarios ocupados filtrando solicitudes no válidas.
+     * Mejoramos el filtro de estados para asegurar que bloquee Pendientes y Aceptadas.
      */
     $sql = "SELECT hora_inicio, hora_fin FROM solicitudes 
-            WHERE id_auditorio = '$id_auditorio' 
+            WHERE id_auditorio = $id_auditorio 
             AND fecha_evento = '$fecha' 
-            AND estado != 'RECHAZADA'";
+            AND estado NOT IN ('RECHAZADA', 'CANCELADA')"; // Más seguro que solo !=
             
     /**
      * INYECCIÓN DE LÓGICA DE EXCLUSIÓN
-     * Si el sistema está en modo 'Edición', ignoramos el registro actual 
-     * para que el usuario pueda reprogramar sus propias horas.
+     * Solo aplicamos la exclusión si realmente hay un ID válido mayor a 0.
      */
-    if ($id_excluir) {
-        $sql .= " AND id_solicitud != '$id_excluir'";
+    if ($id_excluir > 0) {
+        $sql .= " AND id_solicitud <> $id_excluir"; 
     }
             
     $res = mysqli_query($conexion, $sql);

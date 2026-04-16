@@ -189,11 +189,11 @@ contenedor.innerHTML += `
             </div>
         </td>
 
-        <td class="text-center">
-            <span class="badge rounded-pill bg-light text-secondary border px-3" style="font-size: 0.75rem;">
-                ${sol.nombre_auditorio || 'Pendiente'}
-            </span>
-        </td>
+      <td class="text-center">
+    <span class="badge rounded-pill bg-light text-secondary border px-3">
+        ${sol.nombre_espacio ? sol.nombre_espacio : 'Por asignar'}
+    </span>
+</td>
 
         <td class="text-center text-muted fw-medium" style="font-size: 0.85rem;">
             ${sol.fecha_evento || '---'}
@@ -569,8 +569,109 @@ window.abrirReasignacion = async function(id) {
     }
 };
 
-$(document).on('click', '#modalNuevaSolicitud .btn-close', function() {
-    $('#modalNuevaSolicitud').hide();
-    $('.modal-backdrop').remove();
-    $('body').removeClass('modal-open').css('overflow', 'auto');
-});
+window.confirmarReasignacionFinal = async function() {
+    // 1. Recolectamos los datos de los inputs del modal
+    const idCapturado = document.getElementById('id_editando').value;
+
+    const datos = {
+        id_solicitud: idCapturado,
+        id_auditorio: document.getElementById('input_id_auditorio').value,
+        fecha: document.getElementById('input_fecha_evento').value,
+        hora_inicio: document.getElementById('input_hora_inicio').value,
+        // 🟢 CORRECCIÓN: Era 'value', no 'valu'
+        hora_fin: document.getElementById('input_hora_fin').value, 
+        // 🟢 IMPORTANTE: Esto es lo que permite que los asistentes se modifiquen
+        num_asistentes: document.getElementById('num_asistentes_input').value, 
+        notas: document.querySelector('textarea[name="descripcion"]').value
+    };
+
+    // Debug para verificar en consola (F12)
+    console.log("SIRA - Enviando reasignación:", datos);
+
+    if (!datos.id_solicitud || datos.id_solicitud === "0") {
+        return Swal.fire('Error', 'No se detectó el ID de la solicitud.', 'error');
+    }
+
+    try {
+        const response = await fetch('api/solicitudes/reasignar_proceso.php', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('sira_session_token')}`
+            },
+            body: JSON.stringify(datos)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // 1. Cierre manual del modal
+            const modalElement = document.getElementById('modalNuevaSolicitud');
+            const modalReserva = bootstrap.Modal.getInstance(modalElement);
+            if (modalReserva) modalReserva.hide();
+
+            // 2. Limpieza forzada de la interfaz (Backdrops)
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = 'auto';
+
+            // 3. Feedback visual profesional
+            Swal.fire({
+                title: '¡Movimiento Confirmado!',
+                text: 'El auditorio y los asistentes han sido actualizados con éxito.',
+                icon: 'success',
+                confirmButtonColor: '#5B3D66'
+            }).then(() => {
+                location.reload(); // Recarga la tabla de administrador
+            });
+        } else {
+            Swal.fire('Error', result.error || 'No se pudo actualizar', 'error');
+        }
+    } catch (error) {
+        console.error("Falla crítica en el envío SIRA:", error);
+        Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+    }
+};
+
+window.procesarSolicitudSIRA = function(event) {
+    if (event) event.preventDefault();
+
+    // --- 🟢 PASO 1: RECOGER DATOS ---
+    const titulo = document.querySelector('input[name="titulo"]').value.trim();
+    const asistentes = parseInt(document.getElementById('num_asistentes_input').value);
+    const descripcion = document.querySelector('textarea[name="descripcion"]').value.trim();
+    const capacidadMax = parseInt(document.getElementById('capacidad_numero_txt').innerText);
+
+    // --- 🟢 PASO 2: VALIDACIÓN DE CAMPOS VACÍOS ---
+    if (titulo === "" || isNaN(asistentes) || descripcion === "") {
+        Swal.fire({
+            icon: 'error',
+            title: 'Campos Obligatorios',
+            text: 'Para crear un nueva solicitud, todos los campos deben estar llenos.',
+            confirmButtonColor: '#5B3D66'
+        });
+        return; // 🛑 AQUÍ SE BLOQUEA LA REASIGNACIÓN SI FALTA ALGO
+    }
+
+    // --- 🟢 PASO 3: VALIDACIÓN DE CAPACIDAD ---
+    if (asistentes > capacidadMax) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Capacidad Superada',
+            text: `El auditorio seleccionado solo permite ${capacidadMax} personas.`,
+            confirmButtonColor: '#5B3D66'
+        });
+        return; // 🛑 AQUÍ SE BLOQUEA LA REASIGNACIÓN SI SE PASAN
+    }
+
+    // --- 🟢 PASO 4: SI TODO ES VÁLIDO, SE PROCEDE ---
+    const campoId = document.getElementById('id_editando');
+    const idEdicion = campoId ? campoId.value : "";
+    
+    if (idEdicion && idEdicion !== "0" && idEdicion !== "") {
+        // Ahora sí, solo después de validar, llamamos a la reasignación
+        confirmarReasignacionFinal(); 
+    } else {
+        enviarNuevaSolicitud(); 
+    }
+};

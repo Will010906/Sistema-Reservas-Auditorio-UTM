@@ -39,13 +39,27 @@
             </div>
         </nav>
 
-        <header class="masthead">
-            <div class="container">
-                <div class="masthead-subheading">¡BIENVENIDO A SIRA!</div>
-                <div class="masthead-heading text-uppercase">Tu evento empieza aquí</div>
-                <a class="btn btn-primary btn-xl text-uppercase" href="#servicios">Leer más</a>
-            </div>
-        </header>
+     <header class="masthead">
+    <div class="hero-container text-center px-4">
+        <p class="text-uppercase fw-bold mb-3" style="letter-spacing: 4px; color: #D4ADFC;">
+            ¡Bienvenidos a SIRA!
+        </p>
+        
+        <h1 class="display-3 fw-bold text-white mb-4" style="text-shadow: 2px 4px 10px rgba(0,0,0,0.6); line-height: 1.1;">
+            SISTEMA INTEGRAL DE <br>
+            RESERVACIÓN DE AUDITORIOS
+        </h1>
+        
+        <p class="lead mb-5 text-white fw-bold" style="text-shadow: 1px 1px 5px rgba(0,0,0,0.8); max-width: 800px; margin: 0 auto;">
+            Gestiona tus espacios académicos de forma rápida, segura y eficiente.
+        </p>
+
+       <a href="#servicios" class="btn px-5 py-3 rounded-pill text-uppercase fw-bold shadow-lg" 
+   style="background-color: #5B3D66; color: white !important; border: 2px solid rgba(255,255,255,0.2); min-width: 280px; font-size: 1.1rem; transition: all 0.3s ease;">
+    Explorar Servicios <i class="bi bi-chevron-down ms-2"></i>
+</a>
+    </div>
+</header>
 
         <section class="page-section" id="servicios">
             <div class="container">
