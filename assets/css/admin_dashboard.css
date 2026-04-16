@@ -17,16 +17,18 @@ body {
     background-color: var(--sira-bg);
     margin: 0;
     color: #2D2D2D;
+    overflow-x: hidden; /* Evita desbordamiento lateral en móviles */
 }
 
 /* =========================================
-   ESTRUCTURA Y LAYOUT
+   ESTRUCTURA Y LAYOUT (CORREGIDO)
    ========================================= */
 .main-content {
-    margin-left: 310px;
+    margin-left: 310px; /* Margen para escritorio */
     padding: 30px 40px;
     width: calc(100% - 310px);
     min-width: 0;
+    transition: all 0.3s ease;
 }
 
 /* =========================================
@@ -82,7 +84,7 @@ body {
 .bg-rej { background: var(--grad-rejected); }
 
 /* =========================================
-   CONTENEDOR DE TABLA (ALINEACIÓN SUPERIOR)
+   CONTENEDOR DE TABLA
    ========================================= */
 .table-container {
     background: white;
@@ -92,7 +94,7 @@ body {
     min-height: 400px; 
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important; /* Fuerza el pegado arriba */
+    justify-content: flex-start !important;
     overflow: hidden;
 }
 
@@ -101,6 +103,10 @@ body {
     padding-top: 0 !important;
     scrollbar-width: thin;
     scrollbar-color: var(--sira-purple-primary) #f8f9fa;
+    display: block;
+    width: 100%;
+    overflow-x: auto; /* Habilita scroll horizontal en móviles */
+    -webkit-overflow-scrolling: touch;
 }
 
 #tablaSolicitudes {
@@ -157,63 +163,13 @@ body {
     box-shadow: 0 4px 12px rgba(91, 61, 102, 0.2) !important;
 }
 
-/* =========================================
-   RESPONSIVE DESIGN
-   ========================================= */
-@media (max-width: 992px) {
-    .main-content {
-        margin-left: 80px;
-        width: calc(100% - 80px);
-        padding: 15px;
-    }
-    
-    .table-responsive {
-        border: 0;
-    }
-}
-
-/* --- ALINEACIÓN PROFESIONAL PARA TABLA ADMIN --- */
-
-/* 1. Centramos los títulos y el contenido de las columnas que son Badges o Acciones */
-#tablaAdmin thead th, 
-#tablaAdmin tbody td {
-    vertical-align: middle; /* Centrado vertical absoluto */
-    text-align: center;    /* Centrado horizontal por defecto */
-}
-
-/* 2. Mantenemos la alineación a la izquierda SOLO para las columnas de texto largo */
-#tablaAdmin th:nth-child(1), #tablaAdmin td:nth-child(1), /* Folio */
-#tablaAdmin th:nth-child(2), #tablaAdmin td:nth-child(2)  /* Título/Evento */ {
-    text-align: left;
-    padding-left: 1.5rem;
-}
-
-/* 3. Ajuste de Padding para los encabezados (Dales aire) */
-#tablaAdmin thead th {
-    padding-top: 15px;
-    padding-bottom: 15px;
-    background-color: #f8f9fa; /* Un tono gris muy tenue para diferenciar el header */
-    border-bottom: 2px solid #dee2e6;
-    color: #5B3D66; /* El morado SIRA para los títulos */
-}
-
-/* 4. Ajuste específico para la columna de Acciones */
-.col-acciones {
-    width: 120px;
-    text-align: center;
-}   
-
-/* --- OPTIMIZACIÓN DE TABLA ADMIN SIRA --- */
-
-/* 1. Reset general: Centrado vertical para que todo respire */
+/* --- OPTIMIZACIÓN DE TABLAS --- */
 #tablaSolicitudes th, 
 #tablaSolicitudes td {
     vertical-align: middle;
-    padding: 12px 8px; /* Damos más aire a las filas */
+    padding: 12px 8px;
 }
 
-/* 2. Alineación Selectiva: 
-   Centramos Teléfono (col 3), Área (col 4), Estado (col 5) y Acciones (col 6) */
 #tablaSolicitudes th:nth-child(3), #tablaSolicitudes td:nth-child(3),
 #tablaSolicitudes th:nth-child(4), #tablaSolicitudes td:nth-child(4),
 #tablaSolicitudes th:nth-child(5), #tablaSolicitudes td:nth-child(5),
@@ -221,16 +177,64 @@ body {
     text-align: center;
 }
 
-/* 3. Mantenemos alineación natural para Usuario y Matrícula */
-#tablaSolicitudes th:nth-child(1), #tablaSolicitudes td:nth-child(1),
-#tablaSolicitudes th:nth-child(2), #tablaSolicitudes td:nth-child(2) {
-    text-align: left;
-}
-
-/* 4. Estilo premium para el encabezado */
 #tablaSolicitudes thead.table-light th {
     background-color: #f8f9fa;
-    color: #5B3D66; /* Morado SIRA */
+    color: #5B3D66;
     font-weight: 700;
     border-bottom: 2px solid #EBEFF2;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN (REPARADO FINAL)
+   ========================================= */
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 80px !important; 
+        width: calc(100% - 80px) !important;
+        padding: 20px 10px !important; /* Reducimos padding lateral para ganar espacio */
+    }
+
+    /* 🟢 CORRECCIÓN DEFINITIVA PARA FILAS DE TARJETAS */
+    .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+    }
+
+    /* Aseguramos que las columnas no tengan padding excesivo que corte la tarjeta */
+    .col, .col-md-4, .col-sm-6 {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+        flex: 0 0 100% !important; /* Forzamos una tarjeta por fila en móviles */
+        max-width: 100% !important;
+    }
+
+    .card-sira {
+        width: 100% !important;
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Apilado de filtros en móvil */
+    .filter-group, .d-flex.flex-wrap {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    /* Ajuste de texto largo en eventos */
+    td div.fw-bold {
+        white-space: normal !important;
+        min-width: 140px;
+        font-size: 0.85rem;
+        word-break: break-word;
+    }
+
+    /* Botones de acción a ancho completo */
+    .btn-pdf, .btn-secondary, .btn-dark, #btnPDF {
+        width: 100% !important;
+        margin-bottom: 8px;
+    }
 }

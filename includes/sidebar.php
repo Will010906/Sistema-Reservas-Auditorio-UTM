@@ -20,12 +20,12 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
 <style>
     :root {
-        --sira-purple-dark: #2D1B33;    /* Identidad SIRA - Profundo */
-        --sira-purple-primary: #5B3D66; /* Identidad UTM - Primario */
-        --sira-purple-active: #F4EFFF;  /* Estado Selección */
+        --sira-purple-dark: #2D1B33;
+        --sira-purple-primary: #5B3D66;
+        --sira-purple-active: #F4EFFF;
     }
 
-    /* SISTEMA DE POSICIONAMIENTO FIJO (LAYOUT) */
+    /* SISTEMA DE POSICIONAMIENTO FIJO */
     .activity-bar { 
         background-color: var(--sira-purple-dark); 
         width: 80px; 
@@ -38,6 +38,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         align-items: center; 
         padding-top: 25px; 
         z-index: 1001; 
+        transition: all 0.3s ease;
     }
 
     .side-bar { 
@@ -50,9 +51,9 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         border-right: 1px solid rgba(0,0,0,0.05); 
         padding: 30px 15px; 
         z-index: 1000; 
+        transition: all 0.3s ease;
     }
 
-    /* ESTILOS DE ELEMENTOS DE NAVEGACIÓN */
     .nav-section-title { 
         font-size: 0.65rem; 
         font-weight: 800; 
@@ -76,7 +77,6 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     .nav-link-custom i { font-size: 1.1rem; margin-right: 12px; }
 
-    /* ESTADOS DE INTERACCIÓN */
     .nav-link-custom.active { 
         background-color: var(--sira-purple-active); 
         color: var(--sira-purple-primary); 
@@ -85,6 +85,34 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     .nav-link-custom:hover:not(.active) { 
         background-color: #f8f9fa; 
         transform: translateX(5px); 
+    }
+
+    /* 📱 AJUSTES CRÍTICOS PARA MÓVIL (Resuelve el solapamiento) */
+    @media (max-width: 768px) {
+        /* 1. Ocultamos la barra lateral de textos por defecto */
+        .side-bar {
+            transform: translateX(-100%); /* La sacamos de la pantalla */
+            left: 0;
+            width: 200px;
+            z-index: 1002;
+        }
+
+        /* 2. Reducimos la activity-bar a una franja muy delgada o iconos pequeños */
+        .activity-bar {
+            width: 60px;
+        }
+
+        /* 3. Empujamos el contenido principal solo lo necesario */
+        .main-content {
+            margin-left: 60px !important;
+            width: calc(100% - 60px) !important;
+        }
+
+        /* 4. Si quieres que la barra de textos aparezca al tocar algo, 
+           puedes usar una clase 'active', pero por ahora, para que no tape: */
+        .side-bar {
+            display: none; /* La ocultamos en móvil para dar espacio al Dashboard */
+        }
     }
 </style>
 

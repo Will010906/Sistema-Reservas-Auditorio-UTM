@@ -126,3 +126,24 @@ body {
     line-height: 1.5;
     margin-bottom: 0;
 }
+
+/* --- AJUSTES MÓVIL: MENÚ LATERAL --- */
+@media (max-width: 768px) {
+    /* Reducimos el sidebar a solo iconos */
+    .side-bar {
+        width: 70px !important;
+        min-width: 70px !important;
+    }
+
+    /* Ocultamos los textos para evitar el encimado */
+    .side-bar span, 
+    .side-bar .text-menu, 
+    .side-bar h6 {
+        display: none !important;
+    }
+
+    /* Ajustamos el contenido principal para que no quede un hueco blanco */
+    .main-content {
+        margin-left: 70px !important;
+    }
+}
