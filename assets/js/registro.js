@@ -77,41 +77,53 @@ document.getElementById("registroForm")?.addEventListener("submit", async functi
      * 3. TRANSMISIÓN ASÍNCRONA AL BACKEND
      * Consume el microservicio de registro mediante el protocolo HTTP POST.
      */
-    try {
-      const response = await fetch("api/auth/registro_usuario.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nombre,
-          matricula,
-          correo,
-          carrera,
-          password,
-          telefono: telefonoRaw,
-        }),
+/**
+ * 3. TRANSMISIÓN ASÍNCRONA AL BACKEND (VERSIÓN DEPURACIÓN)
+ * Captura la respuesta como texto primero para diagnosticar errores de PHP.
+ */
+try {
+  const response = await fetch("api/auth/registro_usuario.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nombre,
+      matricula,
+      correo,
+      carrera,
+      password,
+      telefono: telefonoRaw,
+    }),
+  });
+
+  // 🟢 PASO CLAVE: Leemos la respuesta como texto crudo primero
+  const responseText = await response.text();
+  
+  try {
+    // Intentamos convertir ese texto a un objeto JSON
+    const data = JSON.parse(responseText);
+
+    if (data.success) {
+      Swal.fire({
+        icon: "success",
+        title: "¡Registro Exitoso!",
+        text: "Su cuenta ha sido creada. Ya puede iniciar sesión.",
+        confirmButtonColor: "#5B3D66",
+      }).then(() => {
+        window.location.href = "index.php";
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Fase de Éxito: Notificación y Redirección al Portal de Acceso
-        Swal.fire({
-          icon: "success",
-          title: "¡Registro Exitoso!",
-          text: "Su cuenta ha sido creada. Ya puede iniciar sesión.",
-          confirmButtonColor: "#5B3D66",
-        }).then(() => {
-          window.location.href = "index.php";
-        });
-      } else {
-        // Manejo de errores lógicos (Ej: Matrícula duplicada en la base de datos)
-        mostrarAlerta("error", "Error en registro", data.error || "La matrícula o correo ya existen.");
-      }
-
-    } catch (error) {
-        console.error("Fallo técnico en registro:", error);
-        mostrarAlerta("error", "Error de conexión", "El servidor mandó una respuesta inválida o el núcleo falló.");
+    } else {
+      mostrarAlerta("error", "Error en registro", data.error || "La matrícula o correo ya existen.");
     }
+  } catch (jsonError) {
+    // 🛑 Si entra aquí, es porque PHP mandó un error de código en lugar de un JSON
+    console.error("Error de sintaxis en el servidor. Respuesta recibida:", responseText);
+    mostrarAlerta("error", "Fallo en el Servidor", "PHP mandó una respuesta inválida. Revisa la consola (F12) para ver el error.");
+  }
+
+} catch (error) {
+    console.error("Fallo técnico de red:", error);
+    mostrarAlerta("error", "Error de conexión", "No se pudo contactar con el núcleo de seguridad UTM.");
+}
 });
 
 /**

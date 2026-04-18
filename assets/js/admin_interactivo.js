@@ -108,12 +108,11 @@ async function gestionar(id) {
  * MOTOR DE FILTRADO (Corregido para Badges Dinámicos)
  */
 function aplicarFiltros() {
-    const inicio = document.getElementById("fecha_inicio")?.value;
-    const fin = document.getElementById("fecha_fin")?.value;
+    const inicioStr = document.getElementById("fecha_inicio")?.value; // Formato YYYY-MM-DD
+    const finStr = document.getElementById("fecha_fin")?.value;       // Formato YYYY-MM-DD
     const chkTodos = document.getElementById("chkTodos");
     const todosActivo = chkTodos ? chkTodos.checked : true;
 
-    // Array de estatus seleccionados (ej: ["URGENTE", "DEMORADA"])
     const seleccionados = todosActivo 
         ? [] 
         : Array.from(document.querySelectorAll(".filter-check:checked")).map(cb => cb.value.toUpperCase());
@@ -121,22 +120,24 @@ function aplicarFiltros() {
     const filas = document.querySelectorAll(".solicitud-fila");
 
     filas.forEach((fila) => {
-        // 1. Filtro de Fechas
-        const celdaFecha = fila.querySelector(".date-cell")?.innerText.trim();
+        // 1. FILTRO DE FECHAS (Corrección Crítica)
+        // Buscamos el valor original YYYY-MM-DD que guardaremos en un atributo data
+        const fechaCeldaRaw = fila.getAttribute("data-fecha-raw"); 
         let cumpleFecha = true;
-        if (inicio && fin) cumpleFecha = (celdaFecha >= inicio && celdaFecha <= fin);
 
-        // 2. Filtro de Semáforo (Basado en el texto del Badge)
+        if (inicioStr && finStr && fechaCeldaRaw) {
+            cumpleFecha = (fechaCeldaRaw >= inicioStr && fechaCeldaRaw <= finStr);
+        }
+
+        // 2. FILTRO DE ESTATUS
         const badge = fila.querySelector(".badge-status");
         let cumpleEstatus = true;
 
         if (badge && !todosActivo) {
             const textoEstado = badge.innerText.trim().toUpperCase();
-            // Comprobamos si el texto del semáforo está en la lista de marcados
             cumpleEstatus = seleccionados.includes(textoEstado);
         }
 
-        // Aplicar visibilidad final
         fila.style.display = (cumpleFecha && cumpleEstatus) ? "" : "none";
     });
 }
@@ -175,7 +176,7 @@ async function cargarDashboard() {
 const claseStatus = sol.prioridad_visual.replace(" ", "").toLowerCase(); 
 
 contenedor.innerHTML += `
-    <tr class="solicitud-fila animate__animated animate__fadeIn">
+    <tr class="solicitud-fila animate__animated animate__fadeIn" data-fecha-raw="${sol.fecha_evento}">
         <td class="ps-4">
             <div class="fw-bold" style="color: #5B3D66; font-size: 0.95rem;">#${sol.folio}</div>
         </td>
