@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="SIRA - Sistema Integral de Reserva de Auditorios UTM" />
         <meta name="author" content="SIRA UTM" />
-        <title>SIRA - UTM</title>
+        <title>SIRA</title>
         <?php include 'includes/head.php'; ?>
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
         
@@ -14,30 +14,41 @@
         <link href="assets/css/pagina.css?v=4.0" rel="stylesheet">
     </head>
     <body id="page-top">
-        <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="#page-top">
-                    <img src="assets/img/logo_app_web_RA_SB.png" alt="SIRA Logo" style="height: 50px; width: auto; margin-right: 12px;">
-                    <span class="fw-bold" style="letter-spacing: 1px;">SIRA-UTM</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                    Menu
-                    <i class="fas fa-bars ms-1"></i>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#catalogo">Catálogo</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#guia">Guía</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#registro">Regístrate</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-                        <li class="nav-item">
-                            <a class="nav-link btn-login-nav" href="login.php">Iniciar Sesión</a>
-                        </li>
+       <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+    <div class="container-fluid px-lg-5"> <a class="navbar-brand d-flex align-items-center" href="#page-top">
+            <img src="assets/img/logos/logo_utm.png" alt="UTM" style="height: 50px; margin-right: 12px;">
+            <img src="assets/img/logos/logo_app_web_RA_SB.png" alt="SIRA" style="height: 50px;">
+            <span class="ms-2 fw-bold border-start ps-3 d-none d-xl-inline" style="letter-spacing: 1px;">SIRA</span>
+        </a>
+
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav text-uppercase mx-auto py-4 py-lg-0">
+                <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
+                <li class="nav-item"><a class="nav-link" href="#propuesta">Propuesta</a></li>
+                <li class="nav-item"><a class="nav-link" href="#roles">Roles</a></li>
+                
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        Proyecto
+                    </a>
+                    <ul class="dropdown-menu shadow border-0">
+                        <li><a class="dropdown-item" href="#tecnologia">Tecnología</a></li>
+                        <li><a class="dropdown-item" href="#equipo">Equipo</a></li>
+                        <li><a class="dropdown-item" href="#catalogo">Catálogo</a></li>
+                        <li><a class="dropdown-item" href="#guia">Guía</a></li>
                     </ul>
-                </div>
+                </li>
+                
+                <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-2">
+                <a class="btn btn-outline-light btn-sm text-uppercase fw-bold" href="#registro">Regístrate</a>
+                <a class="btn btn-primary btn-sm text-uppercase fw-bold px-3" href="login.php" style="background-color: #5B3D66; border: none;">Iniciar Sesión</a>
             </div>
-        </nav>
+        </div>
+    </div>
+</nav>
 
      <header class="masthead">
     <div class="hero-container text-center px-4">
@@ -60,7 +71,6 @@
 </a>
     </div>
 </header>
-
         <section class="page-section" id="servicios">
             <div class="container">
                 <div class="text-center">
@@ -95,6 +105,139 @@
                 </div>
             </div>
         </section>
+
+          <section class="page-section" id="propuesta">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-heading text-uppercase">Propuesta de Solución</h2>
+                    <h3 class="section-subheading text-muted">¿Por qué usar SIRA?</h3>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-6">
+                        <span class="fa-stack fa-4x">
+                            <i class="fas fa-circle fa-stack-2x text-danger"></i>
+                            <i class="fas fa-times-circle fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <h4 class="my-3">Problemática</h4>
+                        <p class="text-muted">Anteriormente, la reserva de auditorios en la UTM se gestionaba de forma manual, causando conflictos de horario, falta de transparencia y lentitud en los procesos académicos.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="fa-stack fa-4x">
+                            <i class="fas fa-circle fa-stack-2x text-success"></i>
+                            <i class="fas fa-lightbulb fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <h4 class="my-3">Nuestro Objetivo</h4>
+                        <p class="text-muted">Ofrecer una plataforma digital centralizada que automatice las solicitudes, permita la consulta en tiempo real y optimice el uso de los espacios institucionales.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+          <section class="page-section bg-light" id="equipo">
+    <div class="container text-center">
+        <h2 class="section-heading text-uppercase">Equipo de Desarrollo</h2>
+        <p class="text-muted mb-5">Estudiantes de TI - 6to Cuatrimestre</p>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-white h-100">
+                    <i class="fas fa-layer-group fa-3x mb-3 text-primary"></i>
+                    <h5 class="fw-bold">Wilmer Ernesto Lobato Alcantar</h5>
+                    <p class="text-muted small">Desarrollador Full-Stack</p>
+                    <p class="x-small">Responsable de la lógica del sistema (backend), interfaz de usuario (frontend) e integración general.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-white h-100">
+                    <i class="fas fa-palette fa-3x mb-3 text-primary"></i>
+                    <h5 class="fw-bold">Andrea Urueta Rodriquez</h5>
+                    <p class="text-muted small">Especialista en Frontend</p>
+                    <p class="x-small">Encargada del diseño visual y la interfaz de usuario, priorizando la experiencia del usuario (UX).</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-white h-100">
+                    <i class="fas fa-microchip fa-3x mb-3 text-primary"></i>
+                    <h5 class="fw-bold">Ivana Yamilet Diaz Mozqueda</h5>
+                    <p class="text-muted small">Analista de Sistemas</p>
+                    <p class="x-small">Definición de requisitos, análisis estructural del sistema y organización funcional del proyecto.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+       <section class="page-section bg-light" id="tecnologia">
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-heading text-uppercase">Tecnología y Herramientas</h2>
+            <h3 class="section-subheading text-muted">Stack tecnológico y entorno de desarrollo del proyecto SIRA.</h3>
+        </div>
+        
+        <div class="row text-center mt-5">
+            <div class="col-md-4 mb-4">
+                <i class="fab fa-html5 fa-4x mb-3" style="color: #E34F26;"></i>
+                <h5 class="fw-bold">HTML5 & CSS3</h5>
+                <p class="text-muted small">Maquetación semántica y estilos institucionales con Bootstrap 5.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="fab fa-js-square fa-4x mb-3" style="color: #F7DF1E;"></i>
+                <h5 class="fw-bold">JavaScript</h5>
+                <p class="text-muted small">Lógica de cliente, validaciones y peticiones asíncronas con Fetch API.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="fab fa-node-js fa-4x mb-3" style="color: #339933;"></i>
+                <h5 class="fw-bold">Node.js / PHP</h5>
+                <p class="text-muted small">Procesamiento de datos en el servidor y servicios de mensajería SMTP.</p>
+            </div>
+        </div>
+        
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <i class="fas fa-server fa-4x mb-3" style="color: #fb7e14;"></i>
+                <h5 class="fw-bold">XAMPP / MariaDB</h5>
+                <p class="text-muted small">Gestión de base de datos relacional y entorno de pruebas local.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="fas fa-code fa-4x mb-3" style="color: #007ACC;"></i>
+                <h5 class="fw-bold">VS Code</h5>
+                <p class="text-muted small">IDE principal para la codificación, depuración y gestión de scripts.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="fab fa-git-alt fa-4x mb-3" style="color: #F05032;"></i>
+                <h5 class="fw-bold">Git & WinSCP</h5>
+                <p class="text-muted small">Control de versiones y despliegue seguro al servidor de la UTM.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <section class="page-section bg-light" id="equipo">
+            <div class="container text-center">
+                <h2 class="section-heading text-uppercase">Equipo de Desarrollo</h2>
+                <p class="text-muted mb-5">Estudiantes de Tecnologías de la Información - 6to Cuatrimestre</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded shadow-sm bg-white">
+                            <h5 class="mb-0">Wilmer Ernesto Lobato Alcantar</h5>
+                            <small class="text-primary fw-bold">Full-Stack / DB Admin</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded shadow-sm bg-white">
+                            <h5 class="mb-0">[Nombre Integrante 2]</h5>
+                            <small class="text-primary fw-bold">UI Designer</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded shadow-sm bg-white">
+                            <h5 class="mb-0">[Nombre Integrante 3]</h5>
+                            <small class="text-primary fw-bold">Frontend Dev</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
 
         <section class="page-section bg-light" id="catalogo">
             <div class="container">

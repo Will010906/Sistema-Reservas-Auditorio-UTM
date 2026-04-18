@@ -116,8 +116,11 @@
     width: 100%; /* La línea se expande al pasar el mouse */
 }
 
+/* Ejemplo de un toque sutil sin usar logos/iconos */
 #mainNav .nav-link:hover {
-    color: var(--color-lila) !important;
+    color: #D4ADFC !important; /* El color lila que usas en el Hero */
+    border-bottom: 2px solid #5B3D66; 
+    transition: all 0.3s ease;
 }
 
 #catalogo .catalogo-item .catalogo-link .catalogo-hover {
