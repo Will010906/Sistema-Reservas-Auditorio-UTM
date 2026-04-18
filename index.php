@@ -133,38 +133,31 @@
             </div>
         </section>
 
-          <section class="page-section bg-light" id="equipo">
-    <div class="container text-center">
-        <h2 class="section-heading text-uppercase">Equipo de Desarrollo</h2>
-        <p class="text-muted mb-5">Estudiantes de TI - 5to Cuatrimestre</p>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="p-4 border rounded shadow-sm bg-white h-100">
-                    <i class="fas fa-layer-group fa-3x mb-3 text-primary"></i>
-                    <h5 class="fw-bold">Wilmer Ernesto Lobato Alcantar</h5>
-                    <p class="text-muted small">Desarrollador Full-Stack</p>
-                    <p class="x-small">Responsable de la lógica del sistema (backend), interfaz de usuario (frontend) e integración general.</p>
+          <section class="page-section bg-light" id="roles">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-heading text-uppercase">Roles del Sistema</h2>
+                    <h3 class="section-subheading text-muted">Diferentes niveles de acceso para cada necesidad.</h3>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <i class="fas fa-user-shield fa-4x mb-3" style="color: #5B3D66;"></i>
+                        <h4>Administrador</h4>
+                        <p class="text-muted">Dictamina solicitudes, gestiona la analítica de urgencia y supervisa los indicadores de ocupación.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-user-graduate fa-4x mb-3" style="color: #5B3D66;"></i>
+                        <h4>Solicitante UTM</h4>
+                        <p class="text-muted">Comunidad académica (docentes y alumnos) que gestionan sus propias peticiones de auditorio.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-user-plus fa-4x mb-3" style="color: #5B3D66;"></i>
+                        <h4>Subdirector</h4>
+                        <p class="text-muted">Supervisa las solicitudes y proporciona orientación estratégica para la gestión de los espacios institucionales.</p>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="p-4 border rounded shadow-sm bg-white h-100">
-                    <i class="fas fa-palette fa-3x mb-3 text-primary"></i>
-                    <h5 class="fw-bold">Andrea Urueta Rodriquez</h5>
-                    <p class="text-muted small">Especialista en Frontend</p>
-                    <p class="x-small">Encargada del diseño visual y la interfaz de usuario, priorizando la experiencia del usuario (UX).</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="p-4 border rounded shadow-sm bg-white h-100">
-                    <i class="fas fa-microchip fa-3x mb-3 text-primary"></i>
-                    <h5 class="fw-bold">Ivana Yamilet Diaz Mozqueda</h5>
-                    <p class="text-muted small">Analista de Sistemas</p>
-                    <p class="x-small">Definición de requisitos, análisis estructural del sistema y organización funcional del proyecto.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+        </section>
 
        <section class="page-section bg-light" id="tecnologia">
     <div class="container">
@@ -209,34 +202,46 @@
             </div>
         </div>
     </div>
+    <div class="text-center mt-4">
+    <p class="text-muted italic small">
+        <i class="fas fa-clipboard-check me-2"></i> 
+        Proyecto respaldado por documentación técnica exhaustiva y protocolos de pruebas de funcionamiento.
+    </p>
+</div>
 </section>
 
-        <section class="page-section bg-light" id="equipo">
-            <div class="container text-center">
-                <h2 class="section-heading text-uppercase">Equipo de Desarrollo</h2>
-                <p class="text-muted mb-5">Estudiantes de Tecnologías de la Información - 6to Cuatrimestre</p>
-                <div class="row justify-content-center">
-                    <div class="col-md-4">
-                        <div class="p-3 border rounded shadow-sm bg-white">
-                            <h5 class="mb-0">Wilmer Ernesto Lobato Alcantar</h5>
-                            <small class="text-primary fw-bold">Full-Stack / DB Admin</small>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="p-3 border rounded shadow-sm bg-white">
-                            <h5 class="mb-0">[Nombre Integrante 2]</h5>
-                            <small class="text-primary fw-bold">UI Designer</small>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="p-3 border rounded shadow-sm bg-white">
-                            <h5 class="mb-0">[Nombre Integrante 3]</h5>
-                            <small class="text-primary fw-bold">Frontend Dev</small>
-                        </div>
-                    </div>
+       <section class="page-section bg-light" id="equipo">
+    <div class="container text-center">
+        <h2 class="section-heading text-uppercase">Equipo de Desarrollo</h2>
+        <p class="text-muted mb-5">Estudiantes de TI - 5to Cuatrimestre</p>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-white h-100">
+                    <i class="fas fa-layer-group fa-3x mb-3 text-primary"></i>
+                    <h5 class="fw-bold">Wilmer Ernesto Lobato Alcantar</h5>
+                    <p class="text-muted small">Desarrollador Full-Stack</p>
+                    <p class="x-small">Responsable de la lógica del sistema (backend), interfaz de usuario (frontend) e integración general.</p>
                 </div>
             </div>
-        </section>
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-white h-100">
+                    <i class="fas fa-palette fa-3x mb-3 text-primary"></i>
+                    <h5 class="fw-bold">Andrea Urueta Rodriquez</h5>
+                    <p class="text-muted small">Especialista en Frontend</p>
+                    <p class="x-small">Encargada del diseño visual y la interfaz de usuario, priorizando la experiencia del usuario (UX).</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-white h-100">
+                    <i class="fas fa-microchip fa-3x mb-3 text-primary"></i>
+                    <h5 class="fw-bold">Ivana Yamilet Diaz Mozqueda</h5>
+                    <p class="text-muted small">Analista de Sistemas</p>
+                    <p class="x-small">Definición de requisitos, análisis estructural del sistema y organización funcional del proyecto.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 
         <section class="page-section bg-light" id="catalogo">
