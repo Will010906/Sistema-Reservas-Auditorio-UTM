@@ -136,7 +136,7 @@
           <section class="page-section bg-light" id="equipo">
     <div class="container text-center">
         <h2 class="section-heading text-uppercase">Equipo de Desarrollo</h2>
-        <p class="text-muted mb-5">Estudiantes de TI - 6to Cuatrimestre</p>
+        <p class="text-muted mb-5">Estudiantes de TI - 5to Cuatrimestre</p>
         <div class="row">
             <div class="col-md-4 mb-4">
                 <div class="p-4 border rounded shadow-sm bg-white h-100">
