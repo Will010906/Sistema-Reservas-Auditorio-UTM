@@ -179,7 +179,7 @@
             </div>
             <div class="col-md-4 mb-4">
                 <i class="fab fa-node-js fa-4x mb-3" style="color: #339933;"></i>
-                <h5 class="fw-bold">Node.js / PHP</h5>
+                <h5 class="fw-bold">Node.js</h5>
                 <p class="text-muted small">Procesamiento de datos en el servidor y servicios de mensajería SMTP.</p>
             </div>
         </div>
