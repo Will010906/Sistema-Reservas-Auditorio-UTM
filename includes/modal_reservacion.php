@@ -1,6 +1,6 @@
 <div class="modal fade" id="modalNuevaSolicitud" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden; background-color: #fcfcfc;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background-color: #fcfcfc;">
 
             <div class="modal-header text-white p-4 border-0" style="background: linear-gradient(135deg, #3a2741 0%, #5B3D66 100%);">
                 <div class="d-flex align-items-center">
@@ -32,7 +32,7 @@
                         ?>
                             <div class="col-md-6 col-lg-4">
                                 <div class="card card-auditorio-pro h-100 border shadow-sm overflow-hidden"
-                                    style="border-radius: 16px; cursor: pointer; transition: all 0.3s ease; border: 1px solid #eee;"
+                                    style="border-radius: 20px; cursor: pointer; transition: all 0.3s ease; border: 1px solid #eee;"
                                     onclick="irAlCalendario(<?php echo $a['id_auditorio']; ?>, '<?php echo addslashes($a['nombre_espacio']); ?>', '<?php echo addslashes($a['equipamiento_fijo']); ?>')">
 
                                     <div class="position-relative" style="height: 160px; overflow: hidden;">
@@ -316,5 +316,22 @@
     .btn-horario.activo {
         background-color: var(--sira-purple-primary) !important;
         color: white !important;
+    }
+
+    /* 5. AJUSTES PARA MÓVIL */
+    @media (max-width: 480px) {
+        #paso_formulario .row.g-3 > .col-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        #paso_formulario .row.g-3 > .col-6.border-end {
+            border-right: none !important;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+        .btn-horario {
+            width: calc(50% - 5px);
+        }
     }
 </style>

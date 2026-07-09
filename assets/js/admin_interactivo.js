@@ -10,6 +10,12 @@ let bsModal = null;
 let idSolicitudActualAdmin = null; // Variable global para reasignación
 
 /**
+ * PAGINACIÓN DE LA TABLA DE SOLICITUDES
+ */
+const FILAS_POR_PAGINA = 6;
+let paginaActualSolicitudes = 1;
+
+/**
  * GESTIÓN DE DETALLES - Abre el modal de información
  */
 async function gestionar(id) {
@@ -118,11 +124,12 @@ function aplicarFiltros() {
         : Array.from(document.querySelectorAll(".filter-check:checked")).map(cb => cb.value.toUpperCase());
 
     const filas = document.querySelectorAll(".solicitud-fila");
+    const filasQueCoinciden = [];
 
     filas.forEach((fila) => {
         // 1. FILTRO DE FECHAS (Corrección Crítica)
         // Buscamos el valor original YYYY-MM-DD que guardaremos en un atributo data
-        const fechaCeldaRaw = fila.getAttribute("data-fecha-raw"); 
+        const fechaCeldaRaw = fila.getAttribute("data-fecha-raw");
         let cumpleFecha = true;
 
         if (inicioStr && finStr && fechaCeldaRaw) {
@@ -138,9 +145,63 @@ function aplicarFiltros() {
             cumpleEstatus = seleccionados.includes(textoEstado);
         }
 
-        fila.style.display = (cumpleFecha && cumpleEstatus) ? "" : "none";
+        if (cumpleFecha && cumpleEstatus) {
+            filasQueCoinciden.push(fila);
+        } else {
+            fila.style.display = "none";
+        }
     });
+
+    // 3. PAGINACIÓN: solo mostramos el bloque de 8 filas de la página actual
+    const totalPaginas = Math.max(1, Math.ceil(filasQueCoinciden.length / FILAS_POR_PAGINA));
+    if (paginaActualSolicitudes > totalPaginas) paginaActualSolicitudes = totalPaginas;
+
+    const inicioRango = (paginaActualSolicitudes - 1) * FILAS_POR_PAGINA;
+    const finRango = inicioRango + FILAS_POR_PAGINA;
+
+    filasQueCoinciden.forEach((fila, index) => {
+        fila.style.display = (index >= inicioRango && index < finRango) ? "" : "none";
+    });
+
+    renderizarPaginacionSolicitudes(totalPaginas);
 }
+
+/**
+ * Dibuja los controles de paginación (Anterior / números / Siguiente)
+ */
+function renderizarPaginacionSolicitudes(totalPaginas) {
+    const contenedor = document.getElementById("paginacionSolicitudes");
+    if (!contenedor) return;
+
+    if (totalPaginas <= 1) {
+        contenedor.innerHTML = "";
+        return;
+    }
+
+    let html = `
+        <li class="page-item ${paginaActualSolicitudes === 1 ? "disabled" : ""}">
+            <button class="page-link" onclick="irAPaginaSolicitudes(${paginaActualSolicitudes - 1})">Anterior</button>
+        </li>`;
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        html += `
+        <li class="page-item ${i === paginaActualSolicitudes ? "active" : ""}">
+            <button class="page-link" onclick="irAPaginaSolicitudes(${i})">${i}</button>
+        </li>`;
+    }
+
+    html += `
+        <li class="page-item ${paginaActualSolicitudes === totalPaginas ? "disabled" : ""}">
+            <button class="page-link" onclick="irAPaginaSolicitudes(${paginaActualSolicitudes + 1})">Siguiente</button>
+        </li>`;
+
+    contenedor.innerHTML = html;
+}
+
+window.irAPaginaSolicitudes = function (numeroPagina) {
+    paginaActualSolicitudes = numeroPagina;
+    aplicarFiltros();
+};
 
 /**
  * CARGAR DASHBOARD
@@ -168,6 +229,20 @@ async function cargarDashboard() {
         const contenedor = document.getElementById("contenedorSolicitudes");
         if (contenedor && data.solicitudes) {
             contenedor.innerHTML = "";
+
+            if (data.solicitudes.length === 0) {
+                contenedor.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                            <p class="mt-3 mb-0 fw-bold">No hay solicitudes registradas</p>
+                            <p class="small mb-0">Aún no se ha capturado ninguna reservación.</p>
+                        </td>
+                    </tr>`;
+                aplicarFiltros();
+                return;
+            }
+
            data.solicitudes.forEach(sol => {
     // Definimos la clase de color según la prioridad visual
     // Dentro de data.solicitudes.forEach(sol => { ...
@@ -177,11 +252,11 @@ const claseStatus = sol.prioridad_visual.replace(" ", "").toLowerCase();
 
 contenedor.innerHTML += `
     <tr class="solicitud-fila animate__animated animate__fadeIn" data-fecha-raw="${sol.fecha_evento}">
-        <td class="ps-4">
+        <td class="ps-4" data-label="Folio">
             <div class="fw-bold" style="color: #5B3D66; font-size: 0.95rem;">#${sol.folio}</div>
         </td>
 
-        <td>
+        <td data-label="Evento">
             <div class="fw-bold text-dark" style="font-size: 0.9rem; line-height: 1.2;">
                 ${sol.titulo_event || 'Sin Título'}
             </div>
@@ -190,23 +265,23 @@ contenedor.innerHTML += `
             </div>
         </td>
 
-      <td class="text-center">
+      <td class="text-center" data-label="Auditorio">
     <span class="badge rounded-pill bg-light text-secondary border px-3">
         ${sol.nombre_espacio ? sol.nombre_espacio : 'Por asignar'}
     </span>
 </td>
 
-        <td class="text-center text-muted fw-medium" style="font-size: 0.85rem;">
+        <td class="text-center text-muted fw-medium" style="font-size: 0.85rem;" data-label="Fecha">
             ${sol.fecha_evento || '---'}
         </td>
 
-        <td class="text-center">
+        <td class="text-center" data-label="Estado">
             <span class="badge-status st-${claseStatus} shadow-sm" style="width: 110px; display: inline-block; font-size: 0.75rem;">
                 ${sol.prioridad_visual.toUpperCase()}
             </span>
         </td>
 
-        <td class="text-center">
+        <td class="text-center" data-label="Acciones">
             <button class="btn btn-outline-secondary btn-sm shadow-sm" onclick="gestionar(${sol.id_solicitud})" style="border-radius: 20px; font-size: 0.75rem;">
                 <i class="bi bi-folder2-open me-1"></i> Gestionar
             </button>
@@ -248,6 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (this.checked) {
             filtrosIndividuales.forEach(cb => cb.checked = false);
         }
+        paginaActualSolicitudes = 1;
         aplicarFiltros();
     });
 
@@ -260,14 +336,18 @@ document.addEventListener("DOMContentLoaded", () => {
             // Si desmarco todos los individuales, vuelvo a marcar "TODOS"
             const algunoMarcado = Array.from(filtrosIndividuales).some(i => i.checked);
             if (!algunoMarcado && chkTodos) chkTodos.checked = true;
-            
+
+            paginaActualSolicitudes = 1;
             aplicarFiltros();
         });
     });
 
     // Escuchar cambios en las fechas
     document.querySelectorAll("#fecha_inicio, #fecha_fin").forEach(el => {
-        el.addEventListener("change", aplicarFiltros);
+        el.addEventListener("change", () => {
+            paginaActualSolicitudes = 1;
+            aplicarFiltros();
+        });
     });
 
     cargarDashboard(); 
@@ -280,6 +360,7 @@ window.resetFiltros = function () {
     document.querySelectorAll(".filter-check").forEach(cb => cb.checked = false);
     document.getElementById("fecha_inicio").value = "";
     document.getElementById("fecha_fin").value = "";
+    paginaActualSolicitudes = 1;
     aplicarFiltros();
 };
 

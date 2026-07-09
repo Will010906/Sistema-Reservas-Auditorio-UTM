@@ -41,11 +41,18 @@ $(document).ready(function () {
         $('#tablaSubdirector').DataTable().destroy();
     }
 
+    const etiquetasSubdirector = ['Folio', 'Solicitante', 'Evento', 'Fecha', 'Estatus', 'Acciones'];
+
     const table = $('#tablaSubdirector').DataTable({
-        language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
+        language: { url: "assets/vendor/datatables/i18n/es-ES.json" },
         pageLength: 10,
         dom: '<"p-3"f>rtip',
-        order: [[0, 'desc']]
+        order: [[0, 'desc']],
+        createdRow: function(row) {
+            $('td', row).each(function(i) {
+                $(this).attr('data-label', etiquetasSubdirector[i] || '');
+            });
+        }
     });
 
     /**

@@ -25,13 +25,14 @@ header("Expires: 0");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRA - Dashboard Pro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <?php include 'includes/head.php'; ?>
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/fonts/fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.min.css">
 
     <script src="assets/js/auth_check.js"></script>
     <link rel="stylesheet" href="assets/css/admin_dashboard.css?v=1.1">
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+    <link href='assets/vendor/fullcalendar/index.global.min.css' rel='stylesheet' />
 </head>
 
 <body>
@@ -39,7 +40,7 @@ header("Expires: 0");
     <?php include 'includes/sidebar.php'; ?>
 
     <div class="main-content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h1 class="fw-800 h3 mb-0" style="color: var(--sira-purple-dark);">Panel Administrador</h1>
                 <p class="text-muted x-small mb-0">UTM • Sistema de Reservación de Auditorios</p>
@@ -55,7 +56,7 @@ header("Expires: 0");
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
+        <div class="row g-2 mb-3">
             <div class="col">
                 <div class="card-sira bg-urg">
                     <h6>Urgentes</h6>
@@ -95,10 +96,10 @@ header("Expires: 0");
         </div>
 
 
-        <div class="bg-white p-3 mb-4 rounded-4 shadow-sm border-0">
+        <div class="bg-white p-2 mb-3 rounded-4 shadow-sm border-0">
             <div class="row g-3 align-items-end">
                 <div class="col-lg-7">
-                    <label class="form-label fw-bold x-small text-muted text-uppercase mb-2">Filtrar por Estatus</label>
+                    <label class="form-label fw-bold x-small text-muted text-uppercase mb-1">Filtrar por Estatus</label>
                     <div class="d-flex flex-wrap gap-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="chkTodos" checked>
@@ -169,21 +170,22 @@ header("Expires: 0");
                     </tbody>
                 </table>
             </div>
+            <nav class="d-flex justify-content-center py-2">
+                <ul class="pagination pagination-sm mb-0" id="paginacionSolicitudes"></ul>
+            </nav>
         </div>
     </div>
 
     <?php include 'includes/modal_detalle.php'; ?>
     <?php include 'includes/modal_reservacion.php'; ?>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script src="assets/vendor/jquery/jquery-3.7.0.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <script src='assets/vendor/fullcalendar/index.global.min.js'></script>
     <script src="assets/js/usuario_reservas.js"></script>
 
     <script src="assets/js/admin_interactivo.js"></script>
-
-    <link rel="stylesheet" href="assets/css/style.css">
 </body>
 
 </html>

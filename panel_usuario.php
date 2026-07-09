@@ -26,10 +26,11 @@ header("Expires: 0");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRA - Mis Reservaciones</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <?php include 'includes/head.php'; ?>
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/fonts/fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="assets/vendor/datatables/css/dataTables.bootstrap5.min.css">
 
     <link rel="stylesheet" href="assets/css/panel_usuario.css">
 
@@ -144,14 +145,14 @@ header("Expires: 0");
     </div>
 
     <?php include 'includes/modal_reservacion.php'; ?>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="assets/vendor/jquery/jquery-3.7.0.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
+    <script src='assets/vendor/fullcalendar/index.global.min.js'></script>
+    <script src="assets/vendor/sweetalert2/sweetalert2.min.js"></script>
 
     <script src="assets/js/usuario_reservas.js"></script>
 </body>

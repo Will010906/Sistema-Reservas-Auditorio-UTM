@@ -88,13 +88,24 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     }
 
     /* 📱 AJUSTES CRÍTICOS PARA MÓVIL (Resuelve el solapamiento) */
+    .sidebar-toggle-mobile { display: none; }
+    .sidebar-backdrop { display: none; }
+
     @media (max-width: 768px) {
-        /* 1. Ocultamos la barra lateral de textos por defecto */
+        /* 1. La barra de textos se convierte en un panel deslizable (drawer) */
         .side-bar {
-            transform: translateX(-100%); /* La sacamos de la pantalla */
+            display: block;
             left: 0;
-            width: 200px;
+            width: 220px;
+            max-width: 80vw;
             z-index: 1002;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .side-bar.mobile-open {
+            transform: translateX(0);
+            box-shadow: 8px 0 30px rgba(0,0,0,0.15);
         }
 
         /* 2. Reducimos la activity-bar a una franja muy delgada o iconos pequeños */
@@ -108,19 +119,47 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             width: calc(100% - 60px) !important;
         }
 
-        /* 4. Si quieres que la barra de textos aparezca al tocar algo, 
-           puedes usar una clase 'active', pero por ahora, para que no tape: */
-        .side-bar {
-            display: none; /* La ocultamos en móvil para dar espacio al Dashboard */
+        /* 4. Botón hamburguesa para abrir el drawer de navegación */
+        .sidebar-toggle-mobile {
+            display: flex;
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--sira-purple-dark);
+            color: white;
+            border: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1003;
         }
+
+        /* 5. Fondo oscuro detrás del drawer, para cerrarlo al tocar fuera */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 1001;
+        }
+
+        .sidebar-backdrop.active { display: block; }
     }
 </style>
+
+<button type="button" class="sidebar-toggle-mobile" id="btnToggleSidebar" aria-label="Abrir menú">
+    <i class="bi bi-list"></i>
+</button>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
 <div class="activity-bar">
     <img src="assets/img/logo_app_web_RA.png" style="max-width: 45px;" class="mb-5" alt="Logo SIRA">
     <div class="d-flex flex-column gap-4 text-center" id="iconosRapidos">
         </div>
-    
+
     <div style="margin-top: auto; padding-bottom: 30px;">
         <a href="javascript:void(0);" onclick="confirmarSalida()" class="text-white opacity-50" title="Cerrar Sesión">
             <i class="bi bi-box-arrow-left fs-4"></i>
@@ -128,7 +167,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     </div>
 </div>
 
-<div class="side-bar">
+<div class="side-bar" id="sideBar">
     <div id="menuDinamico">
         <div class="text-center py-5">
             <div class="spinner-border spinner-border-sm text-muted"></div>
@@ -163,9 +202,9 @@ document.addEventListener("DOMContentLoaded", function() {
         if (perfil === 'administrador') {
             // VISTA ADMINISTRATIVA: Módulos de gestión institucional
             htmlIconos = `
-                <a href="panel_admin.php" class="text-white ${pagina==='panel_admin.php'?'':'opacity-50'}"><i class="bi bi-grid-fill fs-4"></i></a>
-                <a href="admin_auditorios.php" class="text-white ${pagina==='admin_auditorios.php'?'':'opacity-50'}"><i class="bi bi-building fs-4"></i></a>
-                <a href="admin_usuarios.php" class="text-white ${pagina==='admin_usuarios.php'?'':'opacity-50'}"><i class="bi bi-people fs-4"></i></a>`;
+                <a href="panel_admin.php" title="Dashboard" class="text-white ${pagina==='panel_admin.php'?'':'opacity-50'}"><i class="bi bi-grid-fill fs-4"></i></a>
+                <a href="admin_auditorios.php" title="Auditorios" class="text-white ${pagina==='admin_auditorios.php'?'':'opacity-50'}"><i class="bi bi-building fs-4"></i></a>
+                <a href="admin_usuarios.php" title="Usuarios" class="text-white ${pagina==='admin_usuarios.php'?'':'opacity-50'}"><i class="bi bi-people fs-4"></i></a>`;
             
             htmlMenu += `
                 <a href="panel_admin.php" class="nav-link-custom ${pagina==='panel_admin.php'?'active':''}"><i class="bi bi-speedometer2"></i> Dashboard</a>
@@ -174,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <a href="admin_usuarios.php" class="nav-link-custom ${pagina==='admin_usuarios.php'?'active':''}"><i class="bi bi-people"></i> Usuarios</a>`;
         } else {
             // VISTA ESTÁNDAR: Enfocada en operatividad de usuario
-            htmlIconos = `<a href="panel_usuario.php" class="text-white"><i class="bi bi-grid-fill fs-4"></i></a>`;
+            htmlIconos = `<a href="panel_usuario.php" title="Mis Reservas" class="text-white"><i class="bi bi-grid-fill fs-4"></i></a>`;
             
             htmlMenu += `
                 <a href="panel_usuario.php" class="nav-link-custom ${pagina==='panel_usuario.php'?'active':''}"><i class="bi bi-journal-text"></i> Mis Reservas</a>`;
@@ -193,6 +232,33 @@ document.addEventListener("DOMContentLoaded", function() {
     } catch (e) {
         console.error("Fallo de integridad en el componente de navegación:", e);
     }
+});
+
+/**
+ * DRAWER DE NAVEGACIÓN MÓVIL
+ * Controla la apertura/cierre del menú de texto en pantallas pequeñas.
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    const sideBar = document.getElementById('sideBar');
+    const btnToggle = document.getElementById('btnToggleSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+
+    function cerrarDrawer() {
+        sideBar.classList.remove('mobile-open');
+        backdrop.classList.remove('active');
+    }
+
+    btnToggle?.addEventListener('click', function() {
+        sideBar.classList.toggle('mobile-open');
+        backdrop.classList.toggle('active');
+    });
+
+    backdrop?.addEventListener('click', cerrarDrawer);
+
+    // Cierra el drawer al seleccionar una opción del menú
+    sideBar?.addEventListener('click', function(e) {
+        if (e.target.closest('a')) cerrarDrawer();
+    });
 });
 
 /**

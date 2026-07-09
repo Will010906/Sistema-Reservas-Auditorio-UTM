@@ -7,10 +7,10 @@
         <meta name="author" content="SIRA UTM" />
         <title>SIRA</title>
         <?php include 'includes/head.php'; ?>
-        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-        
-        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-        
+        <script src="assets/vendor/fontawesome/js/all.min.js" crossorigin="anonymous"></script>
+
+        <link href="assets/vendor/fonts/fonts.css" rel="stylesheet">
+
         <link href="assets/css/pagina.css?v=4.0" rel="stylesheet">
     </head>
     <body id="page-top">
@@ -20,6 +20,10 @@
             <img src="assets/img/logos/logo_app_web_RA_SB.png" alt="SIRA" style="height: 50px;">
             <span class="ms-2 fw-bold border-start ps-3 d-none d-xl-inline" style="letter-spacing: 1px;">SIRA</span>
         </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Abrir menú">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav text-uppercase mx-auto py-4 py-lg-0">
@@ -67,7 +71,7 @@
 
        <a href="#servicios" class="btn px-5 py-3 rounded-pill text-uppercase fw-bold shadow-lg" 
    style="background-color: #5B3D66; color: white !important; border: 2px solid rgba(255,255,255,0.2); min-width: 280px; font-size: 1.1rem; transition: all 0.3s ease;">
-    Explorar Servicios <i class="bi bi-chevron-down ms-2"></i>
+    Explorar Servicios <i class="fas fa-chevron-down ms-2"></i>
 </a>
     </div>
 </header>
@@ -461,13 +465,9 @@
             </div>
         </footer>
 
-        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script src="assets/vendor/jquery/jquery-3.7.0.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-
-<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <script src="assets/js/pagina.js"></script>
     </body>

@@ -20,10 +20,11 @@ include("config/db_local.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRA - Gestión de Auditorios</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <?php include 'includes/head.php'; ?>
+
+    <script src="assets/vendor/sweetalert2/sweetalert2.min.js"></script>
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.min.css">
     
     <link rel="stylesheet" href="assets/css/admin_auditorios.css">
     
@@ -117,7 +118,7 @@ include("config/db_local.php");
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/admin_auditorios.js"></script>
 <script src="assets/js/auth_check.js"></script>
 

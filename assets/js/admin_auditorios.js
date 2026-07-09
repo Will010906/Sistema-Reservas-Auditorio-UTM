@@ -108,6 +108,16 @@ async function cargarAuditorios() {
     const data = await response.json();
     contenedor.innerHTML = ""; // Limpieza del buffer visual
 
+    if (data.length === 0) {
+      contenedor.innerHTML = `
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="bi bi-building" style="font-size: 2.5rem; opacity: 0.3;"></i>
+            <p class="mt-3 mb-0 fw-bold">No hay auditorios registrados</p>
+            <p class="small mb-0">Registra el primer espacio con el botón "Nuevo Auditorio".</p>
+        </div>`;
+      return;
+    }
+
     data.forEach((aud) => {
       const esDisponible = parseInt(aud.disponibilidad) === 1;
 

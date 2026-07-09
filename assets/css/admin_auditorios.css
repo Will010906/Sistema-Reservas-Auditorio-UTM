@@ -119,14 +119,20 @@
     margin-left: 0;
 }
 
-/* Responsividad: Si la pantalla es pequeña (Tablet) */
-@media (max-width: 992px) {
+/* Responsividad: Si la pantalla es pequeña (móvil) */
+@media (max-width: 768px) {
     .main-content {
-        margin-left: 80px; /* Solo dejamos el espacio de la barra de iconos */
-        width: calc(100% - 80px);
+        margin-left: 60px; /* Solo dejamos el espacio de la barra de iconos */
+        width: calc(100% - 60px);
+        padding: 20px;
     }
-    .side-bar {
-        transform: translateX(-100%); /* Ocultamos la barra de texto */
-        transition: 0.3s;
+
+    /* Encabezado: título + botón se apilan en vez de aplastarse */
+    .main-content > .d-flex.justify-content-between.align-items-center {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .main-content > .d-flex.justify-content-between.align-items-center > button {
+        width: 100%;
     }
 }

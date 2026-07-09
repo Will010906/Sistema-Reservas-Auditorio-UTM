@@ -51,7 +51,10 @@ mysqli_set_charset($conexion, "utf8mb4");
 
 /**
  * NOTA TÉCNICA:
- * Este archivo sustituye a 'db_local.php' cuando el proyecto se despliega
- * en el servidor final o en infraestructura de contenedores.
+ * Ningún archivo del proyecto incluye 'db.php' directamente: todas las
+ * páginas y endpoints usan 'config/db_local.php', que ahora detecta el
+ * entorno automáticamente e intenta estas mismas credenciales de
+ * producción como fallback si la conexión local (XAMPP) falla.
+ * Este archivo se conserva solo como referencia de las credenciales.
  */
 ?>

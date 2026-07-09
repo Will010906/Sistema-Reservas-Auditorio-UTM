@@ -20,9 +20,15 @@
             width: calc(100% - 310px);
         }
 
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+        }
+
         .table-container {
             background: white;
-            border-radius: 28px;
+            border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
         }
@@ -122,12 +128,12 @@
 
         .st-aceptada {
             background: var(--grad-accepted);
-            color: white !important;
+            color: #2D1B33 !important;
         }
 
         .st-rechazada {
             background: var(--grad-rejected);
-            color: white !important;
+            color: #2D1B33 !important;
         }
 
         /* Estilos Calendario */
@@ -198,4 +204,54 @@
             display: flex;
             align-items: center;
             margin-top: 15px;
+        }
+
+        /* =========================================
+           TABLA DE MIS RESERVAS -> TARJETAS EN MÓVIL
+           ========================================= */
+        @media (max-width: 768px) {
+            #tablaMisReservas thead { display: none; }
+
+            #tablaMisReservas, #tablaMisReservas tbody, #tablaMisReservas tr, #tablaMisReservas td {
+                display: block;
+                width: 100%;
+            }
+
+            #tablaMisReservas tr.solicitud-fila {
+                margin-bottom: 14px;
+                border: 1px solid #EBEFF2;
+                border-radius: 16px;
+                padding: 6px 4px;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            }
+
+            #tablaMisReservas td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                text-align: right;
+                padding: 8px 10px;
+                border: none;
+                border-bottom: 1px solid #F5F5F7;
+            }
+
+            #tablaMisReservas td:last-child { border-bottom: none; }
+
+            #tablaMisReservas td::before {
+                content: attr(data-label);
+                font-weight: 800;
+                text-transform: uppercase;
+                font-size: 0.62rem;
+                letter-spacing: 0.5px;
+                color: #adb5bd;
+                text-align: left;
+                white-space: nowrap;
+            }
+
+            #tablaMisReservas td .btn-group {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                gap: 4px;
+            }
         }

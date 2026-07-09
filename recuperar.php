@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRA - Recuperar Acceso</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <?php include 'includes/head.php'; ?>
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.min.css">
     <style>
         :root { --sira-purple: #5B3D66; }
-        body { background-color: #EBEFF2; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .card-recuperar { background: white; border-radius: 30px; max-width: 450px; width: 90%; padding: 3rem; border-top: 6px solid #E5C38E; }
+        body { background-color: #EBEFF2; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px 0; }
+        .card-recuperar { background: white; border-radius: 20px; max-width: 450px; width: 90%; padding: 3rem; border-top: 6px solid #E5C38E; }
+
+        @media (max-width: 480px) {
+            .card-recuperar { padding: 2rem 1.5rem; border-radius: 18px; }
+        }
     </style>
 </head>
 <body>
@@ -32,8 +37,8 @@
         </form>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/vendor/jquery/jquery-3.7.0.min.js"></script>
+    <script src="assets/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="assets/js/recuperar.js"></script>
 </body>
 </html>

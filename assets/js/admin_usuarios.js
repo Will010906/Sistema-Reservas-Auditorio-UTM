@@ -194,7 +194,14 @@ async function cargarUsuarios() {
         cuerpoTabla.innerHTML = ""; 
 
         if (data.length === 0) {
-            cuerpoTabla.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No existen registros en la base de datos.</td></tr>';
+            cuerpoTabla.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="bi bi-people" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                        <p class="mt-3 mb-0 fw-bold">No hay usuarios registrados</p>
+                        <p class="small mb-0">Registra el primero con el botón "Nuevo Usuario".</p>
+                    </td>
+                </tr>`;
             return;
         }
 
@@ -213,7 +220,7 @@ async function cargarUsuarios() {
             // Inyección de fragmento HTML enriquecido
             cuerpoTabla.innerHTML += `
                 <tr>
-                    <td class="ps-4">
+                    <td class="ps-4" data-label="Identidad">
                         <div class="d-flex align-items-center">
                             <div class="avatar-circle-sm me-3">${iniciales}</div>
                             <div>
@@ -222,11 +229,11 @@ async function cargarUsuarios() {
                             </div>
                         </div>
                     </td>
-                    <td><code class="fw-bold text-primary" style="font-size:0.75rem;">${user.matricula || 'N/A'}</code></td>
-                    <td><span class="text-muted small">${user.telefono || '---'}</span></td>
-                    <td><span class="small text-muted">${user.carrera_area}</span></td>
-                    <td><span class="badge ${roleClass} text-uppercase px-3 py-1" style="font-size: 0.6rem; border-radius:10px;">${user.perfil}</span></td>
-                    <td class="text-center">
+                    <td data-label="Matrícula / ID"><code class="fw-bold text-primary" style="font-size:0.75rem;">${user.matricula || 'N/A'}</code></td>
+                    <td data-label="Teléfono"><span class="text-muted small">${user.telefono || '---'}</span></td>
+                    <td data-label="División Académica"><span class="small text-muted">${user.carrera_area}</span></td>
+                    <td data-label="Nivel de Acceso"><span class="badge ${roleClass} text-uppercase px-3 py-1" style="font-size: 0.6rem; border-radius:10px;">${user.perfil}</span></td>
+                    <td class="text-center" data-label="Acciones">
                         <div class="btn-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
                             <button class="btn btn-sm btn-white border-end" onclick='editarUsuario(${JSON.stringify(user)})'>
                                 <i class="bi bi-pencil-square text-primary"></i>

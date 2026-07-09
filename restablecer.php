@@ -10,14 +10,20 @@ $token_url = $_GET['token'];
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRA - Nueva Contraseña</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <?php include 'includes/head.php'; ?>
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.min.css">
     <style>
         :root { --sira-purple: #5B3D66; --sira-gold: #E5C38E; }
-        body { background-color: #EBEFF2; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; }
-        .card-reset { background: white; border-radius: 30px; max-width: 450px; width: 90%; padding: 3rem; border-top: 6px solid var(--sira-gold); }
+        body { background-color: #EBEFF2; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; padding: 20px 0; }
+        .card-reset { background: white; border-radius: 20px; max-width: 450px; width: 90%; padding: 3rem; border-top: 6px solid var(--sira-gold); }
         .form-control { background-color: #F4F7F9; border: 1px solid rgba(91, 61, 102, 0.1); border-radius: 12px; }
+
+        @media (max-width: 480px) {
+            .card-reset { padding: 2rem 1.5rem; border-radius: 18px; }
+        }
     </style>
 </head>
 <body>
@@ -50,8 +56,8 @@ $token_url = $_GET['token'];
         </form>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/vendor/jquery/jquery-3.7.0.min.js"></script>
+    <script src="assets/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="assets/js/contrasena_toggle.js"></script> 
     <script src="assets/js/restablecer.js"></script>
 </body>

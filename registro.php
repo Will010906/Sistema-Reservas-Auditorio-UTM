@@ -12,8 +12,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRA - Registro de Alumnos</title>
     <?php include 'includes/head.php'; ?>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.min.css">
     
     <style>
         :root { --sira-purple: #5B3D66; }
@@ -124,9 +124,9 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/vendor/jquery/jquery-3.7.0.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/sweetalert2/sweetalert2.min.js"></script>
     
     <script src="assets/js/contrasena_toggle.js"></script>
     <script src="assets/js/registro.js"></script>

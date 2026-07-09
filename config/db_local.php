@@ -15,7 +15,11 @@
  * debe estar restringido mediante políticas de servidor (.htaccess).
  */
 
-// PARÁMETROS DE CONFIGURACIÓN DEL SERVIDOR
+// Revierte al modo de error clásico (por defecto en PHP 8.1+ mysqli lanza excepciones,
+// lo cual rompe el fallback local/producción de abajo si no se desactiva).
+mysqli_report(MYSQLI_REPORT_OFF);
+
+// PARÁMETROS DE CONFIGURACIÓN DEL SERVIDOR (ENTORNO LOCAL / XAMPP)
 $host = "localhost";             // Hostname del servidor de base de datos
 $user = "root";                  // Superusuario administrativo (Default XAMPP)
 $pass = "";                      // Credencial de acceso (Vacía por política de desarrollo)
@@ -28,13 +32,28 @@ $db   = "reservacionauditorios"; // Identificador del esquema institucional
 $conexion = mysqli_connect($host, $user, $pass, $db);
 
 /**
+ * FALLBACK AUTOMÁTICO A PRODUCCIÓN (SERVIDOR UTM)
+ * Si el entorno local (XAMPP) no responde, se asume que el sistema corre
+ * en el servidor de la universidad y se usan las credenciales asignadas
+ * al Equipo 11 (ver config/db.php).
+ */
+if (!$conexion) {
+    $host = "mysql";
+    $user = "user_equipo11";
+    $pass = "user_secret_password11";
+    $db   = "proyecto_equipo11_db";
+
+    $conexion = mysqli_connect($host, $user, $pass, $db);
+}
+
+/**
  * VALIDACIÓN DE INTEGRIDAD DE ENLACE
  * Verifica si el handshake con el motor de base de datos fue exitoso.
  */
 if (!$conexion) {
     /**
      * GESTIÓN DE FALLOS CRÍTICOS
-     * En caso de error, el sistema detiene el hilo de ejecución para evitar 
+     * En caso de error, el sistema detiene el hilo de ejecución para evitar
      * inconsistencias de datos en los paneles administrativos.
      */
     die("Error crítico de persistencia: " . mysqli_connect_error());

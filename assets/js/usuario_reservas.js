@@ -65,7 +65,24 @@ async function cargarMisReservaciones() {
             $('#tablaMisReservas').DataTable().destroy();
         }
         
-        contenedor.innerHTML = ""; 
+        contenedor.innerHTML = "";
+
+        if (data.success && data.solicitudes.length === 0) {
+            contenedor.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="bi bi-calendar-x" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                        <p class="mt-3 mb-0 fw-bold">No tienes solicitudes registradas</p>
+                        <p class="small mb-0">Crea tu primera reservación con el botón "Nueva Solicitud".</p>
+                    </td>
+                </tr>`;
+        }
+
+        if (data.stats) {
+            document.getElementById("countPendientes").innerText = data.stats.pendientes || 0;
+            document.getElementById("countAprobadas").innerText = data.stats.aprobadas || 0;
+            document.getElementById("countRechazadas").innerText = data.stats.rechazadas || 0;
+        }
 
         if (data.success && data.solicitudes.length > 0) {
             data.solicitudes.forEach(sol => {
@@ -83,25 +100,25 @@ async function cargarMisReservaciones() {
 
                 contenedor.innerHTML += `
                     <tr class="solicitud-fila animate__animated animate__fadeIn">
-                        <td class="ps-4 fw-bold" style="color: #5B3D66;">
+                        <td class="ps-4 fw-bold" style="color: #5B3D66;" data-label="Folio">
                             #${sol.folio} ${alertaCambio}
                         </td>
-                        <td>
+                        <td data-label="Evento">
                             <div class="fw-bold">${sol.titulo_event}</div>
                             <div class="text-muted x-small">${sol.nombre_espacio}</div>
                         </td>
-                        <td>
+                        <td data-label="Auditorio">
                             <span class="badge rounded-pill bg-light text-dark border px-3">
                                 ${sol.nombre_espacio}
                             </span>
                         </td>
-                        <td class="fw-bold text-muted">${sol.fecha_evento}</td>
-                        <td class="text-center">
+                        <td class="fw-bold text-muted" data-label="Fecha">${sol.fecha_evento}</td>
+                        <td class="text-center" data-label="Estatus">
                             <span class="badge-status st-${sol.estado.toLowerCase()} shadow-sm">
                                 ${sol.estado}
                             </span>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center" data-label="Acciones">
                             <div class="btn-group">
                                 ${fueReasignado ? `
     <div class="btn-group shadow-sm">
@@ -132,20 +149,14 @@ async function cargarMisReservaciones() {
             
             $('#tablaMisReservas').DataTable({
                 retrieve: true,
-                language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
+                language: { url: "assets/vendor/datatables/i18n/es-ES.json" },
                 dom: 'rtip',
                 pageLength: 10,
                 order: [[0, "desc"]],
                 columnDefs: [{ targets: [5], orderable: false }]
             });
-
-            if (data.stats) {
-                document.getElementById("countPendientes").innerText = data.stats.pendientes || 0;
-                document.getElementById("countAprobadas").innerText = data.stats.aprobadas || 0;
-                document.getElementById("countRechazadas").innerText = data.stats.rechazadas || 0;
-            }
         }
-    } catch (error) { 
+    } catch (error) {
         console.error("Falla crítica en la sincronización:", error); 
     }
 }
